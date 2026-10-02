@@ -15,11 +15,12 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     if(!fresh)await p.addInitScript(()=>{try{if(!localStorage.getItem('ch:v1'))localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'Marina',persona:'som',onboarded:true},seen:{tour:1}}))}catch(e){}});
     p.on('pageerror',e=>p.errs.push(e.message));p.on('console',m=>{if(m.type()==='error')p.errs.push(m.text())});p.on('response',r=>{if(r.status()>=400)p.errs.push('HTTP '+r.status()+' '+r.url())});return p};
 
-  console.log('\n0. Abertura (index.html): leque de personagens, título, botão leva às boas-vindas');
+  console.log('\n0. Abertura (index.html): corte para iniciar, texto e botão surgem, botão leva às boas-vindas');
   for(const w of [390,1280]){
-    const q=await newPage(w,800);await q.goto(LAND);await q.waitForTimeout(1600);
-    ok(await q.evaluate(()=>document.querySelectorAll('#fan li').length===5&&/Cortando Histórias/.test(document.querySelector('h1').textContent)&&!/Desenvolvido/.test(document.body.innerText)),w+'px: leque com 5 personagens, título, sem crédito');
-    ok(await q.evaluate(()=>{const r=document.querySelector('#entrar').getBoundingClientRect(),W=document.documentElement.clientWidth;return r.height>=48&&r.left>=0&&r.right<=W&&document.documentElement.scrollWidth<=W}),w+'px: botão visível, sem rolagem horizontal');
+    const q=await newPage(w,800);await q.goto(LAND);await q.waitForTimeout(900);
+    ok(await q.evaluate(()=>/Corte para iniciar/.test(document.querySelector('#instr').textContent)&&!/Desenvolvido/.test(document.body.innerText)),w+'px: instrução "Corte para iniciar", sem crédito');
+    await q.mouse.move(200,200);await q.mouse.down();for(let i=1;i<=20;i++){await q.mouse.move(200,200+i*25);await q.waitForTimeout(16)}await q.mouse.up();await q.waitForTimeout(1200);
+    ok(await q.evaluate(()=>+getComputedStyle(document.querySelector('#rip')).getPropertyValue('--t')>.9&&document.documentElement.classList.contains('aberta')),w+'px: arrastar para baixo abre o papel');
     await q.click('#entrar');await q.waitForTimeout(1500);
     ok(/lab\.html/.test(q.url())&&/boas-vindas/.test(q.url()),w+'px: "Iniciar jornada" chega às boas-vindas');
     ok(!q.errs.length,w+'px: abertura sem erros '+q.errs);await q.context().close();

@@ -42,17 +42,13 @@ CH.views.welcome=function(root,mode){
     <div class="pk" id="pick" data-state="base">
       <div class="pk-left">
         <header class="w-head"><h2 class="w-h" id="w3-t" tabindex="-1">Qual <b>perfil de editor</b> é o seu?</h2>
-          <p class="w-hint">Escolha um perfil para ver como ele olha a montagem. Não existe melhor nem pior.</p></header>
+          <p class="w-hint">Passe o dedo ou o mouse pelos perfis para ver como cada um olha a montagem. Não existe melhor nem pior.</p></header>
         <div class="pk-dock">
-          <div class="pk-ctl" id="pk-ctl" role="group" aria-label="Escolha de perfil de editor" style="--n:${P.length+1}">
-            <span class="pk-track pk-gl" aria-hidden="true"></span>
-            <span class="pk-cap pk-gl" aria-hidden="true"></span>
-            <div class="pk-cells" id="pk-cells">
-              <div class="pk-cell pk-label">Escolha seu perfil →</div>
-              ${P.map(p=>`<button type="button" class="pk-cell pk-b" data-id="${p.id}"><span class="pk-t">${esc(p.curto)}</span></button>`).join("")}
-            </div>
+          <div class="pk-ctl glass" role="radiogroup" aria-label="Perfis de editor">
+            <span class="pk-cap" aria-hidden="true"></span>
+            <ul class="pk-ul" id="pk-ul">${P.map(p=>`<li><button type="button" role="radio" class="pk-b" data-id="${p.id}" aria-checked="false" style="--pc:${p.cor}"><img src="${p.busto}" alt="" width="40" height="40" loading="lazy"><span>${esc(p.curto)}</span></button></li>`).join("")}</ul>
+            <button type="button" class="pk-reset" id="pk-reset" tabindex="-1" aria-hidden="true">Trocar</button>
           </div>
-          <p class="pk-err" id="pk-err" role="alert" hidden><span id="pk-err-t"></span><button type="button" class="pk-retry" id="pk-retry">Tentar de novo</button></p>
         </div>
         <article class="p-det" id="p-det" aria-live="polite"></article>
       </div>
@@ -72,7 +68,7 @@ CH.views.welcome=function(root,mode){
   function show(n){
     step=n;$$(".ws",wel).forEach(s=>{const on=+s.dataset.step===n;s.hidden=!on;if(on){s.classList.remove("in");void s.offsetWidth;s.classList.add("in")}});
     const t=$(`.ws[data-step="${n}"] [tabindex="-1"]`,wel);t&&t.focus({preventScroll:true});window.scrollTo(0,0);
-    if(n===3){if(mob()&&!pick)hov=P[0].id;ensureLayers();renderPick().catch(()=>{});setIndex(0);if(person()&&!mob()&&scene==="base"&&!lock)choose($(`.pk-b[data-id="${pick}"]`,cells),{instant:true});else if(scene==="selected"&&shown&&layers[shown]&&!CH.reduced())layers[shown].play().catch(()=>{});if(mob()&&pick){const i=P.findIndex(x=>x.id===pick);requestAnimationFrame(()=>{swipe.scrollLeft=i*slideW();tocaSw(i);marcaDot(i)})}}if(n===4)renderGo();
+    if(n===3){if(mob()&&!pick)hov=P[0].id;renderPick();requestAnimationFrame(moveCap);if(mob()&&pick){const i=P.findIndex(x=>x.id===pick);requestAnimationFrame(()=>{swipe.scrollLeft=i*slideW();tocaSw(i);marcaDot(i)})}}if(n===4)renderGo();
     if(n!==3&&n!==4)stopVideos();
   }
   function stopVideos(){$$("video",wel).forEach(v=>{v.pause()})}
@@ -106,127 +102,47 @@ CH.views.welcome=function(root,mode){
   /* só o perfil à vista se move (os vizinhos pausam) */
   function tocaSw(i){[...swipe.children].forEach((f,k)=>{const v=f.querySelector(".sw-v");if(!v)return;if(k===i&&!CH.reduced()){v.preload="auto";v.play().catch(()=>{})}else v.pause()})}
   function marcaDot(i){tocaSw(i);dots().forEach((d,k)=>d.classList.toggle("on",k===i))}
-  swipe.addEventListener("scroll",()=>{if(!mob())return;const i=Math.max(0,Math.min(P.length-1,Math.round(swipe.scrollLeft/slideW())));marcaDot(i);[...swipe.children].forEach((f,k)=>f.classList.toggle('on',k===i));wel.classList.add("swiped");
+  /* profundidade: cada cartão recebe sua distância ao centro (--d); o central é grande, os vizinhos inclinam e esmaecem */
+  let depthRaf=0;
+  function profundidade(){depthRaf=0;const w=slideW()||1,c=swipe.scrollLeft;[...swipe.children].forEach((f,k)=>{f.style.setProperty("--d",Math.max(-2,Math.min(2,(k*w-c)/w)).toFixed(3))})}
+  const agendaProf=()=>{if(!depthRaf)depthRaf=requestAnimationFrame(profundidade)};
+  swipe.addEventListener("scroll",()=>{agendaProf();if(!mob())return;const i=Math.max(0,Math.min(P.length-1,Math.round(swipe.scrollLeft/slideW())));marcaDot(i);[...swipe.children].forEach((f,k)=>f.classList.toggle('on',k===i));wel.classList.add("swiped");
     clearTimeout(swT);swT=setTimeout(()=>{const f=swipe.children[i];if(!f)return;const id=f.dataset.id;if(pick){if(pick!==id){pick=id;renderPick()}}else if(hov!==id){hov=id;renderPick()}},80)},{passive:true});
   wel.addEventListener("click",e=>{const d=e.target.closest(".sw-dots i");if(d)swipe.children[+d.dataset.i].scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"})});
-  setTimeout(()=>marcaDot(0),50);swipe.children[0]&&swipe.children[0].classList.add('on');
+  setTimeout(()=>{marcaDot(0);profundidade()},50);swipe.children[0]&&swipe.children[0].classList.add('on');
   const person=()=>CH.PERSONAS[pick];
   const shownP=()=>person()||(hov&&CH.PERSONAS[hov]);
 
-  const stage=$("#pk-stage",wel),pk=$("#pick",wel),ctl=$("#pk-ctl",wel),cells=$("#pk-cells",wel),errBox=$("#pk-err",wel),errT=$("#pk-err-t",wel),retry=$("#pk-retry",wel);
-  const layers={};let shown=null,lastBtn=null,failed=null;
-  /* estado: scene base|selected; lock síncrono; token invalida qualquer callback antigo (timer, vídeo, transição) */
-  let lock=false,token=0,scene="base",swapGen=0,pendingSwap=null;
-  const timers=new Set(),offs=[];
-  const after=(ms,fn)=>{const id=setTimeout(()=>{timers.delete(id);fn()},CH.reduced()?1:ms);timers.add(id)};
-  const wait=ms=>new Promise(r=>after(ms,r));
-  const on=(t,ev,fn,o)=>{t.addEventListener(ev,fn,o);offs.push(()=>t.removeEventListener(ev,fn,o))};
-  const btns=()=>$$(".pk-b",cells);
-  const N=P.length+1;
-  /* cápsula: posição por custom properties (nunca left/width inline); 0 = rótulo, 1..n = perfis; as pontas avançam 5px */
-  function setIndex(i){
-    ctl.style.setProperty("--cap-left",i===0?"-5px":`calc(100% * ${i} / var(--n))`);
-    ctl.style.setProperty("--cap-width",i===0||i===N-1?"calc(100% / var(--n) + 5px)":"calc(100% / var(--n))");
-    ctl.classList.toggle("hl",i>0);
-  }
-  const idle=()=>scene==="base"&&!lock;
-  on(cells,"pointerover",e=>{const b=e.target.closest(".pk-b");if(!b||b.disabled||!idle())return;setIndex(btns().indexOf(b)+1)});
-  on(ctl,"pointerleave",()=>{const a=document.activeElement;if(a&&cells.contains(a)&&a.matches(":focus-visible"))return;if(idle())setIndex(0)});
-  on(ctl,"pointermove",e=>{const r=ctl.getBoundingClientRect();if(!r.width)return;ctl.style.setProperty("--glass-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");ctl.style.setProperty("--glass-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")});
-  on(cells,"focusin",e=>{const b=e.target.closest(".pk-b");if(b&&idle())setIndex(btns().indexOf(b)+1)});
-  on(cells,"focusout",e=>{if(idle()&&!cells.contains(e.relatedTarget)&&!ctl.matches(":hover"))setIndex(0)});
-  on(cells,"keydown",e=>{
-    const bs=btns().filter(b=>!b.disabled),i=bs.indexOf(document.activeElement);if(i<0)return;
-    const d=e.key==="ArrowRight"||e.key==="ArrowDown"?1:e.key==="ArrowLeft"||e.key==="ArrowUp"?-1:0;
-    if(d&&bs.length>1){e.preventDefault();bs[(i+d+bs.length)%bs.length].focus()}
-  });
-  /* o rótulo escolhido viaja até o centro da cápsula recolhida (medido contra o alvo, não por deslocamento fixo) */
-  const narrow=()=>matchMedia("(min-width:641px) and (max-width:1279px)").matches;
-  function travel(b){
+  const stage=$("#pk-stage",wel),pk=$("#pick",wel),ul=$("#pk-ul",wel),cap=$(".pk-cap",wel),rst=$("#pk-reset",wel),ctl=$(".pk-ctl",wel);
+  const layers={};let shown=null,lastBtn=null;
+  /* a cápsula desliza até o item escolhido; medida a partir da própria posição dos itens */
+  function moveCap(){
+    const b=$(`.pk-b[aria-checked="true"]`,ul)||(hov&&$(`.pk-b[data-id="${hov}"]`,ul));
+    if(!b){cap.style.opacity=0;return}
     const c=ctl.getBoundingClientRect(),r=b.getBoundingClientRect();
-    b.style.setProperty("--tx",(c.left+c.width/2-(r.left+r.width/2)).toFixed(1)+"px");
-    b.style.setProperty("--ty",(c.top+(narrow()?32:35)-(r.top+r.height/2)).toFixed(1)+"px");
+    cap.style.opacity=1;cap.style.width=r.width+"px";cap.style.height=r.height+"px";cap.style.transform=`translate(${r.left-c.left}px,${r.top-c.top}px)`;
   }
-  on(window,"resize",()=>{if(scene==="selected"&&lastBtn&&!lock){const t=lastBtn.style.transition;lastBtn.style.transition="none";lastBtn.style.setProperty("--tx","0px");lastBtn.style.setProperty("--ty","0px");travel(lastBtn);void lastBtn.offsetWidth;lastBtn.style.transition=t}});
-  function label(b,txt,aria){b.querySelector(".pk-t").textContent=txt;if(aria)b.setAttribute("aria-label",aria);else b.removeAttribute("aria-label")}
-  function ensureLayers(){
-    if(Object.keys(layers).length)return;
-    P.forEach(p=>{const v=document.createElement("video");v.className="pk-v";v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.poster=p.poster;
-      v.setAttribute("aria-hidden","true");v.innerHTML=CH.videoSources(p.video.replace(/\.webm$/,""));layers[p.id]=v;stage.append(v)});
-  }
-  function cancelSwap(){if(pendingSwap){const s=pendingSwap;pendingSwap=null;s.abort()}swapGen++}
-  /* troca de vídeo sem costura: só revela um quadro decodificado DESTA requisição (mediaTime<=.5 && readyState>=2); o tempo limite nunca conta como sucesso */
+  /* troca de vídeo sem costura: o novo só aparece quando o primeiro quadro já pode ser mostrado; o antigo sai no mesmo quadro (sem fusão) */
   function swap(p){
-    if(pendingSwap&&pendingSwap.id===p.id)return pendingSwap.promise;
-    ensureLayers();
-    const nv=layers[p.id];
-    if(shown===p.id&&nv.classList.contains("on"))return Promise.resolve();
-    cancelSwap();
-    const gen=swapGen;
+    if(!layers[p.id]){
+      const v=document.createElement("video");v.className="pk-v";v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.poster=p.poster;
+      v.setAttribute("aria-hidden","true");v.innerHTML=CH.videoSources(p.video.replace(/\.webm$/,""));layers[p.id]=v;stage.append(v);
+    }
+    const nv=layers[p.id],old=shown&&layers[shown];shown=p.id;
     stage.style.setProperty("--pc",p.bg||p.cor);
-    let finish;
-    const promise=new Promise((resolve,reject)=>{
-      let finished=false,left=12000,t0=0,tm=0,att=0,ac=[];
-      const live=()=>!finished&&gen===swapGen;
-      const clean=()=>{ac.forEach(f=>f());ac=[]};
-      finish=(fn,v)=>{if(finished)return;finished=true;clearTimeout(tm);clean();document.removeEventListener("visibilitychange",vis);if(pendingSwap&&pendingSwap.gen===gen)pendingSwap=null;fn(v)};
-      const arm=()=>{t0=performance.now();clearTimeout(tm);tm=setTimeout(()=>finish(reject,new Error("timeout")),Math.max(0,left))};
-      const disarm=()=>{if(t0){left-=performance.now()-t0;t0=0}clearTimeout(tm)};
-      function vis(){
-        if(!live())return;
-        if(document.hidden){disarm();att++;clean();nv.pause();try{nv.currentTime=0}catch(e){}}
-        else{arm();attempt()}
-      }
-      function seekZero(){return new Promise(res=>{
-        if(nv.currentTime<=.001){res();return}
-        const h=()=>{nv.removeEventListener("seeked",h);res()};
-        nv.addEventListener("seeked",h);ac.push(()=>nv.removeEventListener("seeked",h));
-        try{nv.currentTime=0}catch(e){res()}})}
-      function frame(){return new Promise(res=>{
-        if(typeof nv.requestVideoFrameCallback==="function"){
-          let id=0;const cb=(now,meta)=>{if(meta.mediaTime<=.5&&nv.readyState>=2)res();else id=nv.requestVideoFrameCallback(cb)};
-          id=nv.requestVideoFrameCallback(cb);ac.push(()=>{try{nv.cancelVideoFrameCallback(id)}catch(e){}});
-        }else{
-          let raf=0;
-          const chk=()=>{if(nv.readyState>=2)raf=requestAnimationFrame(()=>{raf=requestAnimationFrame(res)});else raf=requestAnimationFrame(chk)};
-          const h=()=>{nv.removeEventListener("playing",h);chk()};
-          nv.addEventListener("playing",h);ac.push(()=>{nv.removeEventListener("playing",h);cancelAnimationFrame(raf)});
-        }})}
-      function attempt(){
-        const a=++att;clean();nv.preload="auto";
-        seekZero().then(()=>{
-          if(!live()||a!==att||document.hidden)return;
-          const fp=frame();   /* o callback do primeiro quadro é registrado ANTES de play() */
-          const pp=Promise.resolve(nv.play());
-          return Promise.all([pp,fp]).then(()=>{if(live()&&a===att)reveal()});
-        }).catch(e=>{if(live()&&a===att)finish(reject,e)});
-      }
-      function reveal(){
-        Object.values(layers).forEach(x=>{x.classList.toggle("on",x===nv);if(x!==nv)x.pause()});
-        shown=p.id;stage.classList.add("has");if(CH.reduced())nv.pause();
-        finish(resolve);
-      }
-      /* todas as fontes falharam (erro nos <source> não borbulha): falha na hora, sem esperar os 12 s */
-      let bad=0;const nsrc=nv.querySelectorAll("source").length;
-      const onErr=e=>{if(e.target&&e.target.tagName==="SOURCE"){if(++bad>=nsrc)finish(reject,new Error("source"))}else if(e.target===nv)finish(reject,nv.error||new Error("media"))};
-      nv.addEventListener("error",onErr,true);
-      const finish0=finish;finish=(fn,v)=>{nv.removeEventListener("error",onErr,true);finish0(fn,v)};
-      document.addEventListener("visibilitychange",vis);
-      if(nv.networkState===3||nv.error){try{nv.load()}catch(e){}}   /* já falhou antes (o erro passou antes do listener): recarrega para tentar de novo */
-      if(!document.hidden){arm();attempt()}
-    });
-    pendingSwap={id:p.id,gen,promise,abort:()=>finish(()=>{},null)};
-    return promise;
+    const go=()=>requestAnimationFrame(()=>{if(shown!==p.id)return;Object.values(layers).forEach(x=>{x.classList.toggle("on",x===nv);if(x!==nv)x.pause()});stage.classList.add("has");if(!CH.reduced())nv.play().catch(()=>{})});
+    if(nv.readyState>=2)go();else{nv.addEventListener("loadeddata",go,{once:true});nv.load()}
   }
-  /* conteúdo da escolha: detalhe, cores e (no desktop) o vídeo; devolve a promessa do vídeo */
   function renderPick(){
     const p=shownP(),sel=!!person();
+    $$(".pk-b",ul).forEach(b=>{const on=b.dataset.id===pick;b.setAttribute("aria-checked",on);b.tabIndex=on||(!pick&&b===ul.querySelector(".pk-b"))?0:-1});
     pk.dataset.state=sel?"selected":"base";
+    rst.tabIndex=sel?0:-1;rst.setAttribute("aria-hidden",sel?"false":"true");
     const d=$("#p-det",wel),sec=$(".ws3",wel);
     sec.classList.toggle("colored",!!p);
     if(p){const k=edge[p.id]||{bg:p.cor,fg:p.fg};sec.style.setProperty("--pc",k.bg);sec.style.setProperty("--pf",k.fg);if(!edge[p.id])edgeColor(p).then(()=>{if(shownP()&&shownP().id===p.id)renderPick()})}
-    if(!p){d.innerHTML="";cancelSwap();stage.classList.remove("has");Object.values(layers).forEach(x=>{x.classList.remove("on");x.pause()});shown=null;return Promise.resolve()}
-    const vid=mob()?Promise.resolve():swap(p);
+    if(!p){d.innerHTML="";stage.classList.remove("has");Object.values(layers).forEach(x=>{x.classList.remove("on");x.pause()});shown=null;requestAnimationFrame(moveCap);return}
+    if(!mob())swap(p);
     d.style.setProperty("--pc",p.cor);d.style.setProperty("--pf",p.fg);
     d.innerHTML=`
       <h3 class="pd-name">${(()=>{const w=p.nome.split(" "),l=w.pop();return esc(w.join(" "))+" <b>"+esc(l)+"</b>"})()}</h3>
@@ -235,66 +151,32 @@ CH.views.welcome=function(root,mode){
       <p class="pd-ia">Personagem gerado por inteligência artificial</p><details class="pd-more"><summary>Como esse perfil pensa</summary><ul>${p.pensa.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p>${esc(p.papel)}</p></details>
       ${sel||mob()?`<button class="btn red lg" type="button" data-confirm>Esse sou eu${icon("next")}</button>`:""}`;
     const cf=$("[data-confirm]",d);if(cf)cf.onclick=()=>{pick=pick||p.id;CH.store.setPersona(pick);CH.who&&CH.who();show(4)};
-    return vid;
+    /* o item colapsa só depois do layout assentar, então medimos no quadro seguinte e de novo ao fim da transição */
+    requestAnimationFrame(()=>{moveCap();setTimeout(moveCap,520)});
   }
-  /* FORWARD: base → selected. Trava síncrona; recolhe a barra e carrega o vídeo em paralelo; Reset só vale quando os dois terminam */
-  function choose(btn,o){
-    if(lock||scene!=="base"||!btn||btn.disabled)return;
-    lock=true;const my=++token,instant=!!(o&&o.instant),id=btn.dataset.id,p=CH.PERSONAS[id];
-    const had=document.activeElement===btn;   /* capturar o foco ANTES de desabilitar */
-    lastBtn=btn;failed=null;errBox.hidden=true;
-    if(instant)ctl.classList.add("no-anim");
-    btns().forEach(b=>{b.disabled=true});
-    travel(btn);btn.classList.add("is-pick");
-    ctl.classList.add("collapsed","rear-fade");   /* recolhe e agenda o fade do trilho na mesma recalc */
-    pick=id;hov=null;
-    const vid=renderPick();
-    if(!instant)CH.say("Carregando o perfil "+p.curto+".");
-    Promise.all([vid,wait(instant?0:980)]).then(()=>{if(my!==token)return;commit(btn,had,p,instant)},e=>{if(my!==token)return;fail(btn,p,e)});
+  /* deslizar no computador: arrastar o palco (ou setas ←/→ nele) passa para o perfil vizinho, com o mesmo efeito de troca do toque */
+  function passo(d){
+    const ids=P.map(x=>x.id),cur=person()?pick:(hov||ids[0]),n=ids[(ids.indexOf(cur)+d+ids.length)%ids.length];
+    if(person())pick=n;else hov=n;renderPick();
   }
-  function commit(btn,had,p,instant){
-    scene="selected";
-    label(btn,"Reset","Reset: voltar à escolha de perfis");btn.classList.add("is-reset");btn.disabled=false;
-    btns().forEach(b=>{if(b!==btn){b.disabled=true;b.setAttribute("aria-hidden","true");b.tabIndex=-1}});
-    if(had)btn.focus({preventScroll:true});
-    lock=false;
-    if(instant)requestAnimationFrame(()=>requestAnimationFrame(()=>ctl.classList.remove("no-anim")));
-    else CH.say("Perfil "+p.curto+" selecionado. Use Reset para escolher outro.");
+  let dx0=null,dy0=0;
+  stage.style.touchAction="pan-y";stage.style.cursor="grab";
+  stage.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")return;dx0=e.clientX;dy0=e.clientY;stage.style.cursor="grabbing";try{stage.setPointerCapture(e.pointerId)}catch(x){}});
+  const fimArrasto=e=>{if(dx0===null)return;const dx=e.clientX-dx0;dx0=null;stage.style.cursor="grab";if(Math.abs(dx)>50)passo(dx<0?1:-1)};
+  stage.addEventListener("pointerup",fimArrasto);stage.addEventListener("pointercancel",()=>{dx0=null;stage.style.cursor="grab"});
+  pk.addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea"))return;if(e.key==="ArrowRight"&&e.target===stage){e.preventDefault();passo(1)}else if(e.key==="ArrowLeft"&&e.target===stage){e.preventDefault();passo(-1)}});
+  ul.addEventListener("click",e=>{const b=e.target.closest(".pk-b");if(!b||pk.dataset.state==="selected")return;lastBtn=b;pick=b.dataset.id;hov=null;renderPick();rst.focus({preventScroll:true})});
+  ul.addEventListener("keydown",e=>{
+    const bs=$$(".pk-b",ul),i=bs.indexOf(document.activeElement);if(i<0)return;
+    const d=e.key==="ArrowRight"||e.key==="ArrowDown"?1:e.key==="ArrowLeft"||e.key==="ArrowUp"?-1:0;
+    if(d){e.preventDefault();const n=bs[(i+d+bs.length)%bs.length];bs.forEach(x=>x.tabIndex=x===n?0:-1);n.focus()}
+  });
+  if(matchMedia("(hover:hover)").matches){
+    ul.addEventListener("pointerover",e=>{const b=e.target.closest(".pk-b");if(!b||person())return;if(hov!==b.dataset.id){hov=b.dataset.id;renderPick()}});
+    ctl.addEventListener("pointerleave",()=>{if(person()||!hov)return;hov=null;renderPick()});
   }
-  function fail(btn,p,e){
-    const my=token;
-    pick=null;renderPick();
-    ctl.classList.remove("no-anim","collapsed","rear-fade");btn.classList.remove("is-pick");setIndex(0);
-    failed=btn;
-    after(980,()=>{
-      if(my!==token)return;
-      btn.style.removeProperty("--tx");btn.style.removeProperty("--ty");
-      btns().forEach(b=>{b.disabled=false});lock=false;
-      errT.textContent="Não foi possível carregar o vídeo do perfil "+p.curto+".";errBox.hidden=false;
-      CH.say("Não foi possível carregar o vídeo do perfil "+p.curto+". Use Tentar de novo.",true);
-    });
-  }
-  /* REVERSE: selected → base. A barra reabre e os rótulos voltam em paralelo; os botões só reabilitam no fim */
-  function reset(){
-    if(lock||scene!=="selected")return;
-    lock=true;const my=++token,btn=lastBtn,had=document.activeElement===btn,name=CH.PERSONAS[pick]?CH.PERSONAS[pick].curto:btn.querySelector(".pk-t").textContent;
-    btn.disabled=true;btn.classList.add("rst-out");
-    ctl.classList.add("reversing");ctl.classList.remove("collapsed","rear-fade");setIndex(0);
-    btns().forEach(b=>{if(b!==btn)b.removeAttribute("aria-hidden")});
-    pick=null;renderPick();
-    CH.say("Voltando à escolha de perfis.");
-    after(420,()=>{if(my!==token)return;label(btn,name);btn.classList.remove("is-reset","is-pick","rst-out");if(had)btn.focus({preventScroll:true})});
-    after(980,()=>{
-      if(my!==token)return;
-      scene="base";ctl.classList.remove("reversing");
-      btn.style.removeProperty("--tx");btn.style.removeProperty("--ty");
-      btns().forEach(b=>{b.disabled=false;b.removeAttribute("aria-hidden");b.removeAttribute("tabindex")});
-      if(had)btn.focus({preventScroll:true});
-      lock=false;CH.say("Escolha um perfil de editor.");
-    });
-  }
-  on(cells,"click",e=>{const b=e.target.closest(".pk-b");if(!b)return;if(scene==="selected"&&b===lastBtn)reset();else choose(b)});
-  on(retry,"click",()=>{const b=failed;if(b){retry.blur();choose(b)}});
+  rst.addEventListener("click",()=>{const back=lastBtn||$(`.pk-b[data-id="${pick}"]`,ul);pick=null;renderPick();setTimeout(()=>{moveCap();back&&back.focus({preventScroll:true})},60)});
+  window.addEventListener("resize",moveCap);
 
   function renderGo(){
     const p=person(),n=CH.store.name();
@@ -322,7 +204,7 @@ CH.views.welcome=function(root,mode){
   $("[data-skipname]",wel).onclick=()=>{CH.store.setName("");CH.who&&CH.who();show(3)};
   show(step);
   if(troca&&pick){/* na troca, abre já no editor atual */}
-  return{title:"Boas-vindas",destroy(){document.body.classList.remove("immersive");token++;cancelSwap();timers.forEach(clearTimeout);timers.clear();offs.forEach(f=>f());stopVideos()}};
+  return{title:"Boas-vindas",destroy(){document.body.classList.remove("immersive");stopVideos()}};
 };
 CH.views.editor=function(root,m){return CH.views.welcome(root,"troca")};
 })();

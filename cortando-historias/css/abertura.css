@@ -1,47 +1,57 @@
-/* abertura.css — tela de início: leque de personagens (cartões inclinados), título leve, barra de vidro, faixa de contagem. */
-@font-face{font-family:"DM Sans";src:url(../fonts/dm-sans-latin-wght-normal.woff2) format("woff2");font-weight:100 1000;font-style:normal;font-display:swap}
-:root{--bg:#0c0b0d;--fg:#f5f1ea;--mute:rgb(245 241 234 / .62);--ease:cubic-bezier(.22,1,.36,1);--sans:"DM Sans","Helvetica Neue",Helvetica,Arial,sans-serif;--cw:clamp(128px,17vw,252px);--step:calc(var(--cw) * .66)}
+/* abertura.css — capa: embalagem de chocolate. Arrastar para baixo descasca o papel vermelho (dobra de baixo para cima com brilho e sombra);
+   por baixo surge o nome "Cortando Histórias" e o botão "Iniciar jornada". */
+:root{--hero-bg:#a81020;--hero-fg:#fff4ee;--sans:"Helvetica Neue",Helvetica,Arial,sans-serif;--t:0;--L:0px;--fh:0px;--pw:1200px;--ph:1200px}
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--fg);font:300 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-h1,p,ul{margin:0;padding:0}
-ul{list-style:none}
-.start{position:relative;min-height:100vh;min-height:100svh;display:grid;grid-template-rows:minmax(0,1fr) auto auto;justify-items:center;overflow:hidden;padding:max(28px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));isolation:isolate;background:radial-gradient(90% 70% at 50% 38%,#1b1820 0,var(--bg) 70%)}
-/* esfera de imagens ao fundo (referência 4): mosaico recortado num círculo, bem suave */
-.orb{position:absolute;left:50%;top:34%;width:min(78vh,92vw);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);gap:2.2%;border-radius:50%;overflow:hidden;opacity:.2;filter:saturate(.7) blur(1.5px);-webkit-mask-image:radial-gradient(circle,#000 56%,transparent 71%);mask-image:radial-gradient(circle,#000 56%,transparent 71%);z-index:-1;pointer-events:none}
-.orb i{background:var(--im) center/cover;border-radius:12%}
-/* leque (referência 1) */
-.fan{position:relative;align-self:end;width:100%;height:calc(var(--cw) * 1.5);margin-top:clamp(12px,4vh,40px)}
-.fan li{position:absolute;left:50%;bottom:0;width:var(--cw);aspect-ratio:4/5;margin-left:calc(var(--cw) / -2);border-radius:clamp(14px,1.6vw,24px);overflow:hidden;background:var(--bg);border:1px solid rgb(255 255 255 / .16);box-shadow:0 22px 50px rgb(0 0 0 / .5);transform-origin:50% 120%;
-  transform:translateX(calc(var(--i) * var(--step))) translateY(calc(var(--i) * var(--i) * var(--cw) * .045)) rotate(calc(var(--i) * 9deg));z-index:calc(5 - var(--i) * var(--i));transition:transform 900ms var(--ease) calc((2 - var(--i) * var(--i)) * 70ms),opacity 500ms var(--ease)}
-.fan li.mid{width:calc(var(--cw) * 1.16);margin-left:calc(var(--cw) * -.58)}
-.fan img,.fan video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--bg);-webkit-user-drag:none}
-.fan video{opacity:0;transition:opacity .5s var(--ease)}
-.fan video.on{opacity:1}
-.fan span{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.85rem;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 8px rgb(0 0 0 / .55)}
-.js-pre .fan li{transform:translateX(0) translateY(0) rotate(0);opacity:0}
-.js-pre .fan li.mid{opacity:1}
-.copy{display:grid;justify-items:center;gap:14px;text-align:center;padding-top:clamp(20px,4vh,40px)}
-.ttl{font-weight:300;font-size:clamp(2.2rem,5.6vw,4.4rem);line-height:1.02;letter-spacing:-.045em}
-.sub{color:var(--mute);font-size:clamp(.95rem,1.4vw,1.1rem);letter-spacing:-.01em}
-/* barra de vidro (referência 3): mesmo material do controle de perfil */
-.go{position:relative;display:inline-flex;align-items:center;gap:18px;min-height:56px;margin-top:10px;padding:0 8px 0 26px;border-radius:999px;color:var(--fg);text-decoration:none;font-weight:500;font-size:1rem;letter-spacing:-.02em;isolation:isolate}
-.go-track{position:absolute;inset:0;z-index:-1;border-radius:inherit;background:rgb(246 251 255 / .14);border:1px solid rgb(255 255 255 / .28);-webkit-backdrop-filter:blur(13px) saturate(128%) brightness(105%);backdrop-filter:blur(13px) saturate(128%) brightness(105%);
-  box-shadow:0 11px 28px rgb(0 0 0 / .3),inset 1px 1px 0 rgb(255 255 255 / .5),inset -1px -1px 0 rgb(20 49 73 / .18)}
-.go-ar{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--fg);color:#111;transition:transform 400ms var(--ease)}
-.go-ar svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.go:hover .go-ar{transform:translateX(3px)}
-.go:focus-visible{outline:2px solid #fff;outline-offset:4px}
-/* faixa (referência 2): contador e nomes */
-.strip{display:flex;align-items:center;gap:14px;width:min(560px,100%);margin-top:clamp(20px,4vh,36px);font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums}
-.rule{position:relative;flex:1;height:1px;background:rgb(255 255 255 / .2)}
-.rule b{position:absolute;left:0;top:-1px;width:20%;height:3px;background:var(--fg);border-radius:2px}
-.names{white-space:nowrap}
-@media (max-width:640px){
-  :root{--cw:clamp(112px,31vw,150px);--step:calc(var(--cw) * .6)}
-  .names{display:none}
-  .ttl{max-width:11ch}
-  .go{min-height:56px}
-}
-@media (max-height:560px) and (orientation:landscape){.fan{height:calc(var(--cw) * 1.3)}.strip{display:none}}
-@media (prefers-reduced-motion:reduce){.fan li{transition:none}.js-pre .fan li{transform:translateX(calc(var(--i) * var(--step))) translateY(calc(var(--i) * var(--i) * var(--cw) * .045)) rotate(calc(var(--i) * 9deg));opacity:1}}
+html{-webkit-text-size-adjust:100%;background:#7d0a18;overscroll-behavior:none}
+body{margin:0;background:#7d0a18;color:var(--hero-fg);font:300 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
+h1,p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:#7d0a18;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.anim .stage{touch-action:none}
+.cam{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform}
+/* por baixo do papel: vermelho fundo, como o interior de uma barra de chocolate recém-aberta */
+.deep{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:
+  radial-gradient(70% 55% at 50% 46%,rgb(255 120 120 / .22) 0,transparent 70%),
+  radial-gradient(circle at 50% 50%,#ff5266 0,#d8223a 14%,#9c1226 34%,#5a0715 62%,#2a0209 100%)}
+.reveal{display:flex;flex-direction:column;align-items:center;gap:1.8rem;padding:0 1.25rem;text-align:center}
+.txt{display:flex;flex-wrap:wrap;justify-content:center;column-gap:.28em;font-size:clamp(1.7rem,5.8vw,4rem);font-weight:300;letter-spacing:-.045em;line-height:.98;color:var(--hero-fg);text-shadow:0 2px 24px rgb(42 2 9 / .6)}
+.go{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 2rem;border-radius:999px;background:#fff4ee;color:#7d0a18;font-weight:500;font-size:1rem;letter-spacing:.02em;text-decoration:none;box-shadow:0 8px 28px rgb(42 2 9 / .45)}
+.go:focus-visible,.instr:focus-visible{outline:2px solid #fff;outline-offset:5px}
+/* o nome sobe de uma máscara, palavra por palavra, conforme o papel sai */
+.w{display:inline-block}
+.anim .w1{--k:min(1,max(0,(var(--t,0) - .42) * 3.2));opacity:var(--k);transform:translateY(calc((1 - var(--k)) * .5em));filter:blur(calc((1 - var(--k)) * 10px));letter-spacing:calc((1 - var(--k)) * .08em)}
+.anim .w2{--k:min(1,max(0,(var(--t,0) - .5) * 3.2));opacity:var(--k);transform:translateY(calc((1 - var(--k)) * .5em));filter:blur(calc((1 - var(--k)) * 10px));letter-spacing:calc((1 - var(--k)) * .08em)}
+.anim .go{opacity:calc(max(0,min(1,(var(--t,0) - .8) * 5)));pointer-events:none}
+.anim.aberta .go{pointer-events:auto}
+.anim:not(.aberta) .go{visibility:hidden}
+/* o papel: uma folha inclinada (.peel) com a parte presa (.front) e a dobra (.flap) que gira sobre a linha de descolar */
+.rip{position:absolute;inset:0;display:none;pointer-events:none;overflow:hidden}
+.anim .rip{display:block}
+.peel{position:absolute;left:50%;top:50%;width:var(--pw);height:var(--ph);margin:calc(var(--ph) / -2) 0 0 calc(var(--pw) / -2);transform:rotate(-6deg);overflow:hidden}
+.front,.flap{position:absolute;left:0;right:0;top:0;will-change:transform}
+.front{height:100%;transform:translate3d(0,var(--L),0);
+  background:
+    linear-gradient(104deg,rgb(255 255 255 / 0) 22%,rgb(255 255 255 / .13) 30%,rgb(255 255 255 / 0) 38%,rgb(255 255 255 / 0) 62%,rgb(255 255 255 / .07) 70%,rgb(255 255 255 / 0) 78%),
+    repeating-linear-gradient(90deg,rgb(0 0 0 / .035) 0 2px,rgb(255 255 255 / .03) 2px 5px),
+    radial-gradient(120% 80% at 50% 38%,#c01a2c 0,var(--hero-bg) 55%,#7d0a18 100%);
+  box-shadow:0 -1px 0 rgb(255 255 255 / .35)}
+.seal{position:absolute;left:0;right:0;top:0;height:46px;background:linear-gradient(180deg,rgb(0 0 0 / .32),rgb(0 0 0 / 0));pointer-events:none}
+/* a dobra: verso do papel (brilho metálico), com o cilindro do rolo e sombra projetada no papel abaixo */
+.flap{height:var(--fh);transform:translate3d(0,var(--L),0);
+  background:
+    linear-gradient(180deg,rgb(40 0 8 / .55) 0,rgb(255 214 190 / .0) 22%,rgb(255 255 255 / .55) 46%,rgb(255 214 190 / .22) 64%,rgb(70 8 18 / .5) 100%),
+    linear-gradient(90deg,#8e0d1c,#d84a52 30%,#b3202e 55%,#e0606a 80%,#9a1020);
+  border-radius:0 0 14px 14px / 0 0 22px 22px;
+  box-shadow:0 26px 34px -8px rgb(26 0 4 / .6),0 2px 0 rgb(255 255 255 / .25) inset;opacity:calc(min(1,var(--t,0) * 40))}
+.instr{position:absolute;left:0;right:0;bottom:calc(max(3rem,env(safe-area-inset-bottom) + 2.2rem));display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;background:none;border:0;font-family:inherit;color:var(--hero-fg);font-size:.9rem;font-weight:300;letter-spacing:.06em;opacity:calc(.85 - var(--t,0) * 9);z-index:3;cursor:pointer}
+.aberta .instr{visibility:hidden}
+.instr svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;animation:desce 1.8s ease-in-out infinite}
+@keyframes desce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+/* Reduzir Movimento: sem zoom nem dobra — o papel esmaece */
+.redmo .cam{transform:none!important}
+.redmo .flap{display:none}
+.redmo .front{transform:none;opacity:calc(1 - var(--t,0) * 1.3)}
+.redmo .w{transform:none!important;filter:none!important;letter-spacing:inherit!important}
+.redmo .instr svg{animation:none}
+@media (prefers-reduced-motion:reduce){.instr svg{animation:none}}
+.noanim .instr{display:none}
