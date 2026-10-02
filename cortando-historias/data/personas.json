@@ -1,0 +1,241 @@
+{
+ "fonte": "Textos das personas copiados da ficha oficial 'PERSONAS OFICIAIS, JORNADA DO EDITOR' enviada pela autora. Nada além da ficha foi acrescentado. Características não definidas na ficha são 'não especificadas'.",
+ "nota_nomes": "Decisão da autora: o nome da persona é o nome do aluno. Os rótulos de gênero (Editor/Editora) não aparecem mais na interface; o perfil é identificado por 'curto' (Histórias, Ritmo, Olhar, Som, Experimental).",
+ "personas": [
+  {
+   "id": "historias",
+   "nome": "Editora de Histórias",
+   "curto": "Histórias",
+   "cor": "#b05a43",
+   "fg": "#ffffff",
+   "imagem": "assets/personas/historias.jpg",
+   "busto": "assets/personas/historias-busto.jpg",
+   "poster": "assets/personas/historias-poster.jpg",
+   "video": "assets/personas/historias.webm",
+   "campo": [
+    "Narrativa",
+    "Personagem",
+    "Contexto",
+    "Emoção",
+    "Estrutura"
+   ],
+   "pergunta": "O que essa montagem está contando?",
+   "representa": "É a persona ligada à narrativa. Seu olhar está voltado para aquilo que a montagem está contando: quem aparece, o que está acontecendo, qual é o contexto, qual emoção está sendo construída e como os acontecimentos se organizam.",
+   "pensa": [
+    "Quem está ali.",
+    "O que aconteceu antes.",
+    "O que acontece depois.",
+    "Qual informação o público precisa receber.",
+    "Qual emoção a sequência produz.",
+    "Como a ordem dos planos altera a compreensão da história."
+   ],
+   "valoriza": [
+    "Clareza narrativa",
+    "Contexto",
+    "Construção de personagens",
+    "Emoção",
+    "Estrutura",
+    "Sentido produzido pela ordem dos planos"
+   ],
+   "papel": "Introduzir a ideia de que editar não é simplesmente juntar imagens. A escolha e a ordem dos planos podem mudar completamente a maneira como uma história é percebida.",
+   "combina": [
+    "EX_CORTE_004A",
+    "EX_CORTE_004B",
+    "EX_MURCH_001",
+    "EX_EXPERIMENTO_001"
+   ],
+   "cor_ui": "#c4411c",
+   "fg_ui": "#ffffff",
+   "bg": "#995443",
+   "bgfg": "#ffffff"
+  },
+  {
+   "id": "ritmo",
+   "nome": "Editor do Ritmo",
+   "curto": "Ritmo",
+   "cor": "#2f5f9f",
+   "fg": "#ffffff",
+   "imagem": "assets/personas/ritmo.jpg",
+   "busto": "assets/personas/ritmo-busto.jpg",
+   "poster": "assets/personas/ritmo-poster.jpg",
+   "video": "assets/personas/ritmo.webm",
+   "campo": [
+    "Timing",
+    "Duração",
+    "Energia",
+    "Cortes",
+    "Ritmo"
+   ],
+   "pergunta": "Quanto tempo essa imagem precisa durar?",
+   "representa": "É a persona ligada ao tempo da montagem. Seu foco está na duração dos planos, no timing, na energia e na relação entre os cortes.",
+   "pensa": [
+    "Quando cortar.",
+    "Quanto tempo manter um plano.",
+    "Quando acelerar.",
+    "Quando desacelerar.",
+    "Como diferentes durações alteram a sensação da sequência.",
+    "Como a sucessão dos cortes cria energia."
+   ],
+   "valoriza": [
+    "Timing",
+    "Duração dos planos",
+    "Energia",
+    "Pulsação",
+    "Relação entre cortes",
+    "Sensação temporal da sequência"
+   ],
+   "papel": "Mostrar que um mesmo material pode produzir sensações completamente diferentes dependendo do momento e da duração dos cortes.",
+   "combina": [
+    "EX_CORTE_001",
+    "EX_JUMPCUT_NL01",
+    "EX_ELIPSE_NL01"
+   ],
+   "pendente": "Não há ainda uma atividade só de ritmo (duração dos planos) nos dados.",
+   "cor_ui": "#1e5eb8",
+   "fg_ui": "#ffffff",
+   "bg": "#233d62",
+   "bgfg": "#ffffff"
+  },
+  {
+   "id": "olhar",
+   "nome": "Editora do Olhar",
+   "curto": "Olhar",
+   "cor": "#8fa68c",
+   "fg": "#0b0b0b",
+   "imagem": "assets/personas/olhar.jpg",
+   "busto": "assets/personas/olhar-busto.jpg",
+   "poster": "assets/personas/olhar-poster.jpg",
+   "video": "assets/personas/olhar.webm",
+   "campo": [
+    "Continuidade",
+    "Eixo",
+    "Raccord",
+    "Detalhes"
+   ],
+   "pergunta": "O olhar do espectador sabe onde está?",
+   "representa": "É a persona ligada à continuidade visual. Seu olhar está voltado para a relação espacial e visual entre os planos.",
+   "pensa": [
+    "Continuidade.",
+    "Direção do olhar.",
+    "Eixo.",
+    "Posição dos elementos.",
+    "Raccord.",
+    "Detalhes que permitem compreender a ação.",
+    "Coerência espacial entre os planos."
+   ],
+   "valoriza": [
+    "Continuidade",
+    "Clareza espacial",
+    "Eixo",
+    "Raccord",
+    "Detalhes visuais",
+    "Relação entre planos"
+   ],
+   "papel": "Fazer o estudante perceber que a montagem também organiza o espaço e o olhar do espectador. O objetivo é perceber como certas escolhas mantêm ou quebram a continuidade visual.",
+   "combina": [
+    "EX_CORTE_004A",
+    "EX_CONTINU_DF01",
+    "EX_EIXO_001",
+    "EX_MATCHCUT_MC01"
+   ],
+   "cor_ui": "#387e30",
+   "fg_ui": "#ffffff",
+   "bg": "#92a290",
+   "bgfg": "#161618"
+  },
+  {
+   "id": "som",
+   "nome": "Editor do Som",
+   "curto": "Som",
+   "cor": "#6b3f5f",
+   "fg": "#ffffff",
+   "imagem": "assets/personas/som.jpg",
+   "busto": "assets/personas/som-busto.jpg",
+   "poster": "assets/personas/som-poster.jpg",
+   "video": "assets/personas/som.webm",
+   "campo": [
+    "Atmosfera",
+    "Silêncio",
+    "Ambiência",
+    "Música",
+    "J-cut",
+    "L-cut"
+   ],
+   "pergunta": "O que o som está fazendo enquanto a imagem muda?",
+   "representa": "É a persona ligada à construção sonora da montagem. O som não aparece como complemento da imagem: ele participa da construção da cena.",
+   "pensa": [
+    "Sons ambientes.",
+    "Silêncio.",
+    "Música.",
+    "Continuidade sonora.",
+    "Mudanças de atmosfera.",
+    "Sons que começam antes da imagem.",
+    "Sons que permanecem depois da mudança de imagem."
+   ],
+   "valoriza": [
+    "Atmosfera",
+    "Silêncio",
+    "Ambiência",
+    "Música",
+    "Relação entre som e imagem",
+    "Continuidade sonora"
+   ],
+   "papel": "Mostrar que montar também é escutar. É essa persona que conduz as experiências de J-cut, L-cut, áudio, ambiência e silêncio.",
+   "combina": [
+    "EX_JCUT_001",
+    "EX_LCUT_001"
+   ],
+   "cor_ui": "#932f77",
+   "fg_ui": "#ffffff",
+   "bg": "#503445",
+   "bgfg": "#ffffff"
+  },
+  {
+   "id": "experimental",
+   "nome": "Editora Experimental",
+   "curto": "Experimental",
+   "cor": "#c9962f",
+   "fg": "#0b0b0b",
+   "imagem": "assets/personas/experimental.jpg",
+   "busto": "assets/personas/experimental-busto.jpg",
+   "poster": "assets/personas/experimental-poster.jpg",
+   "video": "assets/personas/experimental.webm",
+   "campo": [
+    "Montagem não linear",
+    "Jump cuts",
+    "Associações",
+    "Efeito Kuleshov",
+    "Experimentação"
+   ],
+   "pergunta": "E se eu montar de outro jeito?",
+   "representa": "É a persona ligada à experimentação e às possibilidades da montagem. Não parte necessariamente da ideia de que existe apenas uma forma convencional de organizar as imagens.",
+   "pensa": [
+    "Montagem não linear.",
+    "Jump cuts.",
+    "Associações.",
+    "Aproximações entre planos.",
+    "Relações de sentido.",
+    "Possibilidades diferentes para o mesmo material."
+   ],
+   "valoriza": [
+    "Experimentação",
+    "Associação",
+    "Descoberta",
+    "Novas possibilidades",
+    "Relações inesperadas entre imagens",
+    "Liberdade para testar diferentes montagens"
+   ],
+   "papel": "Mostrar que a montagem também pode ser um espaço de descoberta. Incentiva o estudante a testar possibilidades.",
+   "combina": [
+    "EX_KULESHOV_001",
+    "EX_KULESHOV_002",
+    "EX_JUMPCUT_NL01",
+    "EX_EXPERIMENTO_001"
+   ],
+   "cor_ui": "#956518",
+   "fg_ui": "#ffffff",
+   "bg": "#ac7f3a",
+   "bgfg": "#161618"
+  }
+ ]
+}

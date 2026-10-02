@@ -1,0 +1,75 @@
+/* ============================================================
+   CORTANDO HISTÓRIAS — sistema visual (v9)
+   Uma só linguagem para landing e laboratório: papel quente, tinta, vermelho de claquete, âmbar,
+   DM Sans, vidro (glass) e duotone. Nada de serifa, nada de caixa-alta espaçada.
+   ============================================================ */
+@font-face{font-family:"DM Sans";src:url(../fonts/dm-sans-latin-wght-normal.woff2) format("woff2");font-weight:100 1000;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Sans";src:url(../fonts/dm-sans-latin-wght-italic.woff2) format("woff2");font-weight:100 1000;font-style:italic;font-display:swap}
+:root{
+  --paper:#fbfbfc;--stage:#161618;--hero-bg:#a81020;--hero-fg:#fff4ee;
+  --bg:#ffffff;--bg-alt:#f1f1f3;--ink:#161618;--ink-muted:#5c5c63;
+  --accent:#a81020;--accent-ink:#a81020;--accent-soft:rgba(168,16,32,.08);--rule:#e3e3e6;
+  /* nomes antigos, remapeados para a paleta nova */
+  --papel:var(--bg);--tinta:var(--ink);
+  --g0:#f7f7f8;--g1:#f1f1f3;--g2:#e3e3e6;--g3:#c8c8cd;--g4:#85858d;--g5:#5c5c63;
+  --vermelho:#a81020;--claquete:#a81020;--claquete-fundo:#f4e3e5;--star:#ffc400;
+  --lima:#c8a020;--laranja:#b4531f;--lilas:#a81020;
+  --entrada:#2f7d4f;--saida:#c0262d;--foco:#a81020;
+  --f-BH:#a81020;--f-NZ:#c8a020;--f-SC:#b4531f;--f-DF:#5c5c63;--f-DL:#d4a822;--f-MC:#8a2a2a;--f-ST:#4d6a66;--f-NL:#c8a020;--f-LA:#c8a020;--f-DM:#8a5a30;
+  /* tipografia: uma família só */
+  --display:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;
+  --sans:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;
+  --mono:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;
+  --fs-0:clamp(.8rem,.78rem + .1vw,.88rem);
+  --fs-1:1rem;
+  --fs-2:clamp(1.06rem,1rem + .25vw,1.2rem);
+  --fs-3:clamp(1.3rem,1.15rem + .7vw,1.7rem);
+  --fs-4:clamp(1.9rem,1.4rem + 2.2vw,3.2rem);
+  --fs-5:clamp(2.6rem,1.4rem + 5.4vw,6rem);
+  --fs-6:clamp(3.2rem,1rem + 11vw,9.4rem);
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+  --gut:20px;
+  /* raios com hierarquia: cantos pequenos em controles, grandes em superfícies */
+  --r1:8px;--r2:14px;--r3:22px;--r4:34px;--rp:999px;
+  --hair:1px solid var(--rule);
+  --sombra:0 18px 40px -22px rgba(22,22,24,.35);
+  --appbar-h:76px;--tabbar-h:68px;
+  --sai-b:env(safe-area-inset-bottom,0px);
+  --ease:cubic-bezier(.22,1,.36,1);--ease-out:cubic-bezier(.22,1,.36,1);--ease-clip:cubic-bezier(.19,1,.22,1);--ease-slow:cubic-bezier(.65,0,.35,1);
+  --focus-ring:2px solid var(--vermelho);--focus-ring-offset:3px;
+  --dur-1:.16s;--dur-2:.34s;--dur-3:.7s;
+  /* vidro: sobre claro e sobre escuro */
+  --glass-bg:rgb(250 250 252 / .62);--glass-bd:rgb(22 22 24 / .12);
+  --glass-fx:blur(14px) saturate(140%) contrast(104%);
+  --glass-sh:0 14px 38px rgb(22 22 24 / .14),0 2px 7px rgb(22 22 24 / .08),inset 1px 1px 0 rgb(255 255 255 / .8),inset -1px -1px 0 rgb(22 22 24 / .06);
+  --glass-dk-bg:rgb(24 55 82 / .31);--glass-dk-bd:rgb(255 255 255 / .2);
+  --glass-dk-fx:blur(9px) saturate(126%) contrast(108%) brightness(103%);
+  --glass-dk-sh:0 14px 38px rgb(4 24 43 / .16),0 2px 7px rgb(4 24 43 / .1),inset 1px 1px 0 rgb(255 255 255 / .48),inset -1px -1px 0 rgb(21 49 73 / .14),inset 0 0 0 .5px rgb(255 255 255 / .16);
+  color-scheme:light;
+}
+@media (min-width:768px){:root{--gut:32px;--appbar-h:88px}}
+@media (min-width:1100px){:root{--gut:48px}}
+
+/* preferências do aluno (Meu espaço) */
+:root[data-bigtext="1"]{font-size:118%}
+:root[data-contrast="1"]{--g4:#3c3c42;--g5:#222226;--g3:#6c6c74;--g2:#9b9ba3;--ink-muted:#2c2c31}
+:root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{
+  animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){
+  :root:not([data-motion="on"]) *,:root:not([data-motion="on"]) *::before,:root:not([data-motion="on"]) *::after{
+    animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
+/* ============ tema escuro (palco azul-petróleo; cor só nos blocos) ============ */
+:root[data-theme="dark"]{
+  --bg:#0e0e0f;--bg-alt:#161617;--ink:#f1f1f2;--ink-muted:#a3a3a8;--rule:rgb(255 255 255 / .12);
+  --accent:#cf1d31;--accent-ink:#e0485a;--accent-soft:rgba(207,29,49,.16);
+  --paper:#171718;--stage:#050505;--g0:#161617;--g1:#1e1e20;--g2:#2b2b2e;--g3:#3d3d41;--g4:#9a9aa0;--g5:#b4b4b9;
+  --vermelho:#cf1d31;--claquete:#b8132a;--claquete-fundo:rgb(207 29 49 / .16);--star:#ffc400;
+  --entrada:#5fcf8e;--saida:#ff6b78;--foco:#e0485a;--tinta:var(--ink);--papel:var(--bg);
+  --focus-ring:2px solid #fff;
+  --sombra:0 18px 40px -22px rgba(0,0,0,.8);
+  --glass-bg:rgb(255 255 255 / .08);--glass-bd:rgb(255 255 255 / .16);
+  --glass-sh:0 14px 38px rgb(0 0 0 / .45),inset 1px 1px 0 rgb(255 255 255 / .14),inset -1px -1px 0 rgb(0 0 0 / .3);
+  color-scheme:dark;
+}

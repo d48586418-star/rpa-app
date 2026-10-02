@@ -1,0 +1,24 @@
+.celebra{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:20px;background:rgb(168 16 32 / .72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .35s var(--ease)}
+.celebra.in{opacity:1}.celebra.out{opacity:0}
+.ce-card{position:relative;display:grid;justify-items:center;gap:10px;width:min(100%,460px);padding:40px 28px 30px;border-radius:var(--r4);text-align:center;transform:translateY(24px) scale(.94);transition:transform .6s var(--ease-clip);background:rgb(255 250 242 / .92);border:1px solid rgb(22 22 24 / .12);box-shadow:0 30px 80px -20px rgb(26 8 10 / .5)}
+.celebra.in .ce-card{transform:none}
+.ce-star{position:relative;width:132px;height:124px;margin-bottom:6px}
+.ce-star svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ce-fill{fill:var(--star);opacity:0;transform-origin:60px 56px;transform:scale(.4) rotate(-30deg);filter:drop-shadow(0 6px 14px rgb(255 196 0 / .6))}
+.ce-line{fill:none;stroke:var(--ink);stroke-width:3;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.celebra.in .ce-fill{animation:ce-pop .7s .35s var(--ease-clip) forwards}
+.celebra.in .ce-line{animation:ce-draw .8s .1s var(--ease-slow) forwards}
+.celebra.in .ce-star{animation:ce-float 3s 1.2s ease-in-out infinite}
+@keyframes ce-draw{to{stroke-dashoffset:0}}
+@keyframes ce-pop{60%{transform:scale(1.14) rotate(6deg);opacity:1}to{opacity:1;transform:none}}
+@keyframes ce-float{50%{transform:translateY(-6px) rotate(2deg)}}
+.ce-burst{position:absolute;left:50%;top:50%}
+.ce-burst i{position:absolute;width:8px;height:14px;margin:-7px -4px;border-radius:2px;background:var(--c);opacity:0;transform:rotate(var(--a)) translateY(0)}
+.celebra.in .ce-burst i{animation:ce-bit 1.1s calc(.5s + var(--t)) var(--ease-clip) forwards}
+@keyframes ce-bit{20%{opacity:1}to{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--d) * -1)) rotate(260deg)}}
+.ce-k{font:600 1rem/1 var(--sans);color:var(--vermelho)}
+.ce-t{font-size:clamp(1.5rem,1.1rem + 2vw,2.1rem);font-weight:500;line-height:1.12;letter-spacing:-.035em;color:var(--ink)}
+.ce-t em{display:inline-block;margin-top:6px;font-style:normal;font-weight:700;color:var(--vermelho)}
+.ce-p{max-width:34ch;font-size:.98rem;line-height:1.5;color:var(--ink-muted)}
+.ce-b{margin-top:12px}
+@media (prefers-reduced-motion:reduce){.celebra,.ce-card{transition:none}.ce-fill{opacity:1;transform:none;animation:none!important}.ce-line{stroke-dashoffset:0;animation:none!important}.ce-star,.ce-burst i{animation:none!important}}

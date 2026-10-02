@@ -1,0 +1,301 @@
+{
+ "fonte": "Atividades novas, vindas do pacote JORNADA_EDITOR_MEDIA (v3.0). Regras escritas a partir de activities_rules.json e das durações reais dos arquivos. IDs novos (EX_CORTEDIRETO_001 etc.) porque o pacote reusa EX_CORTE_001, que no projeto já é 'O copo'. Mapa antigo→novo em DESIGN_DECISIONS.md.",
+ "mapa_ids": {
+  "EX_CORTE_001 (pacote: Corte direto)": "EX_CORTEDIRETO_001",
+  "EX_JCUT_001": "EX_JCUT_001",
+  "EX_LCUT_001": "EX_LCUT_001",
+  "EX_EIXO_001": "EX_EIXO_001",
+  "EX_EXPERIMENTO_001": "EX_EXPERIMENTO_001",
+  "EX_BROLL_001": "EX_BROLL_001"
+ },
+ "etapas": [
+  {
+   "n": 10,
+   "t": "O corte mais simples",
+   "a": [
+    "EX_CORTEDIRETO_001"
+   ]
+  },
+  {
+   "n": 11,
+   "t": "Do mesmo lado da linha",
+   "a": [
+    "EX_EIXO_001"
+   ]
+  },
+  {
+   "n": 12,
+   "t": "A mesma história, outra ordem",
+   "a": [
+    "EX_EXPERIMENTO_001"
+   ]
+  },
+  {
+   "n": 13,
+   "t": "O som atravessa o corte",
+   "a": [
+    "EX_JCUT_001",
+    "EX_LCUT_001"
+   ]
+  },
+  {
+   "n": 14,
+   "t": "Dois lugares ao mesmo tempo",
+   "a": [
+    "EX_CROSSCUT_001"
+   ]
+  },
+  {
+   "n": 15,
+   "t": "Cobrir com outro olhar",
+   "a": [
+    "EX_BROLL_001"
+   ]
+  }
+ ],
+ "atividades": [
+  {
+   "id": "EX_CORTEDIRETO_001",
+   "t": "Sem efeito nenhum",
+   "difficulty": "iniciante",
+   "tipo": "direto",
+   "m": "Escolha dois planos diferentes e coloque um logo depois do outro. Assista. Entre eles não há fade nem efeito: só o corte, e é ele que junta os dois planos.",
+   "pool": [
+    "CD_BH_01",
+    "CD_BH_02",
+    "CD_BH_03",
+    "CD_BH_04",
+    "CD_BH_05",
+    "CD_BH_06",
+    "CD_BH_07",
+    "CD_BH_08"
+   ],
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": true,
+    "split": false
+   },
+   "max": 6,
+   "valid_min": 1,
+   "ordem_fixa": false
+  },
+  {
+   "id": "EX_EIXO_001",
+   "t": "Do mesmo lado",
+   "difficulty": "intermediário",
+   "tipo": "eixo",
+   "m": "Os dois estão num carro, conversando. Monte a cena com pelo menos três planos. Em cada plano, repare em quem está à esquerda e quem está à direita.",
+   "pool": [
+    "TAKE_006_059",
+    "TAKE_006_060",
+    "TAKE_006_061",
+    "TAKE_006_063",
+    "TAKE_006_064",
+    "TAKE_006_065",
+    "TAKE_006_067",
+    "TAKE_006_068",
+    "TAKE_006_069",
+    "TAKE_006_070"
+   ],
+   "lado": {
+    "TAKE_006_059": "ele à esquerda, ela à direita",
+    "TAKE_006_060": "ele à esquerda, ela à direita",
+    "TAKE_006_061": "ele à esquerda, ela à direita",
+    "TAKE_006_063": "ele à esquerda, ela à direita",
+    "TAKE_006_064": "ele à esquerda, ela à direita",
+    "TAKE_006_065": "ele à esquerda, ela à direita",
+    "TAKE_006_067": "ele à esquerda, ela à direita",
+    "TAKE_006_068": "ele à esquerda, ela à direita",
+    "TAKE_006_069": "ele à esquerda, ela à direita",
+    "TAKE_006_070": "ele à esquerda, ela à direita"
+   },
+   "lado_revisao": "anotação feita olhando os quadros; conferir com a autora. O material não tem plano que cruze o eixo.",
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": false,
+    "split": false
+   },
+   "max": 8,
+   "valid_min": 1
+  },
+  {
+   "id": "EX_EXPERIMENTO_001",
+   "t": "A mesma história, outra ordem",
+   "difficulty": "iniciante",
+   "tipo": "experimento",
+   "m": "Estes planos contam uma história numa ordem. Monte a versão original, assista, e depois reorganize como quiser. O que muda?",
+   "pool": [
+    "TAKE_009_008",
+    "TAKE_009_017",
+    "TAKE_009_018",
+    "TAKE_009_019",
+    "TAKE_009_021",
+    "TAKE_009_022",
+    "TAKE_009_025",
+    "TAKE_009_027",
+    "TAKE_009_028",
+    "TAKE_009_040"
+   ],
+   "original": [
+    "TAKE_009_008",
+    "TAKE_009_017",
+    "TAKE_009_018",
+    "TAKE_009_019",
+    "TAKE_009_021",
+    "TAKE_009_022",
+    "TAKE_009_025",
+    "TAKE_009_027",
+    "TAKE_009_028",
+    "TAKE_009_040"
+   ],
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": true,
+    "split": false
+   },
+   "max": 8,
+   "valid_min": 1
+  },
+  {
+   "id": "EX_JCUT_001",
+   "t": "O som chega antes",
+   "difficulty": "avançado",
+   "tipo": "jcut",
+   "m": "Coloque o plano A e o plano B. Cada plano vem com o seu som. Separe o som do plano B e faça ele começar antes de a imagem de B aparecer. Assista e ouça.",
+   "pool": [
+    "TAKE_009_025",
+    "TAKE_009_027"
+   ],
+   "ordem": [
+    "TAKE_009_025",
+    "TAKE_009_027"
+   ],
+   "audios": {
+    "TAKE_009_025": "TAKE_009_025_audio",
+    "TAKE_009_027": "TAKE_009_027_audio"
+   },
+   "av": {
+    "ferramentas": [
+     "separar",
+     "antes",
+     "depois"
+    ],
+    "min_segundos": 0.6,
+    "alvo": "TAKE_009_027"
+   },
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": false,
+    "split": false
+   },
+   "max": 2,
+   "valid_min": 1
+  },
+  {
+   "id": "EX_LCUT_001",
+   "t": "O som fica",
+   "difficulty": "avançado",
+   "tipo": "lcut",
+   "m": "Coloque o plano A e o plano B. Quando a imagem mudar para B, o som de A não precisa parar. Separe o som de A e estenda ele por cima da imagem de B. Assista e ouça.",
+   "pool": [
+    "TAKE_009_021",
+    "TAKE_009_022"
+   ],
+   "ordem": [
+    "TAKE_009_021",
+    "TAKE_009_022"
+   ],
+   "audios": {
+    "TAKE_009_021": "TAKE_009_021_audio_extended"
+   },
+   "av": {
+    "ferramentas": [
+     "separar",
+     "esticar",
+     "encolher"
+    ],
+    "min_segundos": 0.6,
+    "alvo": "TAKE_009_021"
+   },
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": false,
+    "split": false
+   },
+   "max": 2,
+   "valid_min": 1
+  },
+  {
+   "id": "EX_CROSSCUT_001",
+   "t": "Dois lugares ao mesmo tempo",
+   "difficulty": "intermediário",
+   "tipo": "crosscut",
+   "m": "Há duas mulheres em duas casas, ligadas por uma ligação de telefone. Descubra quais planos são de cada uma e monte alternando entre elas. Use pelo menos quatro planos.",
+   "pool": [
+    "TAKE_010_033_B2",
+    "TAKE_010_033_A1",
+    "TAKE_010_033_B3",
+    "TAKE_010_033_A3",
+    "TAKE_010_033_B1",
+    "TAKE_010_033_A2"
+   ],
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": true,
+    "split": false
+   },
+   "max": 6,
+   "valid_min": 1
+  },
+  {
+   "id": "EX_BROLL_001",
+   "t": "O que ele está olhando",
+   "difficulty": "intermediário",
+   "tipo": "cobertura",
+   "m": "Um garoto olha para o alto, mas a imagem fica só nele. Monte garoto, depois o que ele vê, e volte ao garoto. Escolha o plano certo para mostrar o que ele olha.",
+   "pool": [
+    "NZ_130",
+    "NZ_021",
+    "NZ_023",
+    "NZ_016",
+    "NZ_032",
+    "NZ_043",
+    "NZ_046",
+    "NZ_037"
+   ],
+   "labels": {
+    "NZ_130": "Garoto, de frente",
+    "NZ_021": "Garoto olhando para cima (1)",
+    "NZ_023": "Garoto olhando para cima (2)",
+    "NZ_016": "Céu com pipa rosa",
+    "NZ_032": "Céu com pipa amarela",
+    "NZ_043": "Detalhe: livro de Nietzsche",
+    "NZ_046": "Detalhe: celular",
+    "NZ_037": "Placa numa árvore"
+   },
+   "a": [
+    "NZ_130",
+    "NZ_021",
+    "NZ_023"
+   ],
+   "b": [
+    "NZ_016",
+    "NZ_032"
+   ],
+   "ops": {
+    "reorder": true,
+    "remove": true,
+    "trim": true,
+    "split": false
+   },
+   "max": 6,
+   "valid_min": 1
+  }
+ ]
+}

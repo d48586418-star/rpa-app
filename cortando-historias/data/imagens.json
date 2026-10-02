@@ -1,0 +1,20 @@
+{
+ "politica": "Quadros e trechos de vídeo das atividades: curtas-metragens do projeto Cinema na Comunidade, usados com finalidade educacional. Personagens (perfis de editor): imagens e vídeos gerados por inteligência artificial. Fotos históricas do Museu da Edição: imagens da internet. O efeito duotone é feito no navegador e não altera os arquivos.",
+ "fontes": [
+  {
+   "pasta": "assets/img e assets/video",
+   "origem": "quadros e trechos dos curtas do projeto Cinema na Comunidade",
+   "ia": false
+  },
+  {
+   "pasta": "assets/personas",
+   "origem": "imagens e vídeos gerados por inteligência artificial",
+   "ia": true
+  },
+  {
+   "pasta": "assets/museu",
+   "origem": "imagens da internet (fonte específica e licença por foto não registradas)",
+   "ia": false
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<script>try{if(localStorage.getItem("ch:tema")==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("ch:cap")){sessionStorage.removeItem("ch:cap");document.documentElement.classList.add("from-cap")}}catch(e){}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a81020">
+<meta name="color-scheme" content="light">
+<title>Cortando Histórias: Laboratório de Montagem</title>
+<meta name="description" content="Cortando Histórias: experimente a montagem com planos de filmes de verdade, assista e descubra o que o corte faz. Você está aprendendo a olhar como editor.">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/screens.css">
+<link rel="stylesheet" href="css/learn.css">
+<link rel="stylesheet" href="css/lab.css">
+<link rel="stylesheet" href="css/welcome.css">
+<link rel="stylesheet" href="css/museu.css">
+<link rel="stylesheet" href="css/guia.css">
+<link rel="stylesheet" href="css/celebrar.css">
+<link rel="stylesheet" href="css/ds.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="duo-y" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".1 .95"/><feFuncG type="table" tableValues=".07 .76"/><feFuncB type="table" tableValues=".03 .2"/></feComponentTransfer></filter>
+  <filter id="duo-l" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".1 .86"/><feFuncG type="table" tableValues=".05 .46"/><feFuncB type="table" tableValues=".03 .2"/></feComponentTransfer></filter>
+  <filter id="duo-o" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".1 .85"/><feFuncG type="table" tableValues=".02 .12"/><feFuncB type="table" tableValues=".04 .16"/></feComponentTransfer></filter>
+  <filter id="duo-v" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".1 .96"/><feFuncG type="table" tableValues=".08 .9"/><feFuncB type="table" tableValues=".06 .8"/></feComponentTransfer></filter>
+  <filter id="duo-p" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".1 .8"/><feFuncG type="table" tableValues=".05 .45"/><feFuncB type="table" tableValues=".06 .42"/></feComponentTransfer></filter>
+  <filter id="duo-b" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".04 .5"/><feFuncG type="table" tableValues=".08 .7"/><feFuncB type="table" tableValues=".22 .98"/></feComponentTransfer></filter>
+  <filter id="duo-g" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".03 .6"/><feFuncG type="table" tableValues=".12 .9"/><feFuncB type="table" tableValues=".08 .6"/></feComponentTransfer></filter>
+  <filter id="duo-m" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".12 .88"/><feFuncG type="table" tableValues=".04 .5"/><feFuncB type="table" tableValues=".2 .78"/></feComponentTransfer></filter>
+  <filter id="duo-t" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".02 .43"/><feFuncG type="table" tableValues=".12 .88"/><feFuncB type="table" tableValues=".12 .84"/></feComponentTransfer></filter>
+  <filter id="duo-a" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .59 .11 0 0 .33 .59 .11 0 0 .33 .59 .11 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".16 1"/><feFuncG type="table" tableValues=".07 .6"/><feFuncB type="table" tableValues=".02 .24"/></feComponentTransfer></filter>
+  <filter id="duo-k" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="1.25" intercept="-.08"/><feFuncG type="linear" slope="1.25" intercept="-.08"/><feFuncB type="linear" slope="1.25" intercept="-.08"/></feComponentTransfer></filter>
+</defs></svg>
+<a class="skip" href="#app">Pular para o conteúdo</a>
+<header class="appbar" role="banner">
+  <a class="brand glass" href="#/inicio" aria-label="Cortando Histórias: início">
+    <span class="brand-word"><b>Cortando</b><i>Histórias</i></span>
+  </a>
+  <nav class="topnav glass" aria-label="Principal" id="topnav"></nav>
+  <div class="bar-right"><button type="button" class="theme-btn glass" id="theme-btn" aria-pressed="false" aria-label="Ativar modo escuro"><svg class="ti-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><svg class="ti-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button><span class="who" id="who"></span></div>
+</header>
+<main id="app" tabindex="-1" aria-live="off"></main>
+<nav class="tabbar" aria-label="Principal (celular)" id="tabbar"></nav>
+<div id="toast" role="status"></div>
+<div id="live" class="sr" aria-live="polite" role="status"></div>
+<noscript><p style="padding:24px;font:16px system-ui">Este laboratório precisa de JavaScript para montar e reproduzir vídeos.</p></noscript>
+<script src="data/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/leituras.js"></script>
+<script src="js/core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/novas.js"></script>
+<script src="js/scroll.js"></script>
+<script src="js/player.js"></script>
+<script src="js/lab.js"></script>
+<script src="js/lab-panels.js"></script>
+<script src="js/lab-av.js"></script>
+<script src="js/lab-tools.js"></script>
+<script src="js/evolucao.js"></script>
+<script src="js/views-home.js"></script>
+<script src="js/views-path.js"></script>
+<script src="js/views-learn.js"></script>
+<script src="js/views-welcome.js"></script>
+<script src="js/views-museu.js"></script>
+<script src="js/views-guia.js"></script>
+<script src="js/passaporte.js"></script>
+<script src="js/celebrar.js"></script>
+<script src="js/views-lab.js"></script>
+<script src="js/views-me.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+{
+ "fonte": "Camada didática do laboratório v8: instrução curta (faça), pista perceptiva (observe), pergunta depois de assistir (apos), o que mudou sem nomear (mudou) e a frase de descoberta (descoberta). Escrita para quem nunca editou. Revisar com a autora.",
+ "atividades": {
+  "EX_CORTE_004A": {
+   "faca": "Coloque o homem na timeline. Depois dele, coloque a imagem que ele parece estar olhando.",
+   "observe": "Para onde ele olha? Que imagem responde a esse olhar?",
+   "apos": "Ninguém disse o que ele vê. Você ligou os dois planos sozinho.",
+   "mudou": "Dois planos que não se tocam na cena passam a ser um olhar e aquilo que é olhado.",
+   "descoberta": "Quando um plano mostra alguém olhando e o seguinte mostra um objeto, o público entende que o objeto está sendo visto. A ligação nasce do corte.",
+   "continue": "Troque o objeto ou inverta a ordem. O olhar ainda encontra alguma coisa?",
+   "caraca": {
+    "t": "Você ligou os dois.",
+    "s": "Ninguém disse o que ele vê. Você disse."
+   },
+   "curto": "Coloque o homem e, depois, o que ele olha."
+  },
+  "EX_KULESHOV_001": {
+   "faca": "Coloque o rosto do homem e, depois dele, uma imagem. Faça três versões, cada uma com uma imagem diferente.",
+   "observe": "O que ele parece sentir em cada versão? Olhe só para o rosto.",
+   "apos": "O rosto era sempre o mesmo. Então de onde veio o que ele sentia?",
+   "mudou": "O rosto não mudou. A imagem ao lado mudou, e a leitura do rosto mudou junto.",
+   "descoberta": "O público liga os dois planos e atribui ao rosto o que vê em seguida. O sentido não está só num plano: nasce entre eles.",
+   "continue": "Experimente outra imagem depois do rosto e observe o que ele passa a sentir.",
+   "kuleshov": true,
+   "caraca": {
+    "t": "Uau.",
+    "s": "Você mudou o sentido sem mudar a primeira imagem."
+   },
+   "curto": "Rosto do homem + uma imagem. Faça 3 versões."
+  },
+  "EX_KULESHOV_002": {
+   "faca": "Escolha um dos dois closes do menino e monte versões com imagens diferentes depois dele.",
+   "observe": "O menino parece outra pessoa a cada imagem? E qual dos dois closes deixa isso mais claro?",
+   "apos": "Dois closes quase iguais do mesmo menino. Um deles aceita melhor a imagem que vem depois.",
+   "mudou": "O mesmo menino, o mesmo olhar. Mudou a imagem que o acompanha.",
+   "descoberta": "Nem todo rosto se deixa reinterpretar do mesmo jeito: um rosto mais neutro recebe melhor o sentido que vem do plano seguinte.",
+   "continue": "Troque o close do menino e repare se a leitura ainda funciona.",
+   "kuleshov": true,
+   "caraca": {
+    "t": "Olha isso.",
+    "s": "O mesmo rosto agora olha para outra coisa."
+   },
+   "curto": "Monte o menino com imagens diferentes depois dele."
+  },
+  "EX_CORTE_001": {
+   "faca": "Coloque os três planos em ordem e assista. Depois encurte um segundo do final do primeiro plano e assista de novo.",
+   "observe": "Em qual das duas você sentiu o corte? Observe a mão e o copo.",
+   "apos": "A ação é a mesma nas duas versões. O que mudou foi o ponto onde o corte caiu.",
+   "mudou": "O ponto do corte mudou: numa versão o gesto continua no plano seguinte; na outra, pula.",
+   "descoberta": "Quando o corte cai no meio do gesto, o olho acompanha o movimento e quase não nota a emenda. Cortar antes do gesto faz a ação pular.",
+   "continue": "Experimente cortar mais cedo, mais tarde, e compare onde o corte aparece.",
+   "caraca": {
+    "t": "O corte falou.",
+    "s": "Dois planos viraram uma ideia."
+   },
+   "curto": "Monte os 3 planos, assista e apare 1 s do primeiro."
+  },
+  "EX_CORTE_002": {
+   "faca": "Escolha dois ou três planos do cofre (todos da mesma câmera) e coloque um depois do outro. Assista em câmera lenta.",
+   "observe": "A câmera não mexe, mas o homem “pula” de uma posição para outra. Esse salto é o jump cut.",
+   "apos": "Nas duas versões o tempo avança. Numa você sente o corte; na outra, ele fica escondido.",
+   "mudou": "Um plano a mais entre as pontas mudou o quanto o corte aparece.",
+   "descoberta": "Colar dois momentos da mesma câmera faz a imagem dar um salto. Um plano diferente entre eles esconde esse salto.",
+   "continue": "Troque o plano do meio por outro e veja se o salto continua escondido.",
+   "caraca": {
+    "t": "Você sentiu o corte.",
+    "s": "A cena mudou de lugar e a história continuou."
+   },
+   "dica": "Receita: “Cofre: ele agachado” → “Cofre: ele se inclina” → “Cofre: pegando o dinheiro”. Depois separe-os com “Detalhe: maços de dinheiro” e veja o salto sumir.",
+   "intro": "Jump cut: dois trechos do mesmo plano, com a câmera parada, colados um depois do outro. O personagem muda de posição de repente, como se o tempo desse um salto.",
+   "curto": "Junte 2 ou 3 planos do cofre e assista em câmera lenta."
+  },
+  "EX_CORTE_003": {
+   "faca": "Encontre dois planos da professora em que ela ocupa o mesmo lugar na tela. Coloque um depois do outro.",
+   "observe": "O que mudou nela e em volta dela? Quanto tempo você acha que passou?",
+   "apos": "Nenhuma legenda diz 'meses depois'. O que a imagem mostrou foi suficiente.",
+   "mudou": "A posição é a mesma. O que mudou foram os sinais de tempo: cabelo, roupa, luz.",
+   "descoberta": "Dois planos com o mesmo enquadramento e sinais de tempo diferentes fazem o público sentir que o tempo passou, sem ninguém explicar.",
+   "continue": "Inverta a ordem. O corte parece avançar no tempo ou voltar, como uma lembrança?",
+   "caraca": {
+    "t": "É uma conversa.",
+    "s": "Dois planos, duas pessoas, uma troca."
+   },
+   "curto": "Una dois planos da professora no mesmo lugar da tela."
+  },
+  "EX_CORTE_004B": {
+   "faca": "Escolha pelo menos quatro objetos da casa e monte uma sequência. Depois monte outra que termine em um objeto diferente.",
+   "observe": "O que a última imagem faz com todas as anteriores?",
+   "apos": "Os objetos eram os mesmos. A história mudou com o final.",
+   "mudou": "O último plano mudou o sentido dos que vieram antes.",
+   "descoberta": "Uma sequência de detalhes não segue uma ação: sugere um estado. A imagem final reorganiza o que vimos antes.",
+   "continue": "Troque só o último objeto e escreva que história a casa passa a contar.",
+   "caraca": {
+    "t": "Você criou uma relação.",
+    "s": "Entre duas imagens que não se conheciam."
+   },
+   "curto": "Monte 4 objetos da casa; depois, outra ordem."
+  },
+  "EX_CORTE_004C": {
+   "faca": "1) Comece com “Homem na porta (início)”. 2) Depois, uma interrupção à sua escolha: a manta, a mulher no jardim ou a sala. 3) Volte com “Homem na porta (volta)”. Depois faça outra versão trocando só a interrupção.",
+   "observe": "A conversa na porta fica igual nas duas versões. O que muda no que você pensa dela quando a interrupção muda?",
+   "apos": "A conversa continuou depois. A interrupção mudou o que ela significa.",
+   "mudou": "Dois planos diferentes interromperam a mesma conversa e deram sentidos diferentes.",
+   "descoberta": "Interromper uma cena com outra imagem e voltar acrescenta um comentário à cena. Quem escolhe a interrupção escolhe o comentário.",
+   "continue": "Interrompa em outro momento da conversa. A interrupção diz a mesma coisa?",
+   "caraca": {
+    "t": "A ordem mudou.",
+    "s": "E o significado foi junto."
+   },
+   "dica": "Receita: Homem na porta (início) → uma interrupção → Homem na porta (volta). Os dois planos da porta têm o mesmo enquadramento, por isso a volta parece natural.",
+   "curto": "Homem na porta, uma interrupção, homem de volta."
+  },
+  "EX_MURCH_001": {
+   "faca": "Monte o abraço três vezes: 1) sem o “Casal do quarto”; 2) com o “Casal do quarto” no meio; 3) com ele no começo. Use os outros planos de abraço como base.",
+   "observe": "Em qual das três você entende melhor o que ela sente? O que cada versão ganha e perde?",
+   "apos": "Nenhuma das três é 'a resposta'. Cada uma privilegia uma coisa diferente.",
+   "mudou": "A posição do plano do quarto mudou o que o abraço parece dizer.",
+   "descoberta": "Decidir um corte é escolher o que pesa mais. Um dos critérios do montador Walter Murch coloca a emoção em primeiro lugar, antes de regras de continuidade.",
+   "continue": "Pergunte a cada corte: por que este plano entra aqui? O que eu priorizei?",
+   "caraca": {
+    "t": "Você escolheu o momento.",
+    "s": "O corte caiu onde a cena pedia."
+   },
+   "dica": "Versão 1: Abraço médio → close dela → Abraço médio dele. Versão 2: coloque o Casal do quarto entre dois deles. Versão 3: comece pelo Casal do quarto.",
+   "curto": "Monte o abraço 3 vezes: sem, no meio e no começo o casal."
+  },
+  "EX_MURCH_002": {
+   "faca": "Monte duas versões da cena do sofá: uma revelando quem está ao lado dela com um plano de perto e outra com a sala inteira.",
+   "observe": "Em qual o público descobre quem é com mais impacto? Em qual entende melhor onde cada um está?",
+   "apos": "As duas revelam a mesma pessoa. O que muda é como e quando o público descobre.",
+   "mudou": "A distância do plano mudou a forma da descoberta: impacto de perto, contexto de longe.",
+   "descoberta": "Quando e como o público descobre algo também é uma escolha de montagem. Revelar de perto dá impacto; revelar pelo espaço dá contexto.",
+   "continue": "Adie a revelação por mais um plano e compare.",
+   "caraca": {
+    "t": "Você pesou o corte.",
+    "s": "Cada escolha trouxe uma coisa e deixou outra."
+   },
+   "curto": "Sofá: uma versão de perto e outra com a sala inteira."
+  },
+  "EX_JUMPCUT_NL01": {
+   "faca": "Assista ao plano inteiro. Depois use Cortar aqui e remova um pedaço do meio.",
+   "observe": "Olhe o que está dentro do quadro logo antes e logo depois do corte. O que mudou de lugar?",
+   "apos": "Era um único plano contínuo. Ao tirar o pedaço, a imagem deu um pulo.",
+   "mudou": "Ao tirar o pedaço do meio, as duas pontas ficaram coladas e o que está no quadro mudou de repente.",
+   "descoberta": "Quando você tira um trecho do meio de um plano contínuo, a imagem dá um salto: o corte aparece na própria imagem, como uma quebra na continuidade do quadro.",
+   "continue": "Tire um pedaço menor e um maior. Em qual o salto é mais forte?",
+   "emenda": true,
+   "caraca": {
+    "t": "O tempo saltou.",
+    "s": "Você deixou o tempo saltar."
+   },
+   "curto": "Assista e remova um pedaço do meio."
+  },
+  "EX_ELIPSE_NL01": {
+   "faca": "Assista ao plano inteiro. Use Cortar aqui duas vezes e remova o pedaço do meio.",
+   "observe": "Quanto do caminho você não viu? Mesmo assim, você entendeu o que aconteceu?",
+   "apos": "Você não viu esse tempo passar. Mas entendeu que ele passou.",
+   "mudou": "Uma parte da ação desapareceu e a história continuou.",
+   "descoberta": "Uma elipse omite um intervalo de tempo: a narrativa pula o que não precisa ser visto e o público completa o que aconteceu entre A e B.",
+   "continue": "Remova um pedaço maior. Até onde o público ainda acompanha?",
+   "tempo": true,
+   "caraca": {
+    "t": "O tempo sumiu.",
+    "s": "E ninguém sentiu falta dele."
+   },
+   "curto": "Corte duas vezes e tire o pedaço do meio."
+  },
+  "EX_CONTINU_DF01": {
+   "faca": "Coloque um plano de cada pessoa, um depois do outro, e assista. Depois inverta a ordem.",
+   "observe": "Parece que uma olha para a outra? Para onde cada uma olha na tela?",
+   "apos": "Elas nunca aparecem juntas no mesmo plano. Mesmo assim, parecem se encontrar.",
+   "mudou": "Dois planos separados passaram a ser um encontro.",
+   "descoberta": "Alternar planos de pessoas que olham em direções opostas cria a sensação de que elas se veem, mesmo sem aparecerem juntas.",
+   "continue": "Inverta a ordem e veja quem parece olhar primeiro.",
+   "caraca": {
+    "t": "Você cortou no movimento.",
+    "s": "O corte desapareceu dentro do gesto."
+   },
+   "curto": "Um plano de cada pessoa. Depois, inverta a ordem."
+  },
+  "EX_MATCHCUT_MC01": {
+   "faca": "Coloque o retrato na moldura e, depois dele, a pessoa de verdade. Assista.",
+   "observe": "O que as duas imagens têm em comum? Forma, posição, olhar?",
+   "apos": "Duas imagens diferentes, ligadas pelo que elas têm em comum.",
+   "mudou": "O retrato e a pessoa passaram a parecer uma só imagem que se transforma.",
+   "descoberta": "Quando dois planos compartilham forma ou posição, o olho encaixa um no outro. A ligação é visual, não de continuidade de ação.",
+   "continue": "Inverta a ordem. A ligação ainda funciona?",
+   "caraca": {
+    "t": "Você encontrou a conexão.",
+    "s": "Duas imagens diferentes, uma mesma forma."
+   },
+   "curto": "Retrato primeiro, depois a pessoa de verdade."
+  },
+  "EX_LAB_LIVRE": {
+   "faca": "Escolha planos de qualquer filme, corte, reordene e assista.",
+   "observe": "Repare no que muda quando você troca a ordem, tira um plano ou encurta outro.",
+   "apos": "Não há resposta certa. Importa o que você percebeu.",
+   "mudou": "",
+   "descoberta": "",
+   "continue": "Guarde versões e compare quando quiser.",
+   "curto": "Escolha planos de qualquer filme e monte."
+  },
+  "EX_CORTEDIRETO_001": {
+   "faca": "Escolha dois planos diferentes e coloque um logo depois do outro. Assista.",
+   "observe": "Entre os dois planos não há fade nem efeito. O que o corte direto faz sozinho?",
+   "apos": "Entre os dois planos não tem nada. A imagem simplesmente mudou.",
+   "mudou": "Um plano terminou e o outro começou no mesmo instante.",
+   "descoberta": "O corte direto é a mudança imediata de um plano para outro, sem efeito nenhum. A própria troca de plano já é uma decisão de montagem.",
+   "continue": "Escolha outro plano para o segundo lugar. A troca ainda funciona?",
+   "caraca": {
+    "t": "Cortou.",
+    "s": "E não precisou de efeito nenhum."
+   },
+   "dica": "Receita: “Ele tira a folha da copiadora” → “Close no rosto”. Qualquer dupla diferente funciona; repetir o mesmo plano não conta.",
+   "curto": "Dois planos diferentes, um depois do outro."
+  },
+  "EX_EIXO_001": {
+   "faca": "Monte a conversa no carro com pelo menos três planos, em qualquer ordem.",
+   "observe": "Em cada plano, quem está à esquerda? E quem está à direita?",
+   "apos": "Você trocou de plano várias vezes e mesmo assim sabe onde cada um está.",
+   "mudou": "A câmera mudou de enquadramento, mas ele ficou sempre à esquerda e ela, à direita.",
+   "descoberta": "A câmera ficou sempre do mesmo lado da linha imaginária entre os dois. Por isso o espectador não se perde: cada um continua no lado da tela onde estava.",
+   "continue": "Monte com outros planos. Alguma vez eles trocaram de lado?",
+   "lado": true,
+   "caraca": {
+    "t": "O espaço ficou inteiro.",
+    "s": "Os dois planos pertencem ao mesmo lugar."
+   },
+   "curto": "Monte a conversa no carro com 3 planos ou mais."
+  },
+  "EX_EXPERIMENTO_001": {
+   "faca": "Monte os planos na ordem original e assista. Depois mude a ordem e assista de novo.",
+   "observe": "A história continua a mesma? O que você entende em cada versão?",
+   "apos": "Os planos eram os mesmos. A história que você contou, não.",
+   "mudou": "A ordem dos planos mudou o que a história parece dizer.",
+   "descoberta": "Dos mesmos planos saem histórias diferentes. Quem decide a ordem decide o que o público entende primeiro, e o que entende depois.",
+   "continue": "Tire um plano da sua versão. A história ainda se entende?",
+   "original": true,
+   "caraca": {
+    "t": "Mesmos planos. outra história.",
+    "s": "Só a ordem mudou."
+   },
+   "curto": "Monte na ordem original; depois, mude a ordem."
+  },
+  "EX_JCUT_001": {
+   "faca": "Coloque o plano A e o plano B. Separe o som de B e faça ele começar antes da imagem de B.",
+   "observe": "Você escuta B enquanto ainda está vendo A?",
+   "apos": "Você ouviu o plano B antes de vê-lo.",
+   "mudou": "O som e a imagem de B deixaram de mudar juntos. O som saiu na frente.",
+   "descoberta": "No J-cut, o som do plano seguinte começa antes de a imagem mudar. O espectador escuta para onde a cena vai antes de ver.",
+   "continue": "Antecipe o som um pouco mais, e depois um pouco menos. Qual deixa a passagem mais suave?",
+   "jcut": true,
+   "caraca": {
+    "t": "É isso.",
+    "s": "O áudio chegou antes da imagem."
+   },
+   "curto": "Faça o som de B começar antes da imagem de B."
+  },
+  "EX_LCUT_001": {
+   "faca": "Coloque o plano A e o plano B. Separe o som de A e estenda ele por cima da imagem de B.",
+   "observe": "A imagem já mudou. O som ainda é o do plano anterior?",
+   "apos": "A imagem mudou, mas o som ficou.",
+   "mudou": "O som de A não parou onde a imagem de A parou.",
+   "descoberta": "No L-cut, a imagem muda, mas o som do plano anterior continua. O som costura os dois planos e faz o corte parecer mais suave.",
+   "continue": "Estenda o som por mais tempo. Até onde ele ainda faz sentido sobre a nova imagem?",
+   "lcut": true,
+   "caraca": {
+    "t": "É isso.",
+    "s": "A imagem mudou. O som ficou."
+   },
+   "curto": "Estenda o som de A por cima da imagem de B."
+  },
+  "EX_CROSSCUT_001": {
+   "faca": "Escolha quais planos pertencem a cada casa e monte alternando entre elas, com pelo menos quatro planos.",
+   "observe": "Quando você volta para a primeira casa, o que a outra mulher estava fazendo?",
+   "apos": "As duas casas nunca aparecem juntas no mesmo plano, mas você sente que a conversa acontece ao mesmo tempo.",
+   "mudou": "Duas linhas de ação separadas passam a parecer a mesma conversa, vista de dois lugares.",
+   "descoberta": "Ao alternar entre dois lugares, a montagem faz o espectador entender que as duas ações acontecem ao mesmo tempo e que uma depende da outra. Isso se chama montagem paralela, ou cross-cut.",
+   "continue": "Monte só uma casa e depois a outra, sem alternar. A sensação de ao mesmo tempo continua?",
+   "cross": true,
+   "caraca": {
+    "t": "Dois lugares. um momento.",
+    "s": "Você fez as duas casas acontecerem juntas."
+   },
+   "curto": "Alterne entre as duas casas, com 4 planos ou mais."
+  },
+  "EX_BROLL_001": {
+   "faca": "Monte: garoto, o que ele vê, garoto de novo. Escolha o plano que explica o olhar dele.",
+   "observe": "O plano do meio responde a uma pergunta que a imagem do garoto deixa aberta: o que ele está olhando?",
+   "dica": "Procure um plano de céu. Detalhes de livro, celular ou placa não mostram o que ele olha.",
+   "apos": "Você saiu do garoto, mostrou o que ele vê e voltou: a cena ganhou um motivo.",
+   "mudou": "Antes, só dava para ver um garoto olhando. Agora a plateia sabe para o quê.",
+   "descoberta": "Um plano de apoio que mostra o que a cena principal não mostra se chama B-roll, ou plano de cobertura. Ele explica, esconde cortes e dá ritmo, mas só funciona quando tem relação com a cena.",
+   "continue": "Troque a pipa rosa pela amarela. O sentido muda? Agora ponha o livro no meio. Ainda faz sentido?",
+   "caraca": {
+    "t": "Você mostrou o que ele vê.",
+    "s": "O plano certo no meio explica a cena inteira."
+   },
+   "curto": "Garoto, o que ele vê, garoto de novo."
+  }
+ }
+}

@@ -1,0 +1,107 @@
+[
+ {
+  "n": 1,
+  "t": "O que um plano faz com o outro",
+  "a": [
+   "EX_CORTEDIRETO_001",
+   "EX_CORTE_004A",
+   "EX_KULESHOV_001",
+   "EX_KULESHOV_002"
+  ]
+ },
+ {
+  "n": 2,
+  "t": "Movimento e interrupção",
+  "a": [
+   "EX_CORTE_001",
+   "EX_CORTE_004C"
+  ]
+ },
+ {
+  "n": 3,
+  "t": "O salto no tempo",
+  "a": [
+   "EX_JUMPCUT_NL01"
+  ]
+ },
+ {
+  "n": 4,
+  "t": "Quem olha para quem",
+  "a": [
+   "EX_CONTINU_DF01"
+  ]
+ },
+ {
+  "n": 5,
+  "t": "Decisões de montador",
+  "a": [
+   "EX_MURCH_001",
+   "EX_MURCH_002"
+  ]
+ },
+ {
+  "n": 6,
+  "t": "Saltos de tempo",
+  "a": [
+   "EX_CORTE_002",
+   "EX_CORTE_003"
+  ]
+ },
+ {
+  "n": 7,
+  "t": "O tempo que sumiu",
+  "a": [
+   "EX_ELIPSE_NL01"
+  ]
+ },
+ {
+  "n": 8,
+  "t": "Sequência e sentido",
+  "a": [
+   "EX_CORTE_004B"
+  ]
+ },
+ {
+  "n": 9,
+  "t": "Uma imagem encontra a outra",
+  "a": [
+   "EX_MATCHCUT_MC01"
+  ]
+ },
+ {
+  "n": 10,
+  "t": "Do mesmo lado da linha",
+  "a": [
+   "EX_EIXO_001"
+  ]
+ },
+ {
+  "n": 11,
+  "t": "A mesma história, outra ordem",
+  "a": [
+   "EX_EXPERIMENTO_001"
+  ]
+ },
+ {
+  "n": 12,
+  "t": "O som atravessa o corte",
+  "a": [
+   "EX_JCUT_001",
+   "EX_LCUT_001"
+  ]
+ },
+ {
+  "n": 13,
+  "t": "Dois lugares ao mesmo tempo",
+  "a": [
+   "EX_CROSSCUT_001"
+  ]
+ },
+ {
+  "n": 14,
+  "t": "Cobrir com outro olhar",
+  "a": [
+   "EX_BROLL_001"
+  ]
+ }
+]

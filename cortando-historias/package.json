@@ -1,0 +1,17 @@
+{
+  "name": "cortando-historias-laboratorio",
+  "version": "9.0.0",
+  "private": true,
+  "description": "Cortando Histórias — Laboratório de Montagem (HTML/CSS/JS puro)",
+  "scripts": {
+    "build": "node scripts/build-data.js",
+    "validate": "node scripts/build-data.js && node scripts/validate.js",
+    "serve": "http-server -p 8765 -c-1 .",
+    "test": "node tests/e2e.js",
+    "qr": "node scripts/qr-links.js"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "playwright": "^1.56.0"
+  }
+}

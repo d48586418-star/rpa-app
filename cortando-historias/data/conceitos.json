@@ -1,0 +1,359 @@
+{
+ "fonte": "Biblioteca de descobertas: apenas conceitos que já existem nas atividades e leituras do laboratório. Textos curtos escritos para o laboratório; conferir com a cartilha impressa e ajustar. A numeração de páginas está em cartilha.json.",
+ "fundamentos": [
+  {
+   "id": "edicao",
+   "t": "O que é edição?",
+   "ideia": "Escolher o que entra, em que ordem e por quanto tempo.",
+   "entenda": "Edição é uma técnica: selecionar, organizar e combinar o material gravado. Ela existe porque a realidade é caótica. Se você grava duas horas de uma festa, ninguém quer assistir às duas horas: você escolhe cinco minutos, e essa é a história que decidiu contar.",
+   "veja": [
+    "SC_026",
+    "SC_013"
+   ]
+  },
+  {
+   "id": "plano",
+   "t": "O que é um plano?",
+   "ideia": "Um pedaço de filme gravado sem interrupção.",
+   "entenda": "Do momento em que a câmera começa a gravar até o momento em que ela para. Sozinho, um plano é só uma imagem que existe. Ele ainda não conta nada.",
+   "veja": [
+    "BH_015"
+   ]
+  },
+  {
+   "id": "corte",
+   "t": "O que é um corte?",
+   "ideia": "O instante em que um plano termina e outro começa.",
+   "entenda": "Quase todo filme está cheio de cortes, e a maioria passa despercebida. Cada corte é uma decisão: onde termina um plano, onde começa o próximo.",
+   "veja": [
+    "SC_029",
+    "SC_030"
+   ]
+  },
+  {
+   "id": "montagem",
+   "t": "O que é montagem?",
+   "ideia": "Juntar imagens cria significado.",
+   "entenda": "Montagem é um conceito: a ideia de que juntar imagens cria significado. O significado está na relação entre as imagens. Por isso a mesma imagem pode querer dizer coisas diferentes, dependendo do que vem antes e depois.",
+   "veja": [
+    "SC_026",
+    "SC_029"
+   ]
+  }
+ ],
+ "conceitos": [
+  {
+   "id": "corte-direto",
+   "t": "Corte direto",
+   "aliases": [
+    "corte direto"
+   ],
+   "ato": 1,
+   "ideia": "A troca imediata de um plano para outro, sem efeito.",
+   "entenda": "Quando um plano termina e outro começa no mesmo instante, a troca é feita por corte direto. Não precisa de fade nem de dissolvência: o próprio corte já é uma decisão de montagem.",
+   "exp": [
+    "EX_CORTEDIRETO_001"
+   ]
+  },
+  {
+   "id": "kuleshov",
+   "t": "Efeito Kuleshov",
+   "aliases": [
+    "efeito Kuleshov"
+   ],
+   "ato": 1,
+   "ideia": "O mesmo rosto parece sentir coisas diferentes conforme a imagem que vem depois.",
+   "entenda": "Quando um close de rosto é seguido por outra imagem, o público liga as duas e imagina o que a pessoa sente. O rosto não muda. Muda o que o espectador constrói entre os dois planos.",
+   "exp": [
+    "EX_KULESHOV_001",
+    "EX_KULESHOV_002"
+   ],
+   "quem": "kuleshov"
+  },
+  {
+   "id": "olhar",
+   "t": "Olhar e contraplano",
+   "aliases": [
+    "olhar e contraplano"
+   ],
+   "ato": 1,
+   "ideia": "Um plano mostra quem olha; o seguinte mostra o que é olhado.",
+   "entenda": "Quando alguém olha para fora do quadro e o próximo plano mostra um objeto, o público entende que aquilo está sendo visto. É a montagem que cria essa ligação.",
+   "exp": [
+    "EX_CORTE_004A"
+   ]
+  },
+  {
+   "id": "corte-na-acao",
+   "t": "Corte na ação",
+   "aliases": [
+    "corte na ação",
+    "corte antes da ação"
+   ],
+   "ato": 2,
+   "ideia": "Cortar durante um gesto faz o movimento atravessar o corte.",
+   "entenda": "Quando o gesto começa num plano e termina no outro, o olho acompanha o movimento e quase não percebe a emenda. Cortar antes do gesto, ao contrário, faz a ação pular.",
+   "exp": [
+    "EX_CORTE_001"
+   ]
+  },
+  {
+   "id": "interrupcao",
+   "t": "Cutaway e contraplano",
+   "aliases": [
+    "cutaway",
+    "contraplano"
+   ],
+   "ato": 2,
+   "ideia": "Interromper uma cena com outra imagem e voltar a ela.",
+   "entenda": "O plano que interrompe comenta a cena: traz outra pessoa, outro lugar, outro detalhe. Quem escolhe o que interrompe escolhe o que a interrupção quer dizer.",
+   "exp": [
+    "EX_CORTE_004C"
+   ]
+  },
+  {
+   "id": "plano-contraplano",
+   "t": "Plano e contraplano",
+   "aliases": [
+    "plano/contraplano"
+   ],
+   "ato": 2,
+   "ideia": "Pessoas que olham em direções opostas parecem se encontrar.",
+   "entenda": "Alternar os planos de duas pessoas que olham uma para a outra cria a sensação de conversa ou encontro, mesmo quando elas não aparecem juntas no mesmo quadro.",
+   "exp": [
+    "EX_CONTINU_DF01"
+   ]
+  },
+  {
+   "id": "match-cut",
+   "t": "Match cut",
+   "aliases": [
+    "match cut"
+   ],
+   "ato": 2,
+   "ideia": "Duas imagens diferentes ligadas pelo que têm em comum.",
+   "entenda": "Forma, posição ou movimento parecidos fazem o olho encaixar um plano no outro. A ligação é visual.",
+   "exp": [
+    "EX_MATCHCUT_MC01"
+   ],
+   "veja": [
+    "TAKE_008_001",
+    "TAKE_008_002"
+   ],
+   "exemplo": "No filme Lawrence da Arábia (David Lean, 1962), a chama do fósforo vira o sol nascendo no deserto. As duas imagens se parecem na luz, na forma e na cor."
+  },
+  {
+   "id": "jump-cut",
+   "t": "Jump cut",
+   "aliases": [
+    "jump cut",
+    "jump cut (salto)"
+   ],
+   "ato": 3,
+   "ideia": "Um salto visível dentro do mesmo enquadramento.",
+   "entenda": "Ao tirar um pedaço do meio de um plano e juntar as pontas, a imagem dá um pulo: alguém ou algo muda de lugar de repente. O corte aparece na própria imagem. Pode ser um defeito ou uma escolha.",
+   "exp": [
+    "EX_JUMPCUT_NL01",
+    "EX_CORTE_002"
+   ]
+  },
+  {
+   "id": "insercao",
+   "t": "Plano de inserção",
+   "aliases": [
+    "plano de inserção"
+   ],
+   "ato": 3,
+   "ideia": "Um plano diferente entre duas pontas esconde o salto.",
+   "entenda": "Quando entre dois momentos da mesma câmera entra outra imagem, o olho não compara as pontas diretamente. O salto fica escondido.",
+   "exp": [
+    "EX_CORTE_002"
+   ]
+  },
+  {
+   "id": "elipse",
+   "t": "Elipse",
+   "aliases": [
+    "elipse"
+   ],
+   "ato": 3,
+   "ideia": "O tempo que a história não mostra, mas o público entende que passou.",
+   "entenda": "Em vez de mostrar tudo, a montagem omite um intervalo. O corte pode até passar despercebido. O que fica é a sensação de que o tempo andou.",
+   "exp": [
+    "EX_ELIPSE_NL01"
+   ]
+  },
+  {
+   "id": "tempo",
+   "t": "O mesmo lugar, outro tempo",
+   "aliases": [
+    "o mesmo lugar, outro tempo"
+   ],
+   "ato": 3,
+   "ideia": "O mesmo enquadramento pode atravessar meses.",
+   "entenda": "Dois planos com a mesma composição e sinais de tempo diferentes (cabelo, roupa, luz) fazem o público sentir que o tempo passou, sem ninguém explicar. É parente do match cut pela semelhança de composição, mas aqui o que importa é o tempo.",
+   "exp": [
+    "EX_CORTE_003"
+   ]
+  },
+  {
+   "id": "sequencia",
+   "t": "Sequência de montagem",
+   "aliases": [
+    "sequência de montagem"
+   ],
+   "ato": 4,
+   "ideia": "Várias imagens juntas sugerem um estado, não um acontecimento.",
+   "entenda": "Em vez de seguir uma ação, a sequência junta objetos e detalhes para mostrar como alguém vive ou se sente. A imagem final muda o sentido de todas as anteriores.",
+   "exp": [
+    "EX_CORTE_004B"
+   ]
+  },
+  {
+   "id": "murch",
+   "t": "Emoção antes da regra",
+   "aliases": [
+    "emoção antes da regra"
+   ],
+   "ato": 4,
+   "ideia": "Decidir um corte é escolher o que pesa mais.",
+   "entenda": "O montador Walter Murch propõe seis critérios para decidir um corte e coloca a emoção no topo da lista. Não é uma regra para obedecer: é uma ordem de perguntas para o montador se fazer.",
+   "exp": [
+    "EX_MURCH_001"
+   ],
+   "quem": "murch",
+   "criterios": [
+    "Emoção",
+    "História",
+    "Ritmo",
+    "Olhar do espectador",
+    "Plano bidimensional da tela",
+    "Espaço tridimensional da ação"
+   ]
+  },
+  {
+   "id": "revelar",
+   "t": "A hora de revelar",
+   "aliases": [
+    "a hora de revelar"
+   ],
+   "ato": 4,
+   "ideia": "Quando e como o público descobre algo muda o que ele sente.",
+   "entenda": "Revelar de perto dá impacto; revelar pelo espaço inteiro dá contexto. As duas escolhas são válidas, e cada uma produz uma experiência diferente.",
+   "exp": [
+    "EX_MURCH_002"
+   ]
+  },
+  {
+   "id": "eixo",
+   "t": "Eixo e linha de ação",
+   "aliases": [
+    "eixo"
+   ],
+   "ato": 2,
+   "ideia": "A câmera fica do mesmo lado da linha entre as pessoas.",
+   "entenda": "Entre duas pessoas que conversam existe uma linha imaginária. Quando todos os planos são filmados do mesmo lado dela, cada pessoa continua no mesmo lado da tela e o espectador não se perde. Cruzar essa linha sem aviso desorienta.",
+   "exp": [
+    "EX_EIXO_001"
+   ]
+  },
+  {
+   "id": "ordem",
+   "t": "A ordem importa",
+   "aliases": [
+    "a ordem importa"
+   ],
+   "ato": 4,
+   "ideia": "Os mesmos planos, em outra ordem, contam outra história.",
+   "entenda": "A ordem dos planos decide o que o público entende primeiro e o que entende depois. Montar é escolher essa ordem.",
+   "exp": [
+    "EX_EXPERIMENTO_001"
+   ]
+  },
+  {
+   "id": "j-cut",
+   "t": "J-cut",
+   "aliases": [
+    "j-cut"
+   ],
+   "ato": 5,
+   "ideia": "O som do próximo plano chega antes da imagem.",
+   "entenda": "Na linha do tempo, o som de B começa embaixo da imagem de A. O espectador escuta para onde a cena vai antes de ver. O nome vem do desenho que o som e a imagem fazem na timeline.",
+   "exp": [
+    "EX_JCUT_001"
+   ]
+  },
+  {
+   "id": "l-cut",
+   "t": "L-cut",
+   "aliases": [
+    "l-cut"
+   ],
+   "ato": 5,
+   "ideia": "O som do plano anterior continua depois que a imagem mudou.",
+   "entenda": "A imagem passa para B, mas o som de A segue tocando por cima. O som costura os dois planos e o corte parece mais suave.",
+   "exp": [
+    "EX_LCUT_001"
+   ]
+  },
+  {
+   "id": "cross-cut",
+   "t": "Montagem paralela (cross-cut)",
+   "aliases": [
+    "cross-cut",
+    "cross cut",
+    "montagem paralela"
+   ],
+   "ato": 4,
+   "ideia": "Alternar entre duas ações que acontecem ao mesmo tempo.",
+   "entenda": "Em vez de mostrar uma ação inteira e depois a outra, a montagem vai e volta entre as duas. O espectador entende que elas acontecem juntas e passa a ligar uma à outra.",
+   "exp": [
+    "EX_CROSSCUT_001"
+   ],
+   "veja": [
+    "TAKE_010_033_A1",
+    "TAKE_010_033_B1"
+   ],
+   "exemplo": "No trecho de Do meu lado (Boitui, 2018), a conversa por telefone aparece em dois lugares: uma mulher perto do altar e outra à mesa, com o lampião."
+  },
+  {
+   "id": "b-roll",
+   "t": "B-roll (plano de cobertura)",
+   "aliases": [
+    "b-roll",
+    "broll",
+    "plano de cobertura",
+    "cutaway"
+   ],
+   "ato": 4,
+   "ideia": "Um plano extra que mostra o que a cena principal não mostra.",
+   "entenda": "Entre dois pedaços da cena principal, entra um plano de apoio: o que o personagem olha, um detalhe, o lugar. Ele explica, esconde um corte e dá fôlego, mas só funciona se tiver relação com a cena.",
+   "exp": [
+    "EX_BROLL_001"
+   ],
+   "veja": [
+    "NZ_130",
+    "NZ_016"
+   ],
+   "exemplo": "Um garoto olha para o alto; o corte mostra uma pipa no céu; voltamos ao garoto. Sem o plano da pipa, não saberíamos o que o prendeu."
+  }
+ ],
+ "quem": {
+  "kuleshov": {
+   "nome": "Lev Kuleshov",
+   "anos": "1899–1970",
+   "papel": "Cineasta e teórico soviético",
+   "frase": "Nos primeiros anos do cinema russo, ele e seus alunos experimentaram juntar o mesmo close de um ator com imagens diferentes e notaram que o público lia emoções diferentes no mesmo rosto.",
+   "relacao": "É o que você fez ao trocar a imagem depois do rosto.",
+   "fonte": "conhecimento geral; conferir com a cartilha"
+  },
+  "murch": {
+   "nome": "Walter Murch",
+   "anos": "nasc. 1943",
+   "papel": "Montador e designer de som norte-americano",
+   "frase": "Em seu livro sobre edição, ele propõe seis critérios para decidir um corte, com a emoção em primeiro lugar.",
+   "relacao": "É o que você fez ao escolher um plano por um motivo, e não por uma regra.",
+   "fonte": "conhecimento geral; conferir com a cartilha"
+  }
+ }
+}

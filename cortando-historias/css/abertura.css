@@ -1,0 +1,49 @@
+/* abertura.css — capa: papel vermelho liso; arrastar para baixo corta o papel, a câmera entra e surgem o texto e o botão. */
+:root{--hero-bg:#a81020;--hero-fg:#fff4ee;--sans:"Helvetica Neue",Helvetica,Arial,sans-serif;--t:0;--txt:1;--btn:1}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:#7d0a18;overscroll-behavior:none}
+body{margin:0;background:#7d0a18;color:var(--hero-fg);font:300 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
+h1,p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:#7d0a18;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.anim .stage{touch-action:none}
+.cam{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform}
+.deep{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%,#ff5266 0,#d8223a 14%,#9c1226 34%,#5a0715 62%,#2a0209 100%)}
+.reveal{display:flex;flex-direction:column;align-items:center;gap:1.6rem;padding:0 1.25rem;text-align:center}
+.txt{font-size:clamp(1.6rem,6.4vw,3rem);font-weight:300;letter-spacing:.01em;line-height:1.05;color:var(--hero-fg);text-shadow:0 2px 24px rgb(42 2 9 / .6)}
+.go{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 2rem;border-radius:999px;background:#fff4ee;color:#7d0a18;font-weight:500;font-size:1rem;letter-spacing:.02em;text-decoration:none;box-shadow:0 8px 28px rgb(42 2 9 / .45)}
+.go:focus-visible,.instr:focus-visible{outline:2px solid #fff;outline-offset:5px}
+/* sem JS ou com a capa ainda fechada por script: texto e botão já visíveis */
+.anim .txt{opacity:calc(max(0,min(1,(var(--t,0) - .25) * 2.5)));transform:translateY(calc((1 - min(1,max(0,(var(--t,0) - .25) * 2.5))) * 18px))}
+.anim .go{opacity:calc(max(0,min(1,(var(--t,0) - .68) * 4)));pointer-events:none}
+.anim.aberta .go{pointer-events:auto}
+.anim:not(.aberta) .go{visibility:hidden}
+.rip{position:absolute;inset:0;display:none;pointer-events:none}
+.anim .rip{display:block}
+.rip-full,.rip-h>div{background:radial-gradient(120% 80% at 50% 38%,#c01a2c 0,var(--hero-bg) 55%,#7d0a18 100%)}
+.rip-full{position:absolute;inset:0}
+.rip.split .rip-full{display:none}
+.rip:not(.split) .rip-h{visibility:hidden}
+.rip-h{position:absolute;inset:0;will-change:transform}
+.rip-h>div{position:absolute;inset:0}
+.rip-h.top>div{clip-path:polygon(var(--cp-top,0 0,100% 0,100% 50%,0 50%))}
+.rip-h.bot>div{clip-path:polygon(var(--cp-bot,0 50%,100% 50%,100% 100%,0 100%))}
+.rip-h.top{transform:translate3d(0,calc(var(--t,0) * -62%),0) rotate(calc(var(--t,0) * -1.6deg));transform-origin:0 50%;filter:drop-shadow(0 1px 0 rgb(255 255 255 / .5)) drop-shadow(0 12px 18px rgb(30 0 5 / .5))}
+.rip-h.bot{transform:translate3d(0,calc(var(--t,0) * 62%),0) rotate(calc(var(--t,0) * 1.2deg));transform-origin:100% 50%;filter:drop-shadow(0 -1px 0 rgb(255 255 255 / .5)) drop-shadow(0 12px 18px rgb(30 0 5 / .5))}
+.rip-glass{position:absolute;left:0;right:0;top:calc(50% - var(--t,0) * 62%);height:calc(var(--t,0) * 124%);
+  opacity:calc(min(1,var(--t,0) * 7) * max(0,1 - (var(--t,0) - .5) * 2.2));
+  -webkit-backdrop-filter:blur(5px) saturate(150%);backdrop-filter:blur(5px) saturate(150%);
+  background:linear-gradient(180deg,rgb(255 255 255 / .16),rgb(255 255 255 / .05) 50%,rgb(255 255 255 / .12));
+  border-block:1px solid rgb(255 255 255 / .55);box-shadow:inset 0 1px 0 rgb(255 255 255 / .5),0 0 40px rgb(255 255 255 / .12)}
+.instr{position:absolute;left:0;right:0;bottom:calc(max(3rem,env(safe-area-inset-bottom) + 2.2rem));display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;background:none;border:0;font-family:inherit;color:var(--hero-fg);font-size:.9rem;font-weight:300;letter-spacing:.06em;opacity:calc(.85 - var(--t,0) * 9);z-index:3;cursor:pointer}
+.aberta .instr{visibility:hidden}
+.instr svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;animation:desce 1.8s ease-in-out infinite}
+@keyframes desce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+/* Reduzir Movimento: sem zoom nem deslocamento — o papel esmaece */
+.redmo .cam{transform:none!important}
+.redmo .rip-h.top,.redmo .rip-h.bot{transform:none;opacity:calc(1 - var(--t,0) * 1.3)}
+.redmo .rip-glass{display:none}
+.redmo .txt{transform:none}
+.redmo .instr svg{animation:none}
+@media (prefers-reduced-motion:reduce){.instr svg{animation:none}}
+.noanim .instr{display:none}

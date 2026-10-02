@@ -1,0 +1,76 @@
+/* ============ DESCOBERTAS · CONCEITOS · O QUE É EDIÇÃO ============ */
+.cgrid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:var(--s8)}
+.ccard{position:relative;display:grid;gap:8px;align-content:start;padding:0 0 18px;border-radius:var(--r3);background:color-mix(in srgb,var(--ac,var(--g1)) 16%,var(--bg));text-decoration:none;overflow:hidden;transition:transform var(--dur-2) var(--ease)}
+.ccard:hover{transform:translateY(-3px)}
+.ccard>:not(.cc-img){padding:0 18px}
+.cc-img{display:block;height:150px;overflow:hidden;margin-bottom:6px}
+.cc-img img{width:100%;height:100%;object-fit:cover}
+.cc-t{font-size:1.9rem;letter-spacing:-.04em}
+.cc-i{font-size:.92rem;line-height:1.4;opacity:.85}
+.ccard.off{background:var(--g0);box-shadow:inset 0 0 0 1.5px var(--g2)}
+.ccard.off .cc-img{opacity:.35}
+.ccard.off .cc-t{color:var(--g3);font-size:2.8rem}
+@media (min-width:600px){.cgrid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:980px){.cgrid{grid-template-columns:repeat(3,1fr)}}
+
+.quem-wrap{display:grid;gap:10px}
+.quem-grid{display:grid;gap:14px;margin-top:10px}
+.quem{display:grid;grid-template-columns:110px 1fr;gap:18px;padding:18px;border-radius:var(--r3);background:var(--g0)}
+.quem-plate{display:grid;align-content:space-between;justify-items:start;aspect-ratio:3/4;padding:12px;border-radius:var(--r2);background:var(--tinta);color:var(--bg)}
+.quem-plate b{font-size:2.6rem;letter-spacing:-.05em}
+.quem-plate .mono{font-size:.62rem;color:#ffffffa0}
+.quem-tx{display:grid;gap:8px;align-content:start;min-width:0}
+.quem-tx p{font-size:.94rem;line-height:1.5}
+.quem-rel{padding:10px 14px;border-radius:var(--r1);background:var(--claquete-fundo)}
+.quem-tx .btn{justify-self:start}
+@media (max-width:520px){.quem{grid-template-columns:1fr}.quem-plate{aspect-ratio:auto;height:96px;grid-auto-flow:column;align-items:end}}
+@media (min-width:900px){.quem-grid{grid-template-columns:1fr 1fr}}
+
+.concept{max-width:860px}
+.concept-t{font-size:clamp(3rem,1.5rem + 7vw,7rem);letter-spacing:-.05em;margin:4px 0 8px}
+.concept-i{font-size:var(--fs-3);line-height:1.25;letter-spacing:-.02em;max-width:26ch;font-weight:600;background:linear-gradient(transparent 62%,var(--ac,var(--claquete)) 62%);width:fit-content;max-width:100%}
+.cblock{display:grid;gap:12px;padding:var(--s5) 0;border-top:var(--hair)}
+.c-ent{font-size:var(--fs-2);line-height:1.55;max-width:56ch}
+.veja{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.veja-f{display:grid;gap:6px;margin:0}
+.veja-m{position:relative;aspect-ratio:var(--ar);border-radius:var(--r2);overflow:hidden;background:#111}
+.veja-m video,.veja-m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.veja-f figcaption{color:var(--g5);font-size:.72rem}
+.crit{display:grid;gap:6px;counter-reset:c;max-width:440px}
+.crit li{display:flex;gap:14px;align-items:center;padding:12px 16px;border-radius:var(--r1);background:var(--g0);font-weight:600}
+.crit li:first-child{background:var(--claquete);color:var(--on-perfil,#fff)}
+.crit-n{font-size:.88rem}
+.na-cart{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:14px 16px;border-radius:var(--r2);background:var(--g0);font-size:.92rem}
+.na-cart svg{width:20px;height:20px}
+.na-cart span{flex:1;min-width:0}
+.locked .page-head{margin-top:var(--s7)}
+
+.fund{display:grid;gap:var(--s7);margin-bottom:var(--s7)}
+.fund-i{position:relative;display:grid;gap:16px;padding-top:var(--s5);border-top:var(--hair)}
+.fund-n{color:var(--g4)}
+.fund-tx{display:grid;gap:12px}
+.fund-ideia{font-size:clamp(1.6rem,1.2rem + 2vw,2.6rem);letter-spacing:-.04em;max-width:20ch}
+@media (min-width:860px){.fund-i{grid-template-columns:60px 1fr 1fr;gap:40px;align-items:start}}
+.fund-cta{margin-bottom:var(--s6)}
+
+/* ---- Museu da Edição ---- */
+.mu-line{list-style:none;margin:12px -16px 0;padding:0 16px 14px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;border-bottom:2px solid var(--tinta)}
+.mu-line li{flex:0 0 min(74vw,260px);scroll-snap-align:start}
+.mu-line a{display:grid;gap:6px;height:100%;padding:14px;border:1.5px solid var(--tinta);border-radius:var(--r2);background:var(--papel,#fff);color:inherit;text-decoration:none;align-content:start}
+.mu-line a:hover,.mu-line a:focus-visible{background:var(--claquete);color:var(--on-perfil,#fff)}
+.mu-y{font-size:1.5rem;letter-spacing:-.04em;color:var(--vermelho)}
+.mu-q{font-size:.8rem;opacity:.7}.mu-1{font-size:.9rem}
+.museu section{margin-top:28px}
+.mu-murch,.mu-ppl,.mu-map{list-style:none;padding:0;margin:12px 0;display:grid;gap:8px}
+.mu-murch li{display:grid;grid-template-columns:28px 1fr auto;gap:2px 10px;padding:10px 0;border-top:1px solid rgb(22 22 24 / 0.20);align-items:baseline}
+.mu-murch li span:last-child{grid-column:2/4;font-size:.92rem}
+.mu-ppl li{display:grid;gap:2px;padding:10px 0;border-top:1px solid rgb(22 22 24 / 0.20)}
+.mu-ppl .mono{font-size:.78rem;opacity:.7}
+.mu-map li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid rgb(22 22 24 / 0.13);min-height:44px;align-items:center}
+.mu-chip{display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:6px 12px;border:1.5px solid var(--tinta);border-radius:var(--r2);color:inherit;text-decoration:none;margin:4px 6px 0 0}
+.mu-link{margin:6px 0}.mu-link .eyebrow{display:block}
+.mu-deep summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600}
+.mu-div{margin:12px 0;padding:10px 12px;border-left:3px solid var(--vermelho)}.mu-div .eyebrow{display:block}
+.mu-src{padding-left:18px}.mu-src li{margin:6px 0;overflow-wrap:anywhere}
+.mu-pn{display:flex;justify-content:space-between;gap:8px;margin-top:20px}
+.mu-note{font-size:.9rem}

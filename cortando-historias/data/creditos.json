@@ -1,0 +1,32 @@
+{
+ "projeto": "Cortando Histórias, Laboratório de Montagem",
+ "concepcao": "Débora Augusta Alves Santos",
+ "desenvolvimento": "Claude Code (Anthropic) e Débora Augusta Alves Santos",
+ "programa": "Cinema na Comunidade",
+ "instituicoes": [
+  {
+   "nome": "UESC",
+   "papel": ""
+  }
+ ],
+ "ia": "Ferramentas de inteligência artificial foram utilizadas no processo de desenvolvimento deste laboratório (código, interface e textos de apoio). A concepção pedagógica, a seleção dos filmes e dos planos e as atividades são do projeto.",
+ "filmes_nota": "Os planos usados nas atividades pertencem aos curtas-metragens listados abaixo e aparecem aqui com finalidade educacional.",
+ "funcoes": [
+  {
+   "papel": "Concepção, coordenação, projeto pedagógico, seleção dos filmes e dos planos, atividades",
+   "nome": "Débora Augusta Alves Santos"
+  },
+  {
+   "papel": "Desenvolvimento e implementação",
+   "nome": "Claude Code (Anthropic), em parceria com Débora Augusta Alves Santos"
+  }
+ ],
+ "ia_politica": [
+  "Código, interface e textos de apoio foram escritos com Claude Code (Anthropic), em parceria com Débora Augusta Alves Santos, que dirigiu e revisou o trabalho.",
+  "As imagens e os vídeos dos cinco personagens (perfis de editor) foram gerados por inteligência artificial.",
+  "As fotos históricas do Museu da Edição são imagens da internet.",
+  "Os planos das atividades são trechos de curtas-metragens listados abaixo, não são gerados por IA.",
+  "A IA não é atribuída como autora humana: a concepção pedagógica, a seleção dos planos e as atividades são de Débora Augusta Alves Santos."
+ ],
+ "autoria": "O simulador Cortando Histórias foi desenvolvido por Claude Code (Anthropic) e por Débora Augusta Alves Santos, que fez a concepção, a seleção dos filmes e dos planos e as atividades."
+}

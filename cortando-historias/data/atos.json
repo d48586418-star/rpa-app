@@ -1,0 +1,75 @@
+{
+ "fonte": "agrupamento das 9 etapas do laboratório v7 em 4 atos. A numeração de páginas da cartilha vive em data/cartilha.json (preencher com a cartilha impressa em mãos).",
+ "atos": [
+  {
+   "n": 1,
+   "titulo": "O que um plano faz com o outro",
+   "resumo": "Dois planos juntos dizem algo que nenhum diz sozinho.",
+   "cor": "#a81020",
+   "etapas": [
+    1
+   ],
+   "verbo": "Relacionar",
+   "pergunta": "Um plano sozinho é só uma imagem. O que ele ganha quando outro chega?",
+   "duo": "duo-o"
+  },
+  {
+   "n": 2,
+   "titulo": "Movimento, olhar e continuidade",
+   "resumo": "O que atravessa o corte: o gesto, o olhar, a forma.",
+   "cor": "#2f5f9f",
+   "etapas": [
+    2,
+    4,
+    9,
+    10
+   ],
+   "verbo": "Continuar",
+   "pergunta": "O que atravessa o corte: o gesto, o olhar, a forma.",
+   "duo": "duo-b"
+  },
+  {
+   "n": 3,
+   "titulo": "O tempo",
+   "resumo": "Tirar um pedaço muda o tempo. Às vezes o corte aparece; às vezes o tempo só passa.",
+   "cor": "#e0a100",
+   "etapas": [
+    3,
+    6,
+    7
+   ],
+   "verbo": "Manipular o tempo",
+   "pergunta": "Tirar um pedaço muda o tempo. Às vezes o corte aparece; às vezes só o tempo passa.",
+   "duo": "duo-y"
+  },
+  {
+   "n": 4,
+   "titulo": "Decisões de montador",
+   "resumo": "Quando tudo é possível, o que você escolhe mostrar, e quando.",
+   "cor": "#3f7d5a",
+   "etapas": [
+    11,
+    13,
+    14,
+    5,
+    8
+   ],
+   "livre": true,
+   "verbo": "Escolher",
+   "pergunta": "Quando tudo é possível, o que você mostra, e quando.",
+   "duo": "duo-g"
+  },
+  {
+   "n": 5,
+   "titulo": "O som atravessa o corte",
+   "resumo": "O som não precisa mudar junto com a imagem.",
+   "cor": "#6b3f5f",
+   "etapas": [
+    12
+   ],
+   "verbo": "Escutar",
+   "pergunta": "O que o som faz enquanto a imagem muda?",
+   "duo": "duo-m"
+  }
+ ]
+}

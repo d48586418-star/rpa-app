@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cortando Histórias</title>
+<meta name="description" content="Simulador de timeline: laboratório de montagem audiovisual.">
+<meta name="theme-color" content="#a81020">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/abertura.css">
+</head>
+<body>
+<main>
+ <div class="stage" id="stage">
+  <h1 class="sr">Cortando Histórias</h1>
+  <div class="cam" id="cam">
+    <div class="deep">
+      <div class="reveal">
+        <p class="txt" id="txt" aria-hidden="true">Criando Histórias</p>
+        <a class="go" id="entrar" href="lab.html#/boas-vindas">Iniciar jornada</a>
+      </div>
+    </div>
+  </div>
+  <div class="rip" id="rip" aria-hidden="true">
+    <div class="rip-full"></div>
+    <div class="rip-h top"><div></div></div>
+    <div class="rip-h bot"><div></div></div>
+    <div class="rip-glass"></div>
+  </div>
+  <button type="button" class="instr" id="instr"><span>Corte para iniciar</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+ </div>
+</main>
+<script src="js/abertura.js"></script>
+</body>
+</html>

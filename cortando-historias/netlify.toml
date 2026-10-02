@@ -1,0 +1,14 @@
+# Site estático (HTML/CSS/JS puro). No Netlify, defina "Base directory" = cortando-historias.
+[build]
+  command = "node scripts/build-data.js"
+  publish = "."
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"

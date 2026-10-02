@@ -1,0 +1,243 @@
+{
+ "fonte": "Mapa laboratório ↔ cartilha (CARTILHA_1, 61 páginas). Os números são as páginas do PDF recebido (a cartilha escaneada não traz numeração impressa legível). Texto lido por OCR e conferido. Edite aqui e rode: node scripts/build-data.js",
+ "pdf": null,
+ "qr_base": "",
+ "atividades": {
+  "EX_KULESHOV_001": {
+   "ato": 1,
+   "secao": "O efeito Kuleshov",
+   "pagina": "14–17"
+  },
+  "EX_KULESHOV_002": {
+   "ato": 1,
+   "secao": "O efeito Kuleshov",
+   "pagina": "14–17"
+  },
+  "EX_CORTE_001": {
+   "ato": 2,
+   "secao": "Ritmo e tempo: montagem rítmica",
+   "pagina": "35"
+  },
+  "EX_CORTE_002": {
+   "ato": 1,
+   "secao": "Dicionário do editor: jump cut",
+   "pagina": "23"
+  },
+  "EX_CORTE_003": {
+   "ato": 2,
+   "secao": "Ritmo e tempo",
+   "pagina": "35"
+  },
+  "EX_CORTE_004A": {
+   "ato": 1,
+   "secao": "O que Kuleshov nos ajuda a perceber",
+   "pagina": "17"
+  },
+  "EX_CORTE_004B": {
+   "ato": 1,
+   "secao": "Dicionário do editor: sequência",
+   "pagina": "19"
+  },
+  "EX_CORTE_004C": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  },
+  "EX_MURCH_001": {
+   "ato": 2,
+   "secao": "A regra dos seis",
+   "pagina": "33"
+  },
+  "EX_MURCH_002": {
+   "ato": 3,
+   "secao": "Suspense vs. surpresa",
+   "pagina": "39"
+  },
+  "EX_JUMPCUT_NL01": {
+   "ato": 1,
+   "secao": "Dicionário do editor: jump cut",
+   "pagina": "23"
+  },
+  "EX_ELIPSE_NL01": {
+   "ato": 1,
+   "secao": "Dicionário do editor: elipse",
+   "pagina": "23"
+  },
+  "EX_CONTINU_DF01": {
+   "ato": 2,
+   "secao": "Ritmo e tempo: montagem rítmica",
+   "pagina": "35"
+  },
+  "EX_MATCHCUT_MC01": {
+   "ato": 1,
+   "secao": "Dicionário do editor: match cut",
+   "pagina": "23"
+  },
+  "EX_LAB_LIVRE": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  },
+  "EX_CORTEDIRETO_001": {
+   "ato": 1,
+   "secao": "Dicionário do editor: corte e corte seco",
+   "pagina": "21 e 23"
+  },
+  "EX_EIXO_001": {
+   "ato": 2,
+   "secao": "A regra dos 180°",
+   "pagina": "30"
+  },
+  "EX_EXPERIMENTO_001": {
+   "ato": 1,
+   "secao": "O efeito Kuleshov: a relação entre imagens",
+   "pagina": "17"
+  },
+  "EX_JCUT_001": {
+   "ato": 3,
+   "secao": "O que são J-cut e L-cut?",
+   "pagina": "42"
+  },
+  "EX_LCUT_001": {
+   "ato": 3,
+   "secao": "O que são J-cut e L-cut?",
+   "pagina": "42"
+  },
+  "EX_CROSSCUT_001": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  },
+  "EX_BROLL_001": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  }
+ },
+ "conceitos": {
+  "kuleshov": {
+   "ato": 1,
+   "secao": "O efeito Kuleshov",
+   "pagina": "14–17"
+  },
+  "olhar": {
+   "ato": 1,
+   "secao": "O que Kuleshov nos ajuda a perceber",
+   "pagina": "17"
+  },
+  "corte-na-acao": {
+   "ato": 2,
+   "secao": "Ritmo e tempo: montagem rítmica",
+   "pagina": "35"
+  },
+  "interrupcao": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  },
+  "plano-contraplano": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  },
+  "match-cut": {
+   "ato": 1,
+   "secao": "Dicionário do editor: match cut",
+   "pagina": "23"
+  },
+  "jump-cut": {
+   "ato": 1,
+   "secao": "Dicionário do editor: jump cut",
+   "pagina": "23"
+  },
+  "insercao": {
+   "ato": 4,
+   "secao": "Os elementos de edição: B-roll",
+   "pagina": "51–52"
+  },
+  "elipse": {
+   "ato": 1,
+   "secao": "Dicionário do editor: elipse",
+   "pagina": "23"
+  },
+  "tempo": {
+   "ato": 2,
+   "secao": "Ritmo e tempo",
+   "pagina": "35"
+  },
+  "sequencia": {
+   "ato": 1,
+   "secao": "Dicionário do editor: sequência",
+   "pagina": "19"
+  },
+  "murch": {
+   "ato": 2,
+   "secao": "A regra dos seis",
+   "pagina": "33"
+  },
+  "revelar": {
+   "ato": 3,
+   "secao": "Suspense vs. surpresa",
+   "pagina": "39"
+  },
+  "corte-direto": {
+   "ato": 1,
+   "secao": "Dicionário do editor: corte e corte seco",
+   "pagina": "21 e 23"
+  },
+  "eixo": {
+   "ato": 2,
+   "secao": "A regra dos 180°",
+   "pagina": "30"
+  },
+  "ordem": {
+   "ato": 1,
+   "secao": "O efeito Kuleshov: a relação entre imagens",
+   "pagina": "17"
+  },
+  "j-cut": {
+   "ato": 3,
+   "secao": "O que são J-cut e L-cut?",
+   "pagina": "42"
+  },
+  "l-cut": {
+   "ato": 3,
+   "secao": "O que são J-cut e L-cut?",
+   "pagina": "42"
+  },
+  "cross-cut": {
+   "ato": null,
+   "secao": null,
+   "pagina": null,
+   "nota": "A cartilha não trata deste tema."
+  }
+ },
+ "atos": [
+  {
+   "n": 1,
+   "t": "O chamado para a montagem",
+   "pag": 5
+  },
+  {
+   "n": 2,
+   "t": "Aprendendo a cortar",
+   "pag": 27
+  },
+  {
+   "n": 3,
+   "t": "Construindo a história",
+   "pag": 38
+  },
+  {
+   "n": 4,
+   "t": "Da timeline à tela",
+   "pag": 44
+  }
+ ]
+}

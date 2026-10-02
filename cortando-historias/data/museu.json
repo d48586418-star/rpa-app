@@ -1,0 +1,645 @@
+{
+ "fonte": "Cada parada indica as obras originais (livros, textos e filmes) e, separadas, leituras de apoio.",
+ "linha": [
+  {
+   "id": "tesouras",
+   "ano": "1895–hoje",
+   "t": "Das tesouras ao celular",
+   "quem": "Muitas mãos, de 1895 até hoje",
+   "n1": "A edição nasceu nas mãos de quem segurava tesoura e fita.",
+   "n2": "Nos primeiros filmes, por volta de 1895, quase não havia cortes: a câmera ficava num ponto só e registrava a cena inteira. Depois, editores passaram a cortar a película com lâmina e colar com fita. A Moviola (1924) permitiu ver o resultado em movimento. A edição não linear (Avid, Final Cut, Premiere), o DaVinci Resolve e, hoje, o CapCut mudaram a ferramenta, não o princípio.",
+   "n3": "A tecnologia mudou completamente, mas a linguagem e os princípios de Kuleshov não mudaram. Cortar três segundos em película exigia contar 72 quadros, usar lâmina e fita; hoje é arrastar o dedo.",
+   "div": "A Moviola é de 1924, e não de 1956, como às vezes se vê escrito.",
+   "conc": [
+    "corte-direto"
+   ],
+   "ex": [
+    "EX_CORTEDIRETO_001"
+   ],
+   "fontes": [
+    "moviola"
+   ],
+   "cat": "maos",
+   "y0": 1895,
+   "y1": 2026,
+   "duo": "duo-b",
+   "orig": [
+    "Karel Reisz e Gavin Millar, The Technique of Film Editing (Londres: Focal Press, 1953; 2ª ed. 1968)"
+   ]
+  },
+  {
+   "id": "melies",
+   "ano": "1896",
+   "t": "O truque de substituição",
+   "quem": "Georges Méliès",
+   "n1": "Parar a câmera, trocar o que está na cena e voltar a filmar faz uma coisa virar outra na tela.",
+   "n2": "Georges Méliès usou a parada de câmera para fazer pessoas aparecerem, sumirem e se transformarem. Para o público, não havia corte: havia um truque. Para quem monta, é um dos primeiros exemplos de que juntar dois pedaços de filme cria algo que não existiu diante da câmera.",
+   "n3": "A técnica é conhecida como truque de parada ou substituição (substitution splice). Na história que o próprio Méliès contou em 1907, a câmera travou ao filmar uma rua de Paris e, na projeção, um ônibus pareceu virar um carro funerário. A história é um relato dele, muito repetida, e não deve ser tomada como registro exato do dia.",
+   "div": "A história de que ele descobriu o truque por acidente, com a câmera emperrada, é o próprio Méliès quem conta, anos depois. Historiadores tratam o episódio com cautela.",
+   "conc": [
+    "jump-cut",
+    "elipse"
+   ],
+   "ex": [
+    "EX_JUMPCUT_NL01",
+    "EX_ELIPSE_NL01"
+   ],
+   "fontes": [
+    "acmi",
+    "subst"
+   ],
+   "cat": "contar",
+   "y0": 1896,
+   "y1": 1896,
+   "duo": "duo-o",
+   "orig": [
+    "Georges Méliès, Le Voyage dans la Lune (filme, 1902)",
+    "Georges Méliès, “Les vues cinématographiques” (1907), texto do próprio cineasta"
+   ]
+  },
+  {
+   "id": "porter",
+   "ano": "1903",
+   "t": "Contar com planos diferentes",
+   "quem": "Edwin S. Porter",
+   "n1": "Em vez de filmar a cena inteira de longe, Porter contou a história passando de um plano a outro.",
+   "n2": "Em The Life of an American Fireman e The Great Train Robbery (ambos de 1903), Edwin S. Porter montou uma história com planos de lugares e pontos de vista diferentes. Aqui a montagem deixa de ser só emenda e passa a ser a maneira de contar.",
+   "n3": "The Life of an American Fireman é citado por muito tempo como um dos primeiros exemplos de intercalação de ações no final, no salvamento. Existem versões diferentes do filme: uma, que se acredita ser a mais antiga, mostrava as cenas em sequência; outra intercala os planos. Por isso a data e o crédito de “primeira vez” são discutidos.",
+   "div": "Existem várias cópias e versões do filme. O que se atribui a Porter depende de qual delas se vê.",
+   "conc": [
+    "corte-direto",
+    "sequencia",
+    "cross-cut"
+   ],
+   "ex": [
+    "EX_CORTEDIRETO_001",
+    "EX_CORTE_001",
+    "EX_CROSSCUT_001"
+   ],
+   "fontes": [
+    "brit",
+    "fireman"
+   ],
+   "cat": "contar",
+   "y0": 1903,
+   "y1": 1903,
+   "duo": "duo-g",
+   "orig": [
+    "Edwin S. Porter, The Life of an American Fireman (filme, 1903)",
+    "Edwin S. Porter, The Great Train Robbery (filme, 1903)"
+   ]
+  },
+  {
+   "id": "griffith",
+   "ano": "1908–1915",
+   "t": "Dois lugares ao mesmo tempo",
+   "quem": "D. W. Griffith",
+   "n1": "Voltar e meia entre duas ações que acontecem juntas deixa a cena mais tensa.",
+   "n2": "D. W. Griffith não inventou a montagem paralela, mas a usou de um jeito que a tornou permanente no cinema: alternar entre ações simultâneas, encurtando os planos conforme o clímax chega. O ritmo do corte passa a ser parte da emoção.",
+   "n3": "The Birth of a Nation (1915) é estudado por suas soluções de montagem e é, ao mesmo tempo, um filme de conteúdo racista e de enorme impacto negativo. A história técnica e a crítica ao filme andam juntas e é honesto contar as duas.",
+   "div": "Dizer que Griffith inventou a montagem paralela é um mito comum. Ele a aperfeiçoou e a colocou no centro da narrativa.",
+   "conc": [
+    "sequencia",
+    "cross-cut"
+   ],
+   "ex": [
+    "EX_CROSSCUT_001"
+   ],
+   "fontes": [
+    "gif",
+    "take"
+   ],
+   "cat": "contar",
+   "y0": 1908,
+   "y1": 1915,
+   "duo": "duo-m",
+   "orig": [
+    "D. W. Griffith, The Lonely Villa (filme, 1909)",
+    "Sergei Eisenstein, “Dickens, Griffith, and the Film Today”, em Film Form (1949)"
+   ]
+  },
+  {
+   "id": "kuleshov",
+   "ano": "c. 1918–1922",
+   "t": "O mesmo rosto, outra imagem",
+   "quem": "Lev Kuleshov",
+   "n1": "O sentido nasce da relação entre os planos, não só de cada plano.",
+   "n2": "Lev Kuleshov e seus colegas teriam mostrado o mesmo plano de um rosto ao lado de imagens diferentes, e o público leu emoções diferentes no rosto. É por isso que o corte importa: o significado aparece entre uma imagem e a seguinte. Em muitas aulas isso aparece como efeito Kuleshov.",
+   "n3": "Não existe filmagem sobrevivente do experimento original. Os relatos, inclusive os de Kuleshov e de Pudovkin (que o descreveu em 1929), não concordam sobre a data nem sobre quais imagens foram usadas; as mais citadas são um prato de sopa e uma criança em um caixão. O experimento não teve grupo de controle. Estudos recentes tentaram reproduzi-lo com filmes autênticos. Antes dos anos 1960, o fenômeno chegou a ser chamado de efeito Pudovkin.",
+   "div": "Não existe cópia do experimento original, e quem o contou lembrou detalhes diferentes. O laboratório não reproduz o experimento histórico: convida você a fazer a sua versão.",
+   "conc": [
+    "kuleshov",
+    "olhar"
+   ],
+   "ex": [
+    "EX_KULESHOV_001",
+    "EX_KULESHOV_002",
+    "EX_CORTE_004A"
+   ],
+   "fontes": [
+    "klass",
+    "pmc",
+    "sstripe"
+   ],
+   "cat": "teoria",
+   "y0": 1918,
+   "y1": 1922,
+   "duo": "duo-t",
+   "orig": [
+    "Lev Kuleshov, Kuleshov on Film: Writings of Lev Kuleshov, org. e trad. Ronald Levaco (Berkeley: University of California Press, 1974)",
+    "V. I. Pudovkin, Film Technique (Londres: Newnes, 1929), trad. Ivor Montagu: traz o relato do experimento"
+   ]
+  },
+  {
+   "id": "eisenstein",
+   "ano": "1925",
+   "t": "O choque entre planos",
+   "quem": "Sergei Eisenstein",
+   "n1": "Para Eisenstein, dois planos em choque podem criar uma ideia nova.",
+   "n2": "Em Battleship Potemkin (1925), Eisenstein levou a montagem ao centro da obra. Ele descreveu cinco métodos: métrico, rítmico, tonal, harmônico (overtonal) e intelectual. A sequência da escadaria de Odessa é o exemplo mais citado.",
+   "n3": "Os cinco métodos: métrico (planos unidos pela duração, como compassos de música), rítmico (o corte segue o movimento dentro do plano), tonal (o clima emocional dominante), harmônico ou overtonal (uma combinação dos três anteriores) e intelectual (imagens combinadas para gerar uma ideia). A classificação é uma ferramenta de análise e não uma regra para ser seguida. Eisenstein defendia a montagem como colisão: do choque entre dois planos nasce um conceito, (imagem A + imagem B = ideia C). Para Pudovkin, a montagem é um encadeamento de planos, tijolo sobre tijolo.",
+   "div": "Eisenstein e Kuleshov discordavam sobre o que é montagem: construir sentido encadeando planos ou criar um choque entre eles.",
+   "conc": [
+    "ordem",
+    "tempo"
+   ],
+   "ex": [
+    "EX_EXPERIMENTO_001"
+   ],
+   "fontes": [
+    "ms",
+    "vm"
+   ],
+   "cat": "teoria",
+   "y0": 1925,
+   "y1": 1925,
+   "duo": "duo-a",
+   "orig": [
+    "Sergei Eisenstein, Film Form: Essays in Film Theory, ed. e trad. Jay Leyda (Harcourt, Brace, 1949); em português, A forma do filme (Rio de Janeiro: Jorge Zahar)",
+    "Sergei Eisenstein, The Film Sense, trad. Jay Leyda (1942); em português, O sentido do filme (Jorge Zahar)",
+    "Filme: O Encouraçado Potemkin (1925)"
+   ]
+  },
+  {
+   "id": "pudovkin",
+   "ano": "1926",
+   "t": "Planos como tijolos",
+   "quem": "Vsevolod Pudovkin",
+   "n1": "Para Pudovkin, os planos se encadeiam como tijolos para construir uma ideia.",
+   "n2": "Vsevolod Pudovkin, aluno de Kuleshov, defendia a montagem como encadeamento: cada plano se liga ao seguinte para guiar o sentimento do espectador. Em Film Technique (1929, na edição inglesa) ele descreve cinco técnicas de montagem: contraste, paralelismo, simbolismo, simultaneidade e leitmotiv. Costuma ser resumido como defensor da “edição invisível”: o espectador deve sentir a história, não os cortes.",
+   "n3": "Em A Mãe (1926), Pudovkin aplicou as ideias de montagem que descreveu nos seus textos. O paralelismo e a simultaneidade dele são parentes do que o laboratório chama de montagem paralela (cross-cut).",
+   "div": "Pudovkin e Eisenstein discordavam: encadear (Pudovkin) contra colidir (Eisenstein). “Edição invisível” é um apelido posterior; Pudovkin falava em montagem construtiva.",
+   "conc": [
+    "sequencia",
+    "cross-cut"
+   ],
+   "ex": [
+    "EX_CORTE_004B",
+    "EX_CROSSCUT_001"
+   ],
+   "fontes": [
+    "pud",
+    "vm"
+   ],
+   "cat": "teoria",
+   "y0": 1926,
+   "y1": 1926,
+   "duo": "duo-y",
+   "orig": [
+    "V. I. Pudovkin, Film Technique (Londres: Newnes, 1929), trad. Ivor Montagu; ampliado em Film Technique and Film Acting (1949)",
+    "Filme: A Mãe (1926)"
+   ]
+  },
+  {
+   "id": "vertov",
+   "ano": "1929",
+   "t": "A montagem como olhar",
+   "quem": "Dziga Vertov e Yelizaveta Svilova",
+   "n1": "Um filme inteiro feito de cortes, sem atores e sem enredo.",
+   "n2": "Man with a Movie Camera (1929) é um documentário experimental dirigido por Dziga Vertov, filmado por Mikhail Kaufman e montado por Yelizaveta Svilova, esposa de Vertov. A montagem mostra a cidade, as máquinas e o próprio ato de filmar e montar.",
+   "n3": "Vertov, Kaufman e Svilova formavam o grupo chamado Conselho dos Três, do movimento Kino-Eye (cine-olho). Estudiosos defendem que os três merecem crédito de autoria. É um exemplo de que a montadora é coautora do filme.",
+   "div": "",
+   "conc": [
+    "match-cut",
+    "insercao"
+   ],
+   "ex": [
+    "EX_MATCHCUT_MC01"
+   ],
+   "fontes": [
+    "bfi",
+    "svilova"
+   ],
+   "cat": "teoria",
+   "y0": 1929,
+   "y1": 1929,
+   "duo": "duo-g",
+   "orig": [
+    "Dziga Vertov, Kino-Eye: The Writings of Dziga Vertov, org. Annette Michelson, trad. Kevin O’Brien (Berkeley: University of California Press, 1984)",
+    "Filme: Um Homem com uma Câmera (1929)"
+   ]
+  },
+  {
+   "id": "godard",
+   "ano": "1960",
+   "t": "O corte que se mostra",
+   "quem": "Jean-Luc Godard, Cécile Decugis e Lila Herman",
+   "n1": "Em Acossado, o salto no tempo aparece e faz parte do estilo.",
+   "n2": "Em À bout de souffle (Acossado, 1960), Godard usou jump cuts de modo muito visível, cortando dentro de uma mesma cena, e isso se tornou uma assinatura da Nouvelle Vague. A montagem do filme é creditada a Cécile Decugis e a Lila Herman.",
+   "n3": "Na continuidade clássica, o corte tenta passar despercebido. No jump cut, a descontinuidade é evidente de propósito. O jump cut não é erro técnico quando é uma escolha.",
+   "div": "Os créditos de montagem dos filmes dessa época foram atribuídos de formas diferentes ao longo do tempo.",
+   "conc": [
+    "jump-cut",
+    "elipse"
+   ],
+   "ex": [
+    "EX_JUMPCUT_NL01"
+   ],
+   "fontes": [
+    "jump",
+    "decugis"
+   ],
+   "cat": "marcou",
+   "y0": 1960,
+   "y1": 1960,
+   "duo": "duo-b",
+   "orig": [
+    "Jean-Luc Godard, “Montage, mon beau souci”, Cahiers du Cinéma, n. 65, dez. 1956, p. 30–31",
+    "Filme: Acossado (À bout de souffle, 1960)"
+   ]
+  },
+  {
+   "id": "lean",
+   "ano": "1962",
+   "t": "O fósforo e o sol",
+   "quem": "David Lean e Anne V. Coates",
+   "n1": "Um fósforo se apaga e, no corte seguinte, o sol nasce no deserto.",
+   "n2": "Em Lawrence of Arabia (1962), o corte do fósforo apagado para o nascer do sol é um dos match cuts mais lembrados. A montadora Anne V. Coates contou que a conexão apareceu quando ela e Lean viram os dois planos juntos.",
+   "n3": "Conta-se que a conexão apareceu na sala de montagem, ao ver os dois planos emendados. O relato vem da própria Coates, em entrevistas depois do filme, e os detalhes variam conforme quem conta. Este laboratório usa um trecho do filme apenas como exemplo educativo.",
+   "div": "Os detalhes de como o corte nasceu mudam conforme quem conta. Vale ouvir a própria montadora, Anne V. Coates, em entrevistas.",
+   "conc": [
+    "match-cut"
+   ],
+   "ex": [
+    "EX_MATCHCUT_MC01"
+   ],
+   "fontes": [
+    "wapo"
+   ],
+   "cat": "marcou",
+   "y0": 1962,
+   "y1": 1962,
+   "duo": "duo-o",
+   "orig": [
+    "Filme: Lawrence da Arábia (1962), montagem de Anne V. Coates"
+   ]
+  },
+  {
+   "id": "murch",
+   "ano": "1995",
+   "t": "Seis critérios para escolher o corte",
+   "quem": "Walter Murch",
+   "n1": "Na hora de cortar, a emoção vem antes da continuidade.",
+   "n2": "No livro In the Blink of an Eye, Walter Murch propõe seis critérios para avaliar um corte, em ordem de importância: emoção, história, ritmo, rastreamento do olho, eixo 2D e espaço 3D. Quando é preciso abrir mão de algo, comece pelo último da lista.",
+   "n3": "Murch dá pesos aos critérios (51%, 23%, 10%, 7%, 5% e 4%), mas eles funcionam como imagem de prioridade e não como medida científica. Os critérios de baixo podem ser sacrificados para preservar os de cima, nunca o contrário. Murch é montador e desenhista de som e ganhou três Oscars, entre eles o de montagem por O Paciente Inglês. O eixo 2D é o que muita gente chama de regra dos 180°. Murch, no livro, trata o plano bidimensional da tela (linhas, movimento e direção dentro do quadro). Os dois usos aparecem em materiais de ensino; aqui seguimos o uso mais comum.",
+   "div": "Os percentuais são uma metáfora do autor, não o resultado de uma medição.",
+   "conc": [
+    "murch"
+   ],
+   "ex": [
+    "EX_MURCH_001",
+    "EX_MURCH_002"
+   ],
+   "fontes": [
+    "murch"
+   ],
+   "cat": "teoria",
+   "y0": 1995,
+   "y1": 1995,
+   "duo": "duo-m",
+   "orig": [
+    "Walter Murch, In the Blink of an Eye: A Perspective on Film Editing (2ª ed., Silman-James Press, 2001); em português, Num piscar de olhos (Rio de Janeiro: Jorge Zahar, 2004)"
+   ]
+  },
+  {
+   "id": "jl",
+   "ano": "Hoje",
+   "t": "O som que não corta junto",
+   "quem": "Prática de montagem",
+   "n1": "O som pode chegar antes da imagem, ou ficar depois que ela mudou.",
+   "n2": "No J-cut, o áudio do próximo plano começa antes da imagem trocar. No L-cut, o áudio do plano anterior continua por cima da imagem seguinte. Os nomes vêm do formato que os dois cortes desenham na timeline.",
+   "n3": "Não há data de origem confirmada para os termos, então este museu também não registra. O que se sabe é o princípio: imagem e som podem ser cortados em pontos diferentes, e isso suaviza ou surpreende a transição.",
+   "div": "Não se sabe quando o termo surgiu.",
+   "conc": [
+    "j-cut",
+    "l-cut"
+   ],
+   "ex": [
+    "EX_JCUT_001",
+    "EX_LCUT_001"
+   ],
+   "fontes": [
+    "jcut",
+    "lcut"
+   ],
+   "cat": "marcou",
+   "y0": 2026,
+   "y1": 2026,
+   "duo": "duo-t",
+   "orig": [
+    "Michael Ondaatje, The Conversations: Walter Murch and the Art of Editing Film (Nova York: Knopf, 2002)"
+   ]
+  }
+ ],
+ "murch": [
+  {
+   "n": 1,
+   "t": "Emoção",
+   "p": "51%",
+   "q": "O corte preserva ou aumenta a emoção?",
+   "e": "É o critério que mais pesa: se o corte faz o público sentir o que a cena pede, ele quase sempre vale, mesmo que quebre os outros cinco.",
+   "x": "Troque o plano de um rosto por outro um instante antes de a emoção acabar. O que o público sente muda?"
+  },
+  {
+   "n": 2,
+   "t": "História",
+   "p": "23%",
+   "q": "O corte avança a história?",
+   "e": "O corte precisa fazer a história andar: dar uma informação nova, mostrar uma consequência, abrir uma pergunta. Se não avança, talvez sobre.",
+   "x": "Tire um plano da sua montagem. A história ainda se entende? Então ele era dispensável."
+  },
+  {
+   "n": 3,
+   "t": "Ritmo",
+   "p": "10%",
+   "q": "O corte cai num momento rítmico certo?",
+   "e": "O momento do corte importa. Cortar cedo ou tarde demais cansa ou apressa. O corte certo cai onde o ritmo da cena pede.",
+   "x": "Mexa meio segundo no fim de um plano e assista de novo. Qual duração soa certa?"
+  },
+  {
+   "n": 4,
+   "t": "Rastreamento do olho",
+   "p": "7%",
+   "q": "O olhar do espectador flui para o próximo ponto?",
+   "e": "Em cada plano o olhar do público está num ponto da tela. Um bom corte leva o olhar ao próximo ponto sem esforço.",
+   "x": "Pense onde você olhava no último quadro e onde o plano seguinte pede que você olhe."
+  },
+  {
+   "n": 5,
+   "t": "Plano da tela (2D)",
+   "p": "5%",
+   "q": "A direção na tela se mantém (regra dos 180°)?",
+   "e": "Respeitar a direção e a posição dos personagens na tela, como a regra dos 180°. Se um personagem muda de lado sem motivo, o público se perde.",
+   "x": "Veja quem está à esquerda e quem está à direita. Eles trocaram de lado entre um plano e outro?"
+  },
+  {
+   "n": 6,
+   "t": "Espaço 3D",
+   "p": "4%",
+   "q": "A geografia do lugar continua fazendo sentido?",
+   "e": "A geografia do lugar precisa fazer sentido: onde está a porta, onde está a janela, quem está perto de quem.",
+   "x": "Depois do corte, você ainda sabe onde cada coisa está no cômodo?"
+  }
+ ],
+ "montadoras": [
+  {
+   "id": "svilova",
+   "nome": "Yelizaveta Svilova",
+   "obra": "Man with a Movie Camera (1929)",
+   "nota": "Montadora do filme e integrante do grupo Kino-Eye. Estudiosos defendem seu crédito de coautoria.",
+   "fontes": [
+    "svilova",
+    "bfi"
+   ]
+  },
+  {
+   "id": "decugis",
+   "nome": "Cécile Decugis",
+   "obra": "À bout de souffle (1960)",
+   "nota": "Creditada, com Lila Herman, pela montagem do filme que popularizou o jump cut.",
+   "fontes": [
+    "decugis"
+   ]
+  },
+  {
+   "id": "coates",
+   "nome": "Anne V. Coates",
+   "obra": "Lawrence of Arabia (1962)",
+   "nota": "Montadora do filme e do match cut do fósforo para o sol.",
+   "fontes": [
+    "wapo",
+    "nfs"
+   ]
+  },
+  {
+   "id": "murchp",
+   "nome": "Walter Murch",
+   "obra": "Apocalypse Now; O Paciente Inglês",
+   "nota": "Montador e desenhista de som. Autor de In the Blink of an Eye.",
+   "fontes": [
+    "murch"
+   ]
+  },
+  {
+   "id": "schoon",
+   "nome": "Thelma Schoonmaker",
+   "obra": "Parceria com Martin Scorsese",
+   "nota": "Mais de 50 anos de parceria. Três Oscars de montagem.",
+   "fontes": [
+    "npr",
+    "variety"
+   ]
+  },
+  {
+   "id": "menke",
+   "nome": "Sally Menke",
+   "obra": "Pulp Fiction; Kill Bill; Bastardos Inglórios",
+   "nota": "Montadora dos filmes de Quentin Tarantino, de Cães de Aluguel (1992) a Bastardos Inglórios (2009).",
+   "fontes": [
+    "variety"
+   ]
+  },
+  {
+   "nome": "Rafael Justo Valverde",
+   "obra": "Deus e o Diabo na Terra do Sol (1964)",
+   "nota": "Montador do filme de Glauber Rocha, de cortes bruscos que quebram a linearidade e criam uma narrativa fragmentada.",
+   "link": [
+    "Itaú Cultural, 60 anos de Deus e o Diabo na Terra do Sol",
+    "https://www.itaucultural.org.br/secoes/series/deus-e-o-diabo-na-terra-do-sol-os-60-anos-de-uma-obra-atemporal"
+   ]
+  },
+  {
+   "nome": "Eduardo Escorel",
+   "obra": "Terra em Transe (1967)",
+   "nota": "Montou Terra em Transe, de Glauber Rocha, e depois dirigiu documentários.",
+   "link": [
+    "Revista de Cinema, entrevista com Eduardo Escorel",
+    "https://revistadecinema.com.br/2018/02/entrevista-eduardo-escorel/"
+   ]
+  },
+  {
+   "nome": "Daniel Rezende",
+   "obra": "Cidade de Deus (2002)",
+   "nota": "Sua primeira montagem em longa-metragem rendeu o BAFTA de melhor montagem e uma indicação ao Oscar. Hoje também dirige.",
+   "link": [
+    "Academia Brasileira de Cinema, Daniel Rezende",
+    "https://academiabrasileiradecinema.com.br/socios-acad/daniel-rezende-2/"
+   ]
+  },
+  {
+   "nome": "Mair Tavares",
+   "obra": "Mar de Rosas (1977)",
+   "nota": "Estudou cinema no IDHEC, na França, e montou filmes brasileiros desde os anos 1970. Ganhou destaque com Mar de Rosas, de Ana Carolina.",
+   "link": [
+    "Biblioteca Cinemateca (BCC), Um montador: Mair Tavares",
+    "https://www.bcc.org.br/textos/225295"
+   ]
+  }
+ ],
+ "fontes": {
+  "acmi": [
+   "ACMI, Georges Méliès",
+   "https://www.acmi.net.au/creators/70525--georges-melies/"
+  ],
+  "subst": [
+   "Britannica, Méliès e Porter na história do cinema",
+   "https://www.britannica.com/art/history-of-film/Melies-and-Porter"
+  ],
+  "brit": [
+   "Britannica, Edwin S. Porter",
+   "https://www.britannica.com/biography/Edwin-S-Porter"
+  ],
+  "fireman": [
+   "Britannica, The Life of an American Fireman",
+   "https://www.britannica.com/topic/The-Life-of-an-American-Fireman"
+  ],
+  "gif": [
+   "Britannica, D.W. Griffith e o cinema narrativo",
+   "https://www.britannica.com/art/history-of-film/Development-of-narrative-film-D-W-Griffith"
+  ],
+  "take": [
+   "Britannica, D.W. Griffith",
+   "https://www.britannica.com/biography/D-W-Griffith"
+  ],
+  "klass": [
+   "Britannica, Lev Kuleshov",
+   "https://www.britannica.com/biography/Lev-Vladimirovich-Kuleshov"
+  ],
+  "pmc": [
+   "Reexamining the Kuleshov effect (PMC)",
+   "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11299807/"
+  ],
+  "sstripe": [
+   "Britannica, efeito Kuleshov",
+   "https://www.britannica.com/topic/Kuleshov-effect"
+  ],
+  "ms": [
+   "Britannica, Sergei Eisenstein",
+   "https://www.britannica.com/biography/Sergey-Mikhaylovich-Eisenstein"
+  ],
+  "vm": [
+   "Britannica, a montagem no cinema",
+   "https://www.britannica.com/art/film/Montage"
+  ],
+  "bfi": [
+   "BFI, Man with a Movie Camera",
+   "https://www.bfi.org.uk/film/cacbb2df-be18-5e59-b5c3-f0eb9ea3a90d/man-with-a-movie-camera"
+  ],
+  "svilova": [
+   "Criterion, Hidden Histories: the story of women film editors",
+   "https://www.criterion.com/current/posts/6582-hidden-histories-the-story-of-women-film-editors"
+  ],
+  "jump": [
+   "Britannica, Jean-Luc Godard",
+   "https://www.britannica.com/biography/Jean-Luc-Godard"
+  ],
+  "decugis": [
+   "Criterion, Hidden Histories: the story of women film editors",
+   "https://www.criterion.com/current/posts/6582-hidden-histories-the-story-of-women-film-editors"
+  ],
+  "wapo": [
+   "The Washington Post, Anne V. Coates",
+   "https://www.washingtonpost.com/local/obituaries/anne-v-coates-oscar-winning-film-editor-of-lawrence-of-arabia-dies-at-92/2018/05/09/4941a71a-539e-11e8-abd8-265bd07a9859_story.html"
+  ],
+  "murch": [
+   "Library of Congress, sumário de In the Blink of an Eye (Walter Murch)",
+   "https://catdir.loc.gov/catdir/toc/fy0706/2001042949.html"
+  ],
+  "jcut": [
+   "StudioBinder, J-cut",
+   "https://www.studiobinder.com/blog/what-is-a-j-cut-in-film/"
+  ],
+  "lcut": [
+   "StudioBinder, L-cut",
+   "https://www.studiobinder.com/blog/what-is-an-l-cut-in-film/"
+  ],
+  "npr": [
+   "NPR, Thelma Schoonmaker",
+   "https://www.npr.org/2005/12/26/5069962/oscar-winning-scorsese-editor-thelma-schoonmaker"
+  ],
+  "variety": [
+   "Variety, Female editors",
+   "https://variety.com/2020/artisans/production/womens-history-month-female-editors-thelma-schoonmaker-1203521812/"
+  ],
+  "moviola": [
+   "Science Museum Group, Moviola film editor",
+   "https://collection.sciencemuseumgroup.org.uk/objects/co8247745/moviola-film-editor"
+  ],
+  "pud": [
+   "Britannica, Vsevolod Pudovkin",
+   "https://www.britannica.com/biography/Vsevolod-Illarionovich-Pudovkin"
+  ]
+ },
+ "pendente": [],
+ "paraver": {
+  "titulo": "Filmes para rever com olhar de montador",
+  "nota": "Três filmes brasileiros que costumam estar no catálogo do Tela Brasil, de graça, com cadastro no gov.br. A disponibilidade pode mudar.",
+  "filmes": [
+   "Deus e o Diabo na Terra do Sol (1964), montagem de Rafael Justo Valverde",
+   "A Hora da Estrela (1985)",
+   "Carandiru (2003)"
+  ],
+  "link": [
+   "Abrir o Tela Brasil",
+   "https://telabrasil.cultura.gov.br"
+  ]
+ },
+ "cats": [
+  {
+   "id": "maos",
+   "t": "Mãos e máquinas",
+   "d": "Tesoura, fita, Moviola, tela de celular."
+  },
+  {
+   "id": "contar",
+   "t": "Contar com planos",
+   "d": "Quando o corte virou jeito de narrar."
+  },
+  {
+   "id": "teoria",
+   "t": "Teorias do corte",
+   "d": "Gente que tentou explicar por que o corte funciona."
+  },
+  {
+   "id": "marcou",
+   "t": "Cortes que marcaram",
+   "d": "Escolhas que mudaram o jeito de ver."
+  }
+ ],
+ "imgs": [
+  "eisenstein",
+  "godard",
+  "griffith",
+  "kuleshov",
+  "melies",
+  "murch",
+  "porter",
+  "pudovkin",
+  "vertov"
+ ],
+ "murch_intro": "Walter Murch é um montador e designer de som norte-americano. Trabalhou em filmes como Apocalypse Now, O Poderoso Chefão e O Paciente Inglês, e escreveu In the Blink of an Eye, livro sobre montagem. Nele propõe seis critérios para decidir onde cortar, em ordem de importância. Os percentuais são a forma que ele encontrou de dizer 'quanto cada um pesa'; são uma metáfora, não uma medição.",
+ "murch_link": [
+  "Library of Congress, sumário de In the Blink of an Eye",
+  "https://catdir.loc.gov/catdir/toc/fy0706/2001042949.html"
+ ]
+}
