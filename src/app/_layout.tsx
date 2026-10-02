@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { T } from '../components/ui';
 import { fetchMyProfile } from '../lib/api';
 import { AuthProvider, useAuth } from '../lib/auth';
+import { isDemo } from '../lib/demo';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { colors, fonts } from '../theme';
 
@@ -24,7 +25,7 @@ function Gate() {
     enabled: Boolean(userId),
   });
 
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured && !isDemo) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 24 }}>
         <T style={{ fontSize: 18, fontFamily: fonts.semibold }}>Supabase não configurado</T>
@@ -58,6 +59,7 @@ function Gate() {
           options={{
             headerShown: true, title: 'Conversa', headerStyle: { backgroundColor: colors.bg },
             headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold },
+            headerShadowVisible: false,
           }}
         />
       </Stack.Protected>
@@ -77,6 +79,13 @@ export default function RootLayout() {
         <AuthProvider>
           <StatusBar style="light" />
           <Gate />
+          {isDemo && (
+            <View pointerEvents="none" style={{ position: 'absolute', top: 6, right: 12, alignItems: 'flex-end', zIndex: 10 }}>
+              <T style={{ fontSize: 11, color: colors.muted, backgroundColor: 'rgba(17,17,17,0.9)', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, overflow: 'hidden' }}>
+                Modo demo · dados não são salvos
+              </T>
+            </View>
+          )}
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

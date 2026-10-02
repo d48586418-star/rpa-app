@@ -4,9 +4,8 @@ import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { T } from '../../components/ui';
-import { fetchMatches } from '../../lib/api';
+import { fetchMatches, subscribeMatches } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
-import { supabase } from '../../lib/supabase';
 import { colors, fonts } from '../../theme';
 
 export default function Matches() {
@@ -15,14 +14,10 @@ export default function Matches() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ['matches', me], queryFn: () => fetchMatches(me) });
 
-  useEffect(() => {
-    const ch = supabase
-      .channel('matches-feed')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, () =>
-        qc.invalidateQueries({ queryKey: ['matches'] }))
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [qc]);
+  useEffect(
+    () => subscribeMatches(() => qc.invalidateQueries({ queryKey: ['matches'] })),
+    [qc],
+  );
 
   if (isLoading) return <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />;
   return (

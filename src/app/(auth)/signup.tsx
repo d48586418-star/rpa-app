@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Alert, SafeAreaView, StyleSheet, View } from 'react-native';
 import { Button, Input, T, Wordmark } from '../../components/ui';
-import { supabase } from '../../lib/supabase';
+import { signUp } from '../../lib/authActions';
 import { colors, fonts } from '../../theme';
 
 export default function Signup() {
@@ -13,10 +13,10 @@ export default function Signup() {
   const submit = async () => {
     if (password.length < 6) return Alert.alert('A senha precisa ter ao menos 6 caracteres.');
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
+    const { error, needsConfirmation } = await signUp(email, password);
     setLoading(false);
-    if (error) return Alert.alert('Não foi possível criar a conta', error.message);
-    if (!data.session) Alert.alert('Confirme seu e-mail', 'Enviamos um link de confirmação para o seu e-mail.');
+    if (error) return Alert.alert('Não foi possível criar a conta', error);
+    if (needsConfirmation) Alert.alert('Confirme seu e-mail', 'Enviamos um link de confirmação para o seu e-mail.');
   };
 
   return (

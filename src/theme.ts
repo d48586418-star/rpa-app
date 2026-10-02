@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 // Valores amostrados das referências (TAKE ONE / CircleUp).
 export const colors = {
   bg: '#050505',
@@ -27,10 +29,13 @@ export const gradients = {
 
 export const radius = { sm: 12, md: 20, lg: 28, xl: 40, pill: 999 };
 
+// Na web, uma fonte reserva evita cair em serifada se o arquivo da Montserrat não carregar.
+const fallback = Platform.OS === 'web' ? ', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' : '';
+
 export const fonts = {
-  light: 'Montserrat_300Light',
-  regular: 'Montserrat_400Regular',
-  semibold: 'Montserrat_600SemiBold',
-  bold: 'Montserrat_700Bold',
-  black: 'Montserrat_900Black',
+  light: `Montserrat_300Light${fallback}`,
+  regular: `Montserrat_400Regular${fallback}`,
+  semibold: `Montserrat_600SemiBold${fallback}`,
+  bold: `Montserrat_700Bold${fallback}`,
+  black: `Montserrat_900Black${fallback}`,
 };

@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Alert, SafeAreaView, StyleSheet, View } from 'react-native';
 import { Button, Input, T, Wordmark } from '../../components/ui';
-import { supabase } from '../../lib/supabase';
+import { signIn } from '../../lib/authActions';
 import { colors, fonts } from '../../theme';
 
 export default function Login() {
@@ -12,9 +12,9 @@ export default function Login() {
 
   const submit = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    const { error } = await signIn(email, password);
     setLoading(false);
-    if (error) Alert.alert('Não foi possível entrar', error.message);
+    if (error) Alert.alert('Não foi possível entrar', error);
   };
 
   return (

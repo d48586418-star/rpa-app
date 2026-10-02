@@ -34,7 +34,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
               clipPath={`url(#${clipId})`}
             />
           ) : (
-            <SvgText x="50" y="64" fontSize="46" fontWeight="800" fill={colors.bg} textAnchor="middle">
+            <SvgText x="50" y="64" fontSize="46" fontFamily={fonts.black} fill={colors.bg} textAnchor="middle">
               {profile.name.charAt(0).toUpperCase()}
             </SvgText>
           )}

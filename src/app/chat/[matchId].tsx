@@ -3,9 +3,8 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { Button, Input, T } from '../../components/ui';
-import { fetchMessages, sendMessage } from '../../lib/api';
+import { fetchMessages, sendMessage, subscribeMessages } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
-import { supabase } from '../../lib/supabase';
 import type { Message } from '../../lib/types';
 import { colors, fonts } from '../../theme';
 
@@ -16,24 +15,15 @@ export default function Chat() {
   const qc = useQueryClient();
   const [text, setText] = useState('');
   const list = useRef<FlatList<Message>>(null);
-  const key = ['messages', matchId];
-  const { data } = useQuery({ queryKey: key, queryFn: () => fetchMessages(matchId) });
+  const { data } = useQuery({ queryKey: ['messages', matchId], queryFn: () => fetchMessages(matchId) });
 
-  useEffect(() => {
-    const ch = supabase
-      .channel(`chat-${matchId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages', filter: `match_id=eq.${matchId}` },
-        (payload) => {
-          const msg = payload.new as Message;
-          qc.setQueryData<Message[]>(key, (cur = []) => (cur.some((m) => m.id === msg.id) ? cur : [...cur, msg]));
-        },
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchId, qc]);
+  useEffect(
+    () =>
+      subscribeMessages(matchId, (msg) =>
+        qc.setQueryData<Message[]>(['messages', matchId], (cur = []) =>
+          cur.some((m) => m.id === msg.id) ? cur : [...cur, msg])),
+    [matchId, qc],
+  );
 
   const send = async () => {
     const body = text.trim();
