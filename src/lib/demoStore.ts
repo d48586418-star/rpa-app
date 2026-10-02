@@ -1,6 +1,7 @@
 import { PERSONAS, personaById, personaByKey } from '../constants/personas';
 import { todayISO } from './dates';
 import { JobsModule } from './demoJobs';
+import { ProjectsModule } from './demoProjects';
 import { filterCandidates, matchPair, type DiscoverFilters } from './matching';
 import type { Match, Message, Profile } from './types';
 
@@ -23,6 +24,8 @@ export class DemoStore {
   replyDelayMs = 1200;
   /** Jobs, candidaturas, contrato em etapas, XP, créditos e agenda. */
   readonly jobs: JobsModule;
+  /** Projetos abertos com funções em aberto (montar equipe). */
+  readonly projects: ProjectsModule;
   private today: string;
   private active: string | null = null;
   private profiles = new Map<string, Profile>();
@@ -42,6 +45,11 @@ export class DemoStore {
       today: () => this.today,
       ensureConversation: (a, b) => this.ensureConversation(a, b),
     });
+    this.projects = new ProjectsModule({
+      profiles: this.profiles,
+      today: () => this.today,
+      ensureConversation: (a, b) => this.ensureConversation(a, b),
+    });
     this.reset();
   }
 
@@ -54,6 +62,7 @@ export class DemoStore {
     this.messages = [];
     this.replyCount.clear();
     this.jobs.reset();
+    this.projects.reset();
     for (const p of PERSONAS) this.profiles.set(p.profile.id, { ...p.profile });
     for (const p of PERSONAS) {
       for (const k of p.preLikes) this.recordLike(p.profile.id, personaByKey(k)!.profile.id);
@@ -70,6 +79,7 @@ export class DemoStore {
     this.matches = this.matches.filter((m) => !gone.has(m.id));
     this.messages = this.messages.filter((m) => !gone.has(m.match_id));
     this.jobs.resetUser(DEMO_ME);
+    this.projects.resetUser(DEMO_ME);
     this.addNewcomerLikes();
   }
 
@@ -86,6 +96,11 @@ export class DemoStore {
     const s = this.swiped.get(from) ?? new Set<string>();
     s.add(to);
     this.swiped.set(from, s);
+  }
+
+  /** Dia de hoje da demo (YYYY-MM-DD). */
+  todayISO(): string {
+    return this.today;
   }
 
   /** Define quem está logado (usado para decidir quando o outro lado responde no chat). */

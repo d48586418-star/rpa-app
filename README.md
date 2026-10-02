@@ -18,6 +18,10 @@ Para testar o match, crie duas contas (dois aparelhos/emuladores) e dê "chamar"
 
 Splash (deslizar) → **Selecione a sua jornada** (Freelancer ou Empresa) → cadastro → perfil por tipo → deck. Freelancers veem empresas e empresas veem freelancers; match mútuo abre o chat.
 
+## Navegação (demo)
+
+Início, Descobrir (Talentos e Projetos), botão **+** (criar projeto aberto ou job), Cena e Projetos, e Perfil. Veja [docs/direcao-visual.md](docs/direcao-visual.md).
+
 ## Jobs e match %
 
 Na demo há uma aba **Jobs**: a empresa publica um job, o profissional vê o match % explicado e se candidata, e os dois seguem por contrato, custódia (simulada), avaliação e XP. Veja [docs/jobs-e-match.md](docs/jobs-e-match.md).

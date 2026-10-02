@@ -15,7 +15,20 @@ export type PersonaJob = {
   description: string;
 };
 
+export type Availability = 'now' | 'open' | 'busy' | 'from';
+
+export type PersonaProject = {
+  key: string;
+  title: string;
+  description: string;
+  city: string | null;
+  budgetTotal: number;
+  roles: string[];
+};
+
 export type PersonaExtras = {
+  availability: Availability;
+  availableFromOffset: number | null;
   radiusKm: number;
   createdDaysAgo: number;
   blockedOffsets: number[];
@@ -36,6 +49,7 @@ export type Persona = {
   profile: Profile;
   extras: PersonaExtras;
   jobs: PersonaJob[];
+  projects: PersonaProject[];
 };
 
 export const TEST_PASSWORD: string = data.password;
@@ -48,6 +62,8 @@ export const PERSONAS: Persona[] = data.personas.map((p) => ({
   replies: p.replies,
   preLikes: p.pre_likes,
   extras: {
+    availability: p.availability as Availability,
+    availableFromOffset: (p as { available_from_offset?: number }).available_from_offset ?? null,
     radiusKm: p.radius_km,
     createdDaysAgo: p.created_days_ago,
     blockedOffsets: p.blocked_offsets,
@@ -67,6 +83,9 @@ export const PERSONAS: Persona[] = data.personas.map((p) => ({
       pioneer: p.progress.pioneer,
     },
   },
+  projects: p.projects.map((q) => ({
+    key: q.key, title: q.title, description: q.description, city: q.city, budgetTotal: q.budget_total, roles: q.roles,
+  })),
   jobs: p.jobs.map((j) => ({
     key: j.key,
     title: j.title,

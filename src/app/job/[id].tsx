@@ -26,7 +26,7 @@ export default function JobScreen() {
   const me = session!.user.id;
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ['job', id, me], queryFn: () => fetchJob(id, me) });
-  const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: ['job'] }), qc.invalidateQueries({ queryKey: ['jobs'] }), qc.invalidateQueries({ queryKey: ['progress'] }), qc.invalidateQueries({ queryKey: ['matches'] })]);
+  const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: ['job'] }), qc.invalidateQueries({ queryKey: ['jobs'] }), qc.invalidateQueries({ queryKey: ['progress'] }), qc.invalidateQueries({ queryKey: ['matches'] }), qc.invalidateQueries({ queryKey: ['home'] })]);
   const run = useMutation({
     mutationFn: async (fn: () => Promise<unknown>) => fn(),
     onSuccess: refresh,

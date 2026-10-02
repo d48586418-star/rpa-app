@@ -171,3 +171,42 @@ export const fetchProgress = async (me: string): Promise<ProgressView> => jobs()
 export const addCredit = async (me: string, c: { title: string; role: string; genre: Genre; year: number }): Promise<Credit> => jobs().addCredit(me, c);
 export const confirmCreditDemo = async (me: string, creditId: string) => jobs().simulateConfirm(me, creditId);
 export const toggleBusyDay = async (me: string, date: string) => jobs().toggleBusy(me, date);
+
+// ---------- Projetos abertos, disponibilidade, Cena e Início (só na demo) ----------
+
+import { upcomingCena, type CenaView } from './cena';
+import type { NewProject, ProjectCard } from './demoProjects';
+import type { Availability, CenaKind, OpenProject } from './types';
+import { oppositeType } from './matching';
+
+export type { NewProject, ProjectCard, CenaView };
+
+const projects = () => (isDemo ? demoStore.projects : demoOnly());
+
+export const fetchProjects = async (me: string): Promise<ProjectCard[]> => projects().feed(me);
+export const fetchProject = async (id: string, me: string) => projects().detail(id, me);
+export const createProject = async (me: string, input: NewProject): Promise<OpenProject> => projects().create(me, input);
+export const toggleProjectInterest = async (id: string, me: string, role: string) => projects().toggleInterest(id, me, role);
+export const chooseForRole = async (id: string, me: string, role: string, proId: string) => projects().choose(id, me, role, proId);
+export const talkToInterested = async (id: string, me: string, proId: string) => projects().talk(id, me, proId);
+export const setMyAvailability = async (me: string, state: Availability, from: string | null = null) => jobs().setAvailability(me, state, from);
+export const fetchCena = async (opts: { kind?: CenaKind; city?: string; limit?: number } = {}): Promise<CenaView[]> =>
+  upcomingCena(isDemo ? demoStore.todayISO() : demoOnly(), opts);
+
+/** Tudo que o Início mostra, numa chamada só. */
+export async function fetchHome(me: string) {
+  if (!isDemo) return demoOnly();
+  const profile = demoStore.profileOf(me);
+  const isOwner = profile?.account_type === 'empresa';
+  return {
+    profile,
+    isOwner,
+    jobs: isOwner ? demoStore.jobs.feedForOwner(me).slice(0, 3) : [],
+    matchingJobs: isOwner ? [] : demoStore.jobs.feedForPro(me).slice(0, 3),
+    projects: demoStore.projects.feed(me).slice(0, 3),
+    people: profile ? demoStore.candidates(me, { accountType: oppositeType(profile.account_type) }).slice(0, 6) : [],
+    cena: upcomingCena(demoStore.todayISO(), { limit: 3 }),
+    conversations: demoStore.listMatches(me).length,
+  };
+}
+export type HomeData = Awaited<ReturnType<typeof fetchHome>>;

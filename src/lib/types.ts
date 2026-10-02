@@ -104,3 +104,38 @@ export type Review = {
   scores: ReviewScores;
   tip: string | null;
 };
+
+// ---- Projetos abertos, disponibilidade e Cena ----
+
+export type Availability = 'now' | 'open' | 'busy' | 'from';
+
+export type ProjectRole = {
+  role: string;
+  /** Quem foi escolhido para a função (null = procurando). */
+  filledBy: string | null;
+  /** Profissionais que marcaram "tenho interesse" nesta função. */
+  interested: string[];
+};
+
+export type OpenProject = {
+  id: string;
+  owner_id: string;
+  title: string;
+  description: string;
+  city: string | null;
+  budget_total: number;
+  roles: ProjectRole[];
+  created_at: string;
+};
+
+export type CenaKind = 'evento' | 'oficina' | 'edital' | 'chamada' | 'vaga';
+
+export type CenaItem = {
+  id: string;
+  kind: CenaKind;
+  title: string;
+  city: string;
+  /** Dias a partir de hoje. */
+  offsetDays: number;
+  description: string;
+};

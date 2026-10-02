@@ -20,3 +20,11 @@ export function formatShort(iso: string): string {
   const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
   return `${WEEK[d.getUTCDay()]} ${dd}/${mm}`;
 }
+
+/** "Bom dia", "Boa tarde" ou "Boa noite" a partir da hora local (0 a 23). */
+export function greeting(hour: number): string {
+  if (hour < 5) return 'Boa noite';
+  if (hour < 12) return 'Bom dia';
+  if (hour < 18) return 'Boa tarde';
+  return 'Boa noite';
+}

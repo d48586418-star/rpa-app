@@ -1,9 +1,10 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 import Svg, { ClipPath, Defs, Image as SvgImage, Path, Text as SvgText } from 'react-native-svg';
 import { formatRate } from '../lib/matching';
 import { blobPath, hashString } from '../lib/shapes';
 import type { Profile } from '../lib/types';
-import { colors, fonts, radius } from '../theme';
+import { auras, colors, fonts, glass, radius } from '../theme';
 import { Chip, T } from './ui';
 
 export function blobColor(id: string): string {
@@ -20,6 +21,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
       : profile.available ? 'Disponível' : 'Ocupado(a)';
   return (
     <View style={s.card}>
+      <LinearGradient colors={auras.orange} start={{ x: 1, y: 0 }} end={{ x: 0.1, y: 0.8 }} style={StyleSheet.absoluteFill} />
       <View style={s.art}>
         <Svg viewBox="0 0 100 100" style={StyleSheet.absoluteFill}>
           <Defs>
@@ -59,7 +61,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
 const s = StyleSheet.create({
   card: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.xl, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
   art: { height: '58%', margin: 12, marginBottom: 0 },
-  info: { paddingHorizontal: 20, paddingVertical: 12, gap: 6 },
+  info: { marginHorizontal: 10, marginTop: 8, paddingHorizontal: 14, paddingVertical: 12, gap: 6, borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: glass.border },
   name: { fontFamily: fonts.semibold, fontSize: 26 },
   sub: { fontFamily: fonts.semibold, fontSize: 14 },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },

@@ -2,6 +2,7 @@ import { PERSONAS } from '../constants/personas';
 import { ROLES } from '../constants/roles';
 import { contractClauses, quote, revisionsFor, type Clause, type Quote } from './contract';
 import { addDays, daysBetween } from './dates';
+import { availabilityLabel, isAvailableToday } from './availability';
 import { distanceKm } from './geo';
 import { applyAction, average, nextActionFor, type Action } from './engagement';
 import {
@@ -13,10 +14,12 @@ import {
   type Badge, type LevelInfo, type Progress,
 } from './xp';
 import type {
-  Application, Credit, Engagement, Genre, Job, Profile, Reputation, Review, ReviewScores,
+  Application, Availability, Credit, Engagement, Genre, Job, Profile, Reputation, Review, ReviewScores,
 } from './types';
 
 type Extras = {
+  availability: Availability;
+  availableFrom: string | null;
   radiusKm: number;
   createdAt: string; // YYYY-MM-DD
   blocked: Set<string>;
@@ -45,6 +48,7 @@ export type JobDetail = {
 export type ProgressView = {
   progress: Progress; level: LevelInfo; badges: Badge[]; allBadges: Badge[];
   credits: Credit[]; blockedDates: string[]; today: string; reputation: Reputation; radiusKm: number;
+  availability: Availability; availableFrom: string | null; availabilityText: string;
 };
 export type NewJob = {
   title: string; role: string; genre: Genre; date: string; days: number; city: string | null;
@@ -82,6 +86,8 @@ export class JobsModule {
     for (const p of PERSONAS) {
       const x = p.extras;
       this.extras.set(p.profile.id, {
+        availability: x.availability,
+        availableFrom: x.availableFromOffset == null ? null : addDays(today, x.availableFromOffset),
         radiusKm: x.radiusKm,
         createdAt: addDays(today, -x.createdDaysAgo),
         blocked: new Set(x.blockedOffsets.map((o) => addDays(today, o))),
@@ -124,6 +130,7 @@ export class JobsModule {
     let x = this.extras.get(id);
     if (!x) {
       x = {
+        availability: 'now', availableFrom: null,
         radiusKm: 80, createdAt: this.ctx.today(), blocked: new Set(), credits: [],
         reputation: { ratingAvg: null, ratingCount: 0, attendance: null, onTime: null },
         trainingBadges: [], progress: emptyProgress(),
@@ -356,7 +363,23 @@ export class JobsModule {
       progress: { ...x.progress }, level: levelFor(x.progress.xp), badges: earnedBadges(x.progress), allBadges: ALL_BADGES,
       credits: x.credits.map((c) => ({ ...c })), blockedDates: [...x.blocked].sort(), today: this.ctx.today(),
       reputation: { ...x.reputation }, radiusKm: x.radiusKm,
+      availability: x.availability, availableFrom: x.availableFrom, availabilityText: availabilityLabel(x.availability, x.availableFrom),
     };
+  }
+
+  /** Muda o estado de disponibilidade e mantém o campo `available` do perfil em sincronia (filtros do Descobrir). */
+  setAvailability(me: string, state: Availability, from: string | null = null) {
+    if (state === 'from' && (!from || from < this.ctx.today())) fail('Escolha uma data a partir de hoje.');
+    const x = this.extrasOf(me);
+    x.availability = state;
+    x.availableFrom = state === 'from' ? from : null;
+    const p = this.ctx.profiles.get(me);
+    if (p) this.ctx.profiles.set(me, { ...p, available: isAvailableToday(state, x.availableFrom, this.ctx.today()) });
+  }
+
+  availabilityOf(id: string): { state: Availability; from: string | null; text: string } {
+    const x = this.extrasOf(id);
+    return { state: x.availability, from: x.availableFrom, text: availabilityLabel(x.availability, x.availableFrom) };
   }
 
   addCredit(me: string, c: { title: string; role: string; genre: Genre; year: number }): Credit {

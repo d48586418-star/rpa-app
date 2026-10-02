@@ -88,7 +88,9 @@
         "on_time_deliveries": 0,
         "pioneer": true
       },
-      "jobs": []
+      "jobs": [],
+      "availability": "now",
+      "projects": []
     },
     {
       "key": "f2",
@@ -167,7 +169,9 @@
         "on_time_deliveries": 8,
         "pioneer": true
       },
-      "jobs": []
+      "jobs": [],
+      "availability": "open",
+      "projects": []
     },
     {
       "key": "f3",
@@ -249,7 +253,10 @@
         "on_time_deliveries": 0,
         "pioneer": false
       },
-      "jobs": []
+      "jobs": [],
+      "availability": "from",
+      "available_from_offset": 15,
+      "projects": []
     },
     {
       "key": "f4",
@@ -314,7 +321,9 @@
         "on_time_deliveries": 0,
         "pioneer": true
       },
-      "jobs": []
+      "jobs": [],
+      "availability": "now",
+      "projects": []
     },
     {
       "key": "f5",
@@ -384,7 +393,23 @@
         "on_time_deliveries": 0,
         "pioneer": true
       },
-      "jobs": []
+      "jobs": [],
+      "availability": "open",
+      "projects": [
+        {
+          "key": "p1",
+          "title": "Curta Maré Baixa",
+          "description": "Curta de ficção sobre a pesca artesanal em Itacaré. Filmagem em dois fins de semana.",
+          "city": "Itacaré",
+          "budget_total": 8000,
+          "roles": [
+            "Diretor(a) de Fotografia",
+            "Técnico(a) de Som Direto",
+            "Editor(a)",
+            "Maquiador(a)"
+          ]
+        }
+      ]
     },
     {
       "key": "e1",
@@ -462,7 +487,9 @@
         "on_time_checkins": 0,
         "on_time_deliveries": 0,
         "pioneer": false
-      }
+      },
+      "availability": "now",
+      "projects": []
     },
     {
       "key": "e2",
@@ -526,7 +553,23 @@
         "on_time_checkins": 0,
         "on_time_deliveries": 0,
         "pioneer": false
-      }
+      },
+      "availability": "now",
+      "projects": [
+        {
+          "key": "p2",
+          "title": "Documentário Mulheres do Cacau",
+          "description": "Documentário de 40 minutos sobre mulheres que trabalham com cacau no Sul da Bahia.",
+          "city": "Itabuna",
+          "budget_total": 25000,
+          "roles": [
+            "Diretor(a) de Fotografia",
+            "Técnico(a) de Som Direto",
+            "Editor(a)",
+            "Colorista"
+          ]
+        }
+      ]
     },
     {
       "key": "e3",
@@ -589,7 +632,9 @@
         "on_time_checkins": 0,
         "on_time_deliveries": 0,
         "pioneer": false
-      }
+      },
+      "availability": "busy",
+      "projects": []
     },
     {
       "key": "e4",
@@ -650,7 +695,9 @@
         "on_time_checkins": 0,
         "on_time_deliveries": 0,
         "pioneer": false
-      }
+      },
+      "availability": "now",
+      "projects": []
     },
     {
       "key": "e5",
@@ -711,7 +758,22 @@
         "on_time_checkins": 0,
         "on_time_deliveries": 0,
         "pioneer": false
-      }
+      },
+      "availability": "now",
+      "projects": [
+        {
+          "key": "p3",
+          "title": "Teaser para projeto cultural",
+          "description": "Teaser de 1 minuto para um projeto cultural em Valença, com captação em um dia.",
+          "city": "Valença",
+          "budget_total": 3500,
+          "roles": [
+            "Operador(a) de Câmera",
+            "Editor(a)",
+            "Motion Designer"
+          ]
+        }
+      ]
     }
   ]
 }

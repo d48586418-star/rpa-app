@@ -3,7 +3,7 @@ import {
   ActivityIndicator, Pressable, StyleSheet, Text, TextInput,
   type StyleProp, type TextInputProps, type TextProps, type ViewStyle,
 } from 'react-native';
-import { colors, fonts, radius } from '../theme';
+import { colors, fonts, glass, radius } from '../theme';
 import { View } from 'react-native';
 
 /** Text com a fonte e a cor padrão do app (RN não herda fontFamily). */
@@ -29,12 +29,12 @@ export function Button({
         (pressed || disabled) && { opacity: 0.7 },
       ]}>
       {loading ? (
-        <ActivityIndicator color={primary ? colors.onLight : colors.text} />
+        <ActivityIndicator color={primary ? colors.onAccent : colors.text} />
       ) : (
         <>
           <T style={[s.btnText, !primary && { color: colors.text }]}>{title}</T>
           {arrow && (
-            <View style={s.arrow}><T style={{ color: colors.text, fontFamily: fonts.semibold }}>→</T></View>
+            <View style={s.arrow}><T style={{ color: colors.accent, fontFamily: fonts.semibold }}>→</T></View>
           )}
         </>
       )}
@@ -56,8 +56,8 @@ export function Chip({
   label, selected, onPress, tint,
 }: { label: string; selected?: boolean; onPress?: () => void; tint?: string }) {
   return (
-    <Pressable onPress={onPress} style={[s.chip, selected && s.chipOn, tint ? { borderColor: tint } : null]}>
-      <T style={[s.chipText, selected && { color: colors.onLight, fontFamily: fonts.semibold }]}>{label}</T>
+    <Pressable onPress={onPress} accessibilityRole={onPress ? 'button' : undefined} accessibilityState={onPress ? { selected: Boolean(selected) } : undefined} style={[s.chip, selected && s.chipOn, tint && !selected ? { borderColor: tint } : null]}>
+      <T style={[s.chipText, selected && { color: colors.onAccent, fontFamily: fonts.semibold }]}>{label}</T>
     </Pressable>
   );
 }
@@ -68,6 +68,16 @@ export function Glass({ children, style }: { children: React.ReactNode; style?: 
     <BlurView intensity={30} tint="dark" style={[s.glass, style]}>
       {children}
     </BlurView>
+  );
+}
+
+/** Título grande e leve com a segunda parte em cinza (referências 8 e 9). */
+export function Title({ lead, rest, size = 30 }: { lead: string; rest?: string; size?: number }) {
+  return (
+    <T style={{ fontSize: size, lineHeight: size * 1.28, letterSpacing: -0.5 }}>
+      <T style={{ fontFamily: fonts.semibold, fontSize: size, lineHeight: size * 1.28 }}>{lead}</T>
+      {rest ? <T style={{ fontFamily: fonts.light, fontSize: size, lineHeight: size * 1.28, color: colors.muted }}>{'\n'}{rest}</T> : null}
+    </T>
   );
 }
 
@@ -85,10 +95,10 @@ const s = StyleSheet.create({
     paddingVertical: 14, paddingHorizontal: 22, borderRadius: radius.pill,
     alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 12,
   },
-  btnPrimary: { backgroundColor: colors.text },
+  btnPrimary: { backgroundColor: colors.accent },
   btnGhost: { borderWidth: 1, borderColor: colors.border },
-  btnText: { color: colors.onLight, fontFamily: fonts.semibold, fontSize: 16 },
-  arrow: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.onLight, alignItems: 'center', justifyContent: 'center' },
+  btnText: { color: colors.onAccent, fontFamily: fonts.semibold, fontSize: 16 },
+  arrow: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.onAccent, alignItems: 'center', justifyContent: 'center' },
   input: {
     backgroundColor: colors.surface, color: colors.text, borderRadius: radius.md,
     borderWidth: 1, borderColor: colors.border, paddingHorizontal: 18, paddingVertical: 14,
@@ -98,10 +108,10 @@ const s = StyleSheet.create({
     maxWidth: '100%', paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1,
     borderColor: colors.border, backgroundColor: colors.surface,
   },
-  chipOn: { backgroundColor: colors.text, borderColor: colors.text },
+  chipOn: { backgroundColor: colors.accent, borderColor: colors.accent },
   chipText: { fontSize: 13, fontFamily: fonts.regular, flexShrink: 1 },
   glass: {
     overflow: 'hidden', borderRadius: radius.pill, borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)', backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: glass.border, backgroundColor: glass.fill,
   },
 });

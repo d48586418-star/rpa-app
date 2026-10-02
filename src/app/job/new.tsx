@@ -44,6 +44,7 @@ export default function NewJob() {
         gear: gear.split(',').map((g) => g.trim()).filter(Boolean), description: desc.trim(),
       });
       await qc.invalidateQueries({ queryKey: ['jobs'] });
+      await qc.invalidateQueries({ queryKey: ['home'] });
       router.replace({ pathname: '/job/[id]', params: { id: job.id } });
     } catch (e) {
       Alert.alert('Não foi possível publicar', e instanceof Error ? e.message : 'Tente novamente.');

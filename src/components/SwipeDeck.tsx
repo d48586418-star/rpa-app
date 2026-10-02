@@ -81,8 +81,8 @@ export function SwipeDeck({ profiles, onSwipe }: Props) {
         <Pressable accessibilityLabel="Pular" onPress={() => fling('pass')} style={[s.action, { borderColor: colors.border }]}>
           <T style={{ fontSize: 24, fontFamily: fonts.light }}>✕</T>
         </Pressable>
-        <Pressable accessibilityLabel="Chamar para trabalhar" onPress={() => fling('like')} style={[s.action, { backgroundColor: colors.light, borderColor: colors.light }]}>
-          <T style={{ fontSize: 30, fontFamily: fonts.light, color: colors.onLight, lineHeight: 34 }}>→</T>
+        <Pressable accessibilityLabel="Chamar para trabalhar" onPress={() => fling('like')} style={[s.action, { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+          <T style={{ fontSize: 30, fontFamily: fonts.light, color: colors.onAccent, lineHeight: 34 }}>→</T>
         </Pressable>
       </View>
     </View>
