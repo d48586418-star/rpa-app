@@ -18,9 +18,14 @@ Para testar o match, crie duas contas (dois aparelhos/emuladores) e dê "chamar"
 
 Splash (deslizar) → **Selecione a sua jornada** (Freelancer ou Empresa) → cadastro → perfil por tipo → deck. Freelancers veem empresas e empresas veem freelancers; match mútuo abre o chat.
 
+## Personas de teste
+
+Dez contas prontas (5 freelancers e 5 empresas) para testar o match: veja [docs/personas-teste.md](docs/personas-teste.md). Na demo (`EXPO_PUBLIC_DEMO=1`) elas aparecem na tela de login; no Supabase de teste, rode `supabase/seed/personas.sql`. Os arquivos são gerados com `npm run gen:personas`.
+
 ## Scripts
 
-- `npm test` — testes das regras de match/filtros
+- `npm test` — testes das regras de match/filtros e das personas
+- `npm run gen:personas` — regera o SQL e o guia das personas a partir de `src/constants/personas.json`
 - `npm run typecheck` — TypeScript
 - `npm run lint` — ESLint do Expo
 

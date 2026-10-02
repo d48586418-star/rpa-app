@@ -95,11 +95,11 @@ const s = StyleSheet.create({
     fontSize: 16, fontFamily: fonts.regular,
   },
   chip: {
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1,
+    maxWidth: '100%', paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1,
     borderColor: colors.border, backgroundColor: colors.surface,
   },
   chipOn: { backgroundColor: colors.text, borderColor: colors.text },
-  chipText: { fontSize: 13, fontFamily: fonts.regular },
+  chipText: { fontSize: 13, fontFamily: fonts.regular, flexShrink: 1 },
   glass: {
     overflow: 'hidden', borderRadius: radius.pill, borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.14)', backgroundColor: 'rgba(255,255,255,0.04)',

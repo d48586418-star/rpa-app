@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.5",
     "@types/react": "~19.2.2",
     "jest": "^29.7.0",
     "jest-expo": "^57.0.5",
@@ -44,7 +45,8 @@
     "web": "expo start --web",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "gen:personas": "node scripts/gen-personas.js"
   },
   "private": true,
   "jest": {

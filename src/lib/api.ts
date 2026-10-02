@@ -8,7 +8,7 @@ const PROFILE_COLS =
   'id,account_type,website,name,avatar_url,city,bio,roles,day_rate_min,day_rate_max,available,portfolio_links,gear';
 
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
-  if (isDemo) return demoStore.me;
+  if (isDemo) return demoStore.profileOf(userId);
   const { data, error } = await supabase
     .from('profiles')
     .select(PROFILE_COLS)
@@ -40,7 +40,7 @@ export async function fetchCandidates(
   me: string,
   filters: DiscoverFilters,
 ): Promise<Profile[]> {
-  if (isDemo) return demoStore.candidates(filters);
+  if (isDemo) return demoStore.candidates(me, filters);
   const [{ data: profiles, error: e1 }, { data: swipes, error: e2 }] = await Promise.all([
     supabase.from('profiles').select(PROFILE_COLS).neq('id', me).limit(200),
     supabase.from('swipes').select('target_id').eq('swiper_id', me),
@@ -57,7 +57,7 @@ export async function recordSwipe(
   target: string,
   direction: 'like' | 'pass',
 ): Promise<boolean> {
-  if (isDemo) return demoStore.swipe(target, direction);
+  if (isDemo) return demoStore.swipe(me, target, direction);
   const { error } = await supabase
     .from('swipes')
     .insert({ swiper_id: me, target_id: target, direction });
@@ -77,7 +77,7 @@ export async function recordSwipe(
 export type MatchWithProfile = Match & { other: Profile };
 
 export async function fetchMatches(me: string): Promise<MatchWithProfile[]> {
-  if (isDemo) return demoStore.listMatches();
+  if (isDemo) return demoStore.listMatches(me);
   const { data, error } = await supabase
     .from('matches')
     .select('id,user_a,user_b,created_at')

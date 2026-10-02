@@ -1,80 +1,115 @@
-import { filterCandidates, type DiscoverFilters } from './matching';
+import { PERSONAS, personaById, personaByKey } from '../constants/personas';
+import { filterCandidates, matchPair, type DiscoverFilters } from './matching';
 import type { Match, Message, Profile } from './types';
 
+/** Conta criada pelo cadastro livre na demo (as personas têm contas próprias). */
 export const DEMO_ME = 'demo-me';
 
-type Seed = Profile & { likesBack: boolean };
+/** Personas que já curtiram a conta nova, para o fluxo de match aparecer logo. */
+const LIKES_NEWCOMER = ['e1', 'e3', 'f1', 'f3'];
 
-const base = {
-  avatar_url: null, website: null, gear: null, portfolio_links: [] as string[],
-  day_rate_min: null, day_rate_max: null, available: true, bio: null,
-};
-
-const SEEDS: Seed[] = [
-  { ...base, id: 'd1', account_type: 'empresa', name: 'Lume Filmes', city: 'São Paulo', roles: ['Diretor(a) de Fotografia', 'Operador(a) de Câmera'], bio: 'Produtora de publicidade e videoclipes. Procuramos equipe para campanhas de moda neste trimestre.', website: '@lumefilmes', likesBack: true },
-  { ...base, id: 'd2', account_type: 'empresa', name: 'Casa Vermelha Produções', city: 'Rio de Janeiro', roles: ['Editor(a)', 'Colorista'], bio: 'Documentários e séries para streaming. Pós-produção remota ou presencial.', website: 'casavermelha.example', likesBack: false },
-  { ...base, id: 'd3', account_type: 'empresa', name: 'Estúdio Neon', city: 'Belo Horizonte', roles: ['Motion Designer', 'VFX / Animador(a)'], bio: 'Vinhetas, lyric videos e animação 2D/3D para marcas.', available: false, likesBack: true },
-  { ...base, id: 'd4', account_type: 'empresa', name: 'Pulso Audiovisual', city: 'Curitiba', roles: ['Técnico(a) de Som Direto', 'Desenhista de Som'], bio: 'Cobertura de shows e festivais. Equipe de som sempre bem-vinda.', likesBack: false },
-  { ...base, id: 'f1', account_type: 'freelancer', name: 'Marina Duarte', city: 'São Paulo', roles: ['Diretor(a) de Fotografia'], bio: 'DP com 8 anos em publicidade e ficção. Disponível para diárias e projetos longos.', day_rate_min: 1800, day_rate_max: 2800, gear: 'FX6, lentes Sigma Cine, Aputure 600d', portfolio_links: ['vimeo.com/marinaduarte'], likesBack: true },
-  { ...base, id: 'f2', account_type: 'freelancer', name: 'Caio Ribeiro', city: 'Rio de Janeiro', roles: ['Editor(a)', 'Colorista'], bio: 'Edição e color grading para documentário e clipes. DaVinci Resolve.', day_rate_min: 900, day_rate_max: 1500, likesBack: false },
-  { ...base, id: 'f3', account_type: 'freelancer', name: 'Joana Alencar', city: 'Recife', roles: ['Técnico(a) de Som Direto'], bio: 'Som direto para cinema e TV, equipe própria de boom e mixer.', day_rate_min: 1200, day_rate_max: 1900, available: false, likesBack: true },
-  { ...base, id: 'f4', account_type: 'freelancer', name: 'Theo Nakamura', city: 'São Paulo', roles: ['Motion Designer', 'VFX / Animador(a)'], bio: 'Motion para redes e TV, After Effects e Cinema 4D.', day_rate_min: 700, day_rate_max: 1300, likesBack: false },
-  { ...base, id: 'f5', account_type: 'freelancer', name: 'Bia Camargo', city: 'Porto Alegre', roles: ['Direção de Arte', 'Figurinista'], bio: 'Direção de arte para curtas e publicidade, com acervo próprio de objetos de cena.', day_rate_min: 800, day_rate_max: 1400, likesBack: false },
-];
-
-const REPLIES = [
+const GENERIC_REPLIES = [
   'Oi! Adorei seu perfil. Você está livre nas próximas semanas?',
   'Show! Posso te mandar o roteiro e as datas ainda hoje.',
-  'Combinado. Tenho uma diária na semana que vem, topa conversar?',
-  'Boa! Me passa seu portfólio atualizado que eu levo pra equipe.',
+  'Combinado. Me passa seu portfólio atualizado que eu levo pra equipe.',
 ];
 
 type Listener = () => void;
+export type MatchWithOther = Match & { other: Profile };
 
 export class DemoStore {
-  me: Profile | null = null;
-  private profiles: Seed[] = SEEDS.map((s) => ({ ...s }));
-  private swiped = new Set<string>();
+  replyDelayMs = 1200;
+  private active: string | null = null;
+  private profiles = new Map<string, Profile>();
+  private likes = new Set<string>(); // "de>para"
+  private swiped = new Map<string, Set<string>>(); // quem já avaliou quem
   private matches: Match[] = [];
   private messages: Message[] = [];
   private seq = 0;
-  private replyIdx = 0;
+  private replyCount = new Map<string, number>();
   private matchListeners = new Set<Listener>();
   private msgListeners = new Map<string, Set<(m: Message) => void>>();
-  replyDelayMs = 1200;
 
-  /** Conta nova: zera perfil, swipes, matches e mensagens. */
+  constructor() {
+    this.reset();
+  }
+
+  /** Volta tudo ao estado inicial: personas, likes pré-existentes, sem matches nem mensagens. */
   reset() {
-    this.me = null;
+    this.profiles.clear();
+    this.likes.clear();
     this.swiped.clear();
     this.matches = [];
     this.messages = [];
+    this.replyCount.clear();
+    for (const p of PERSONAS) this.profiles.set(p.profile.id, { ...p.profile });
+    for (const p of PERSONAS) {
+      for (const k of p.preLikes) this.recordLike(p.profile.id, personaByKey(k)!.profile.id);
+    }
+    this.addNewcomerLikes();
+  }
+
+  /** Zera só a conta do cadastro livre (perfil, avaliações e matches dela). */
+  resetNewUser() {
+    this.profiles.delete(DEMO_ME);
+    this.swiped.delete(DEMO_ME);
+    for (const l of [...this.likes]) if (l.endsWith(`>${DEMO_ME}`) || l.startsWith(`${DEMO_ME}>`)) this.likes.delete(l);
+    const gone = new Set(this.matches.filter((m) => m.user_a === DEMO_ME || m.user_b === DEMO_ME).map((m) => m.id));
+    this.matches = this.matches.filter((m) => !gone.has(m.id));
+    this.messages = this.messages.filter((m) => !gone.has(m.match_id));
+    this.addNewcomerLikes();
+  }
+
+  private addNewcomerLikes() {
+    for (const k of LIKES_NEWCOMER) this.recordLike(personaByKey(k)!.profile.id, DEMO_ME);
+  }
+
+  private recordLike(from: string, to: string) {
+    this.likes.add(`${from}>${to}`);
+    this.markSwiped(from, to);
+  }
+
+  private markSwiped(from: string, to: string) {
+    const s = this.swiped.get(from) ?? new Set<string>();
+    s.add(to);
+    this.swiped.set(from, s);
+  }
+
+  /** Define quem está logado (usado para decidir quando o outro lado responde no chat). */
+  setActive(id: string | null) {
+    this.active = id;
+  }
+
+  profileOf(id: string): Profile | null {
+    return this.profiles.get(id) ?? null;
   }
 
   saveProfile(p: Profile) {
-    this.me = { ...p, id: DEMO_ME };
+    this.profiles.set(p.id, { ...p });
   }
 
-  candidates(filters: DiscoverFilters): Profile[] {
-    return filterCandidates(this.profiles, DEMO_ME, this.swiped, filters);
+  candidates(me: string, filters: DiscoverFilters): Profile[] {
+    const all = [...this.profiles.values()];
+    return filterCandidates(all, me, this.swiped.get(me) ?? new Set(), filters);
   }
 
-  /** Registra o swipe; retorna true se gerou match (só com perfis que "curtem de volta"). */
-  swipe(targetId: string, direction: 'like' | 'pass'): boolean {
-    this.swiped.add(targetId);
+  /** Registra o swipe; retorna true se o like gerou match (a outra pessoa já tinha curtido). */
+  swipe(me: string, targetId: string, direction: 'like' | 'pass'): boolean {
+    this.markSwiped(me, targetId);
     if (direction !== 'like') return false;
-    const target = this.profiles.find((p) => p.id === targetId);
-    if (!target?.likesBack) return false;
-    if (this.matches.some((m) => m.user_a === targetId || m.user_b === targetId)) return false;
-    this.matches.unshift({
-      id: `m-${++this.seq}`, user_a: DEMO_ME, user_b: targetId, created_at: new Date().toISOString(),
-    });
+    this.likes.add(`${me}>${targetId}`);
+    if (!this.likes.has(`${targetId}>${me}`)) return false;
+    const [a, b] = matchPair(me, targetId);
+    if (this.matches.some((m) => m.user_a === a && m.user_b === b)) return false;
+    this.matches.unshift({ id: `m-${++this.seq}`, user_a: a, user_b: b, created_at: new Date().toISOString() });
     this.matchListeners.forEach((l) => l());
     return true;
   }
 
-  listMatches(): (Match & { other: Profile })[] {
-    return this.matches.map((m) => ({ ...m, other: this.profiles.find((p) => p.id === m.user_b)! }));
+  listMatches(me: string): MatchWithOther[] {
+    return this.matches
+      .filter((m) => m.user_a === me || m.user_b === me)
+      .map((m) => ({ ...m, other: this.profiles.get(m.user_a === me ? m.user_b : m.user_a)! }));
   }
 
   listMessages(matchId: string): Message[] {
@@ -82,12 +117,19 @@ export class DemoStore {
   }
 
   send(matchId: string, senderId: string, body: string) {
-    if (!this.matches.some((m) => m.id === matchId)) throw new Error('Conversa não encontrada.');
+    const match = this.matches.find((m) => m.id === matchId);
+    if (!match) throw new Error('Conversa não encontrada.');
+    if (senderId !== match.user_a && senderId !== match.user_b) throw new Error('Você não participa desta conversa.');
     this.push({ id: `msg-${++this.seq}`, match_id: matchId, sender_id: senderId, body, created_at: new Date().toISOString() });
-    if (senderId !== DEMO_ME) return;
-    const match = this.matches.find((m) => m.id === matchId)!;
-    const reply = REPLIES[this.replyIdx++ % REPLIES.length];
-    setTimeout(() => this.send(matchId, match.user_b, reply), this.replyDelayMs);
+    if (senderId !== this.active) return; // só quem está logado dispara resposta
+    const otherId = match.user_a === senderId ? match.user_b : match.user_a;
+    const persona = personaById(otherId);
+    if (!persona) return;
+    const n = this.replyCount.get(matchId) ?? 0;
+    this.replyCount.set(matchId, n + 1);
+    const pool = persona.replies.length ? persona.replies : GENERIC_REPLIES;
+    const reply = pool[n % pool.length];
+    setTimeout(() => this.send(matchId, otherId, reply), this.replyDelayMs);
   }
 
   private push(m: Message) {

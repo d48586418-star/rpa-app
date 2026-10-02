@@ -1,3 +1,4 @@
+import { TEST_PASSWORD, personaByEmail } from '../constants/personas';
 import { isDemo } from './demo';
 import { DEMO_ME, demoStore } from './demoStore';
 import { supabase } from './supabase';
@@ -5,19 +6,25 @@ import { supabase } from './supabase';
 export type AppSession = { user: { id: string } };
 type Result = { error: string | null; needsConfirmation?: boolean };
 
-const demoSession: AppSession = { user: { id: DEMO_ME } };
 let current: AppSession | null = null;
 const listeners = new Set<(s: AppSession | null) => void>();
 
-const setDemo = (s: AppSession | null) => {
-  current = s;
-  listeners.forEach((l) => l(s));
+const setDemo = (id: string | null) => {
+  current = id ? { user: { id } } : null;
+  demoStore.setActive(id);
+  listeners.forEach((l) => l(current));
 };
 
 export async function signIn(email: string, password: string): Promise<Result> {
   if (isDemo) {
-    if (!email.trim()) return { error: 'Informe um e-mail (na demo, qualquer um serve).' };
-    setDemo(demoSession);
+    if (!email.trim()) return { error: 'Informe um e-mail.' };
+    const persona = personaByEmail(email);
+    if (persona) {
+      if (password !== TEST_PASSWORD) return { error: `Senha incorreta. Nas personas de teste a senha é ${TEST_PASSWORD}.` };
+      setDemo(persona.profile.id);
+      return { error: null };
+    }
+    setDemo(DEMO_ME); // qualquer outro e-mail entra na conta livre da demo
     return { error: null };
   }
   const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -26,8 +33,8 @@ export async function signIn(email: string, password: string): Promise<Result> {
 
 export async function signUp(email: string, password: string): Promise<Result> {
   if (isDemo) {
-    demoStore.reset();
-    setDemo(demoSession);
+    demoStore.resetNewUser();
+    setDemo(DEMO_ME);
     return { error: null };
   }
   const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
@@ -37,6 +44,13 @@ export async function signUp(email: string, password: string): Promise<Result> {
 export async function signOut(): Promise<void> {
   if (isDemo) return setDemo(null);
   await supabase.auth.signOut();
+}
+
+/** Só na demo: apaga likes, matches e mensagens feitos e volta ao estado inicial. */
+export async function resetDemo(): Promise<void> {
+  if (!isDemo) return;
+  demoStore.reset();
+  setDemo(null);
 }
 
 export async function getSession(): Promise<AppSession | null> {
