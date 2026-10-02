@@ -5,30 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cortando Histórias</title>
 <meta name="description" content="Simulador de timeline: laboratório de montagem audiovisual.">
-<meta name="theme-color" content="#a81020">
+<meta name="theme-color" content="#0c0b0d">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/abertura.css">
 </head>
 <body>
-<main>
- <div class="stage" id="stage">
-  <h1 class="sr">Cortando Histórias</h1>
-  <div class="cam" id="cam">
-    <div class="deep">
-      <div class="reveal">
-        <p class="txt" id="txt" aria-hidden="true">Criando Histórias</p>
-        <a class="go" id="entrar" href="lab.html#/boas-vindas">Iniciar jornada</a>
-      </div>
-    </div>
+<main class="start" id="start">
+  <div class="orb" aria-hidden="true">
+    <i style="--im:url(assets/personas/historias-busto.jpg)"></i><i style="--im:url(assets/personas/ritmo-busto.jpg)"></i><i style="--im:url(assets/personas/olhar-busto.jpg)"></i>
+    <i style="--im:url(assets/personas/som-busto.jpg)"></i><i style="--im:url(assets/personas/experimental-busto.jpg)"></i><i style="--im:url(assets/personas/historias-busto.jpg)"></i>
+    <i style="--im:url(assets/personas/ritmo-busto.jpg)"></i><i style="--im:url(assets/personas/olhar-busto.jpg)"></i><i style="--im:url(assets/personas/som-busto.jpg)"></i>
   </div>
-  <div class="rip" id="rip" aria-hidden="true">
-    <div class="rip-full"></div>
-    <div class="rip-h top"><div></div></div>
-    <div class="rip-h bot"><div></div></div>
-    <div class="rip-glass"></div>
+  <ul class="fan" id="fan" aria-hidden="true">
+    <li style="--i:-2;--bg:#995443"><img src="assets/personas/historias-poster.jpg" alt="" width="640" height="640"><span>Histórias</span></li>
+    <li style="--i:-1;--bg:#233d62"><img src="assets/personas/ritmo-poster.jpg" alt="" width="640" height="640"><span>Ritmo</span></li>
+    <li style="--i:0;--bg:#92a290" class="mid"><img src="assets/personas/olhar-poster.jpg" alt="" width="640" height="640"><video muted loop playsinline preload="metadata" poster="assets/personas/olhar-poster.jpg"><source src="assets/personas/olhar.webm" type='video/webm; codecs="vp9, opus"'><source src="assets/personas/olhar.mp4" type="video/mp4"></video><span>Olhar</span></li>
+    <li style="--i:1;--bg:#503445"><img src="assets/personas/som-poster.jpg" alt="" width="640" height="640"><span>Som</span></li>
+    <li style="--i:2;--bg:#ac7f3a"><img src="assets/personas/experimental-poster.jpg" alt="" width="640" height="640"><span>Experimental</span></li>
+  </ul>
+  <div class="copy">
+    <h1 class="ttl">Cortando Histórias</h1>
+    <p class="sub">Introdução à edição e montagem audiovisual</p>
+    <a class="go" id="entrar" href="lab.html#/boas-vindas">
+      <span class="go-track" aria-hidden="true"></span>
+      <span class="go-txt">Iniciar jornada</span>
+      <span class="go-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
   </div>
-  <button type="button" class="instr" id="instr"><span>Corte para iniciar</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
- </div>
+  <div class="strip" aria-hidden="true">
+    <span class="cnt">01 / 05</span>
+    <span class="rule"><b></b></span>
+    <span class="names">Histórias · Ritmo · Olhar · Som · Experimental</span>
+  </div>
 </main>
 <script src="js/abertura.js"></script>
 </body>
