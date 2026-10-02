@@ -18,6 +18,10 @@ Para testar o match, crie duas contas (dois aparelhos/emuladores) e dê "chamar"
 
 Splash (deslizar) → **Selecione a sua jornada** (Freelancer ou Empresa) → cadastro → perfil por tipo → deck. Freelancers veem empresas e empresas veem freelancers; match mútuo abre o chat.
 
+## Jobs e match %
+
+Na demo há uma aba **Jobs**: a empresa publica um job, o profissional vê o match % explicado e se candidata, e os dois seguem por contrato, custódia (simulada), avaliação e XP. Veja [docs/jobs-e-match.md](docs/jobs-e-match.md).
+
 ## Personas de teste
 
 Dez contas prontas (5 freelancers e 5 empresas) para testar o match: veja [docs/personas-teste.md](docs/personas-teste.md). Na demo (`EXPO_PUBLIC_DEMO=1`) elas aparecem na tela de login; no Supabase de teste, rode `supabase/seed/personas.sql`. Os arquivos são gerados com `npm run gen:personas`.

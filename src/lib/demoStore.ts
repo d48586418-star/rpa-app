@@ -1,4 +1,6 @@
 import { PERSONAS, personaById, personaByKey } from '../constants/personas';
+import { todayISO } from './dates';
+import { JobsModule } from './demoJobs';
 import { filterCandidates, matchPair, type DiscoverFilters } from './matching';
 import type { Match, Message, Profile } from './types';
 
@@ -19,6 +21,9 @@ export type MatchWithOther = Match & { other: Profile };
 
 export class DemoStore {
   replyDelayMs = 1200;
+  /** Jobs, candidaturas, contrato em etapas, XP, créditos e agenda. */
+  readonly jobs: JobsModule;
+  private today: string;
   private active: string | null = null;
   private profiles = new Map<string, Profile>();
   private likes = new Set<string>(); // "de>para"
@@ -30,7 +35,13 @@ export class DemoStore {
   private matchListeners = new Set<Listener>();
   private msgListeners = new Map<string, Set<(m: Message) => void>>();
 
-  constructor() {
+  constructor(today: string = todayISO()) {
+    this.today = today;
+    this.jobs = new JobsModule({
+      profiles: this.profiles,
+      today: () => this.today,
+      ensureConversation: (a, b) => this.ensureConversation(a, b),
+    });
     this.reset();
   }
 
@@ -42,6 +53,7 @@ export class DemoStore {
     this.matches = [];
     this.messages = [];
     this.replyCount.clear();
+    this.jobs.reset();
     for (const p of PERSONAS) this.profiles.set(p.profile.id, { ...p.profile });
     for (const p of PERSONAS) {
       for (const k of p.preLikes) this.recordLike(p.profile.id, personaByKey(k)!.profile.id);
@@ -57,6 +69,7 @@ export class DemoStore {
     const gone = new Set(this.matches.filter((m) => m.user_a === DEMO_ME || m.user_b === DEMO_ME).map((m) => m.id));
     this.matches = this.matches.filter((m) => !gone.has(m.id));
     this.messages = this.messages.filter((m) => !gone.has(m.match_id));
+    this.jobs.resetUser(DEMO_ME);
     this.addNewcomerLikes();
   }
 
@@ -104,6 +117,17 @@ export class DemoStore {
     this.matches.unshift({ id: `m-${++this.seq}`, user_a: a, user_b: b, created_at: new Date().toISOString() });
     this.matchListeners.forEach((l) => l());
     return true;
+  }
+
+  /** Abre a conversa entre duas pessoas (ou reaproveita a que já existe) e devolve o id. */
+  ensureConversation(a: string, b: string): string {
+    const [x, y] = matchPair(a, b);
+    const existing = this.matches.find((m) => m.user_a === x && m.user_b === y);
+    if (existing) return existing.id;
+    const m: Match = { id: `m-${++this.seq}`, user_a: x, user_b: y, created_at: new Date().toISOString() };
+    this.matches.unshift(m);
+    this.matchListeners.forEach((l) => l());
+    return m.id;
   }
 
   listMatches(me: string): MatchWithOther[] {

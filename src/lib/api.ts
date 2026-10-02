@@ -140,3 +140,34 @@ export function subscribeMatches(onMatch: () => void): () => void {
     .subscribe();
   return () => { supabase.removeChannel(ch); };
 }
+
+// ---------- Jobs (só na demo por enquanto) ----------
+
+import type { Action } from './engagement';
+import type { Credit, Genre, ReviewScores } from './types';
+import type { CandidateRow, EngagementView, JobCard, JobDetail, NewJob, OwnerJobRow, ProgressView } from './demoJobs';
+
+export type { CandidateRow, EngagementView, JobCard, JobDetail, NewJob, OwnerJobRow, ProgressView };
+
+/** O backend Supabase dos jobs ainda não existe: a aba Jobs só aparece na demo. */
+export const jobsEnabled = isDemo;
+
+const demoOnly = (): never => {
+  throw new Error('Jobs ainda não estão disponíveis fora da demo.');
+};
+const jobs = () => (isDemo ? demoStore.jobs : demoOnly());
+
+export const fetchJobFeed = async (me: string): Promise<JobCard[]> => jobs().feedForPro(me);
+export const fetchMyJobs = async (me: string): Promise<OwnerJobRow[]> => jobs().feedForOwner(me);
+export const fetchJob = async (jobId: string, me: string): Promise<JobDetail> => jobs().detail(jobId, me);
+export const createJob = async (me: string, input: NewJob) => jobs().createJob(me, input);
+export const applyToJob = async (jobId: string, me: string) => jobs().apply(jobId, me);
+export const inviteCandidate = async (jobId: string, me: string, proId: string) => jobs().invite(jobId, me, proId);
+export const selectCandidate = async (jobId: string, me: string, proId: string) => jobs().select(jobId, me, proId);
+export const actOnEngagement = async (
+  jobId: string, me: string, action: Action, payload?: { scores: ReviewScores; tip?: string },
+) => jobs().act(jobId, me, action, payload);
+export const fetchProgress = async (me: string): Promise<ProgressView> => jobs().progress(me);
+export const addCredit = async (me: string, c: { title: string; role: string; genre: Genre; year: number }): Promise<Credit> => jobs().addCredit(me, c);
+export const confirmCreditDemo = async (me: string, creditId: string) => jobs().simulateConfirm(me, creditId);
+export const toggleBusyDay = async (me: string, date: string) => jobs().toggleBusy(me, date);

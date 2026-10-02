@@ -17,7 +17,7 @@ export function otherUserId(match: { user_a: string; user_b: string }, me: strin
   return match.user_a === me ? match.user_b : match.user_a;
 }
 
-const norm = (s: string) =>
+export const norm = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 /** Filtra o deck de descoberta: exclui o próprio usuário e quem já recebeu swipe. */

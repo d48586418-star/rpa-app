@@ -13,16 +13,16 @@ Dez contas prontas, cinco freelancers e cinco empresas. **Senha de todas: `Teste
 
 | Persona | Tipo | Cargo | Cidade | Funções | Cachê/dia | Situação | Login |
 |---|---|---|---|---|---|---|---|
-| **Marina Duarte** | freelancer | Diretora de Fotografia | São Paulo | Diretor(a) de Fotografia | R$ 1.800 a 2.800 | Disponível | `marina.duarte@takeone.test` |
-| **Caio Ribeiro** | freelancer | Editor e Colorista | Rio de Janeiro | Editor(a), Colorista | R$ 900 a 1.500 | Disponível | `caio.ribeiro@takeone.test` |
-| **Joana Alencar** | freelancer | Técnica de Som Direto | Recife | Técnico(a) de Som Direto | R$ 1.200 a 1.900 | Ocupada | `joana.alencar@takeone.test` |
-| **Theo Nakamura** | freelancer | Motion Designer e VFX | São Paulo | Motion Designer, VFX / Animador(a) | R$ 700 a 1.300 | Disponível | `theo.nakamura@takeone.test` |
-| **Bia Camargo** | freelancer | Direção de Arte e Figurino | Porto Alegre | Direção de Arte, Figurinista | R$ 800 a 1.400 | Disponível | `bia.camargo@takeone.test` |
-| **Lume Filmes** | empresa | Produtora publicitária | São Paulo | Diretor(a) de Fotografia, Operador(a) de Câmera | — | Contratando | `lume.filmes@takeone.test` |
-| **Casa Vermelha Produções** | empresa | Documentários e séries | Rio de Janeiro | Editor(a), Colorista, Motion Designer | — | Contratando | `casa.vermelha@takeone.test` |
-| **Estúdio Neon** | empresa | Estúdio de motion e VFX | Belo Horizonte | Motion Designer, VFX / Animador(a) | — | Sem vagas | `estudio.neon@takeone.test` |
-| **Pulso Audiovisual** | empresa | Cobertura de shows e festivais | Curitiba | Técnico(a) de Som Direto, Desenhista de Som | — | Contratando | `pulso.audiovisual@takeone.test` |
-| **Fio Condutor Cinema** | empresa | Cinema autoral | Porto Alegre | Direção de Arte, Figurinista | — | Contratando | `fio.condutor@takeone.test` |
+| **Marina Duarte** | freelancer | Diretora de Fotografia | Ilhéus | Diretor(a) de Fotografia, Operador(a) de Câmera | R$ 700 a 1.800 | Disponível | `marina.duarte@takeone.test` |
+| **Caio Ribeiro** | freelancer | Editor e Colorista | Itabuna | Editor(a), Colorista | R$ 900 a 1.500 | Disponível | `caio.ribeiro@takeone.test` |
+| **Joana Alencar** | freelancer | Técnica de Som Direto | Porto Seguro | Técnico(a) de Som Direto | R$ 1.200 a 1.900 | Ocupada | `joana.alencar@takeone.test` |
+| **Theo Nakamura** | freelancer | Motion Designer e VFX | Ilhéus | Motion Designer, VFX / Animador(a) | R$ 700 a 1.300 | Disponível | `theo.nakamura@takeone.test` |
+| **Bia Camargo** | freelancer | Direção de Arte e Figurino | Itacaré | Direção de Arte, Figurinista | R$ 800 a 1.400 | Disponível | `bia.camargo@takeone.test` |
+| **Lume Filmes** | empresa | Produtora publicitária | Ilhéus | Diretor(a) de Fotografia, Operador(a) de Câmera | — | Contratando | `lume.filmes@takeone.test` |
+| **Casa Vermelha Produções** | empresa | Documentários e séries | Itabuna | Editor(a), Colorista, Motion Designer | — | Contratando | `casa.vermelha@takeone.test` |
+| **Estúdio Neon** | empresa | Estúdio de motion e VFX | Itacaré | Motion Designer, VFX / Animador(a) | — | Sem vagas | `estudio.neon@takeone.test` |
+| **Pulso Audiovisual** | empresa | Cobertura de shows e festivais | Porto Seguro | Técnico(a) de Som Direto, Desenhista de Som | — | Contratando | `pulso.audiovisual@takeone.test` |
+| **Fio Condutor Cinema** | empresa | Cinema autoral | Valença | Direção de Arte, Figurinista | — | Contratando | `fio.condutor@takeone.test` |
 
 ## Personalidade (define as respostas automáticas do chat na demo)
 
@@ -79,6 +79,39 @@ Entre como a persona, abra Descobrir e curta quem está na lista. Quem já receb
 - **Filtro de disponibilidade:** Joana (ocupada) e Estúdio Neon (sem vagas) somem com "Só disponíveis" ou "Só contratando".
 - **Filtro por função:** use os chips de função no topo do deck.
 - **Chat:** na demo, o outro lado responde com a personalidade da persona.
+
+## Jobs de exemplo (aba Jobs, só na demo)
+
+| Job | Publicado por | Função | Gênero | Local | Diárias | Orçamento/diária | Equipamento pedido |
+|---|---|---|---|---|---|---|---|
+| Casamento em Itacaré: cobertura de câmera | Lume Filmes | Operador(a) de Câmera | casamento | Itacaré | 1 | R$ 650 | Câmera 4K, Estabilizador |
+| Filme institucional para hotel em Trancoso | Lume Filmes | Diretor(a) de Fotografia | institucional | Trancoso | 2 | R$ 1.400 | Câmera 4K |
+| Edição de documentário (3 episódios) | Casa Vermelha Produções | Editor(a) | documentario | Itabuna | 5 | R$ 900 | DaVinci Resolve |
+| Motion: vinheta para rede de supermercados | Estúdio Neon | Motion Designer | publicidade | remoto | 3 | R$ 700 | After Effects |
+| Som direto para festival em Porto Seguro | Pulso Audiovisual | Técnico(a) de Som Direto | evento | Porto Seguro | 2 | R$ 1.000 | Gravador multicanal |
+| Direção de arte para curta de época | Fio Condutor Cinema | Direção de Arte | ficcao | Valença | 4 | R$ 600 | — |
+
+## Dados de match dos freelancers (créditos, agenda, reputação)
+
+| Persona | Cidade | Raio | Créditos verificados | Nota (avaliações) | Selos de formação | Dias ocupados (a partir de hoje) | Conta criada há |
+|---|---|---|---|---|---|---|---|
+| Marina Duarte | Ilhéus | 120 km | 5 de 5 | 4,8 (23) | — | +3 | 420 dias |
+| Caio Ribeiro | Itabuna | 80 km | 4 de 4 | 4,6 (9) | Formado em Montagem | — | 400 dias |
+| Joana Alencar | Porto Seguro | 180 km | 3 de 4 | 4,9 (14) | — | +10, +11, +12, +13, +14 | 300 dias |
+| Theo Nakamura | Ilhéus | 100 km | 2 de 2 | sem avaliações | — | — | 20 dias |
+| Bia Camargo | Itacaré | 60 km | 3 de 3 | 4,5 (6) | — | — | 250 dias |
+
+### Cenários para o match %
+
+- **Data bloqueada:** Marina tem o dia +3 ocupado, e o job de casamento em Itacaré cai nele. Disponibilidade zera.
+- **Fora do raio:** Bia (raio de 60 km) vê o job em Valença com distância zerada.
+- **Equipamento:** o job de casamento pede câmera 4K e estabilizador; Marina tem os dois.
+- **Conta nova:** Theo foi criado há 20 dias, não tem avaliações (nota neutra) e ganha bônus de visibilidade na lista do contratante.
+- **Formação:** só Caio tem o selo Formado em Montagem, que conta no job de edição.
+- **Chance de ser chamado:** Alta, Média ou Baixa conforme o match e a posição entre os candidatos.
+- **Agenda cheia:** Joana tem do dia +10 ao +14 ocupado, o que afeta o job de som do festival.
+
+Os números exatos saem do código (`src/lib/matchScore.ts`) e estão cobertos por testes; este guia não repete os percentuais para não ficar desatualizado.
 
 ## Se o login do seed falhar no Supabase
 

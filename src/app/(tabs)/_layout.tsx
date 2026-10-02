@@ -1,6 +1,7 @@
 import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Glass, T } from '../../components/ui';
+import { jobsEnabled } from '../../lib/api';
 import { colors, fonts } from '../../theme';
 
 function GlassTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
@@ -8,6 +9,7 @@ function GlassTabBar({ state, descriptors, navigation, insets }: BottomTabBarPro
     <View style={[s.wrap, { bottom: Math.max(insets.bottom, 12) }]} pointerEvents="box-none">
       <Glass style={s.bar}>
         {state.routes.map((route, i) => {
+          if (route.name === 'jobs' && !jobsEnabled) return null;
           const focused = state.index === i;
           const title = descriptors[route.key].options.title ?? route.name;
           return (
@@ -32,6 +34,7 @@ function GlassTabBar({ state, descriptors, navigation, insets }: BottomTabBarPro
 export default function TabsLayout() {
   return (
     <Tabs
+      initialRouteName={jobsEnabled ? 'jobs' : 'discover'}
       tabBar={(p) => <GlassTabBar {...p} />}
       screenOptions={{
         headerStyle: { backgroundColor: colors.bg },
@@ -40,6 +43,7 @@ export default function TabsLayout() {
         headerShadowVisible: false,
         sceneStyle: { backgroundColor: colors.bg },
       }}>
+      <Tabs.Screen name="jobs" options={{ title: 'Jobs', href: jobsEnabled ? undefined : null }} />
       <Tabs.Screen name="discover" options={{ title: 'Descobrir' }} />
       <Tabs.Screen name="matches" options={{ title: 'Matches' }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />

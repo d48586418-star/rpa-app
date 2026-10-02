@@ -54,6 +54,8 @@ function Gate() {
       </Stack.Protected>
       <Stack.Protected guard={Boolean(session) && hasProfile}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="job/[id]" options={{ headerShown: true, title: 'Job', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
+        <Stack.Screen name="job/new" options={{ headerShown: true, title: 'Novo job', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
         <Stack.Screen
           name="chat/[matchId]"
           options={{

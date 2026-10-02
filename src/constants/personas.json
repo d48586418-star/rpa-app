@@ -9,22 +9,86 @@
       "account_type": "freelancer",
       "name": "Marina Duarte",
       "cargo": "Diretora de Fotografia",
-      "city": "São Paulo",
-      "bio": "DP com 8 anos em publicidade e ficção. Disponível para diárias e projetos longos.",
-      "roles": ["Diretor(a) de Fotografia"],
-      "day_rate_min": 1800,
-      "day_rate_max": 2800,
+      "city": "Ilhéus",
+      "bio": "DP e operadora de câmera com 8 anos em publicidade, casamentos e institucionais no Sul da Bahia.",
+      "roles": [
+        "Diretor(a) de Fotografia",
+        "Operador(a) de Câmera"
+      ],
+      "day_rate_min": 700,
+      "day_rate_max": 1800,
       "available": true,
       "website": null,
-      "gear": "FX6, lentes Sigma Cine, Aputure 600d",
-      "portfolio_links": ["vimeo.com/marinaduarte"],
+      "gear": "Sony FX6 (câmera 4K), estabilizador DJI Ronin, lentes Sigma Cine, Aputure 600d",
+      "portfolio_links": [
+        "vimeo.com/marinaduarte"
+      ],
       "personality": "Perfeccionista e direta. Quer decupagem, lentes e referências antes de fechar qualquer diária.",
       "replies": [
         "Oi! Antes de tudo: você já tem decupagem e referências de luz?",
         "Fecho a diária se fizermos uma visita técnica antes. Consegue?",
         "Manda o roteiro e o cronograma que eu devolvo a proposta hoje."
       ],
-      "pre_likes": ["e1"]
+      "pre_likes": [
+        "e1"
+      ],
+      "radius_km": 120,
+      "created_days_ago": 420,
+      "blocked_offsets": [
+        3
+      ],
+      "credits": [
+        {
+          "title": "Campanha Verão Costa do Cacau",
+          "role": "Diretor(a) de Fotografia",
+          "genre": "publicidade",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Institucional Hotel Praia",
+          "role": "Diretor(a) de Fotografia",
+          "genre": "institucional",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Casamento Pousada do Mar",
+          "role": "Operador(a) de Câmera",
+          "genre": "casamento",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Casamento Fazenda Cacau",
+          "role": "Operador(a) de Câmera",
+          "genre": "casamento",
+          "year": 2024,
+          "verified": true
+        },
+        {
+          "title": "Casamento em Olivença",
+          "role": "Operador(a) de Câmera",
+          "genre": "casamento",
+          "year": 2024,
+          "verified": true
+        }
+      ],
+      "reputation": {
+        "rating_avg": 4.8,
+        "rating_count": 23,
+        "attendance": 0.98,
+        "on_time": 0.96
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 420,
+        "jobs_done": 12,
+        "on_time_checkins": 9,
+        "on_time_deliveries": 0,
+        "pioneer": true
+      },
+      "jobs": []
     },
     {
       "key": "f2",
@@ -33,22 +97,77 @@
       "account_type": "freelancer",
       "name": "Caio Ribeiro",
       "cargo": "Editor e Colorista",
-      "city": "Rio de Janeiro",
-      "bio": "Edição e color grading para documentário e clipes. DaVinci Resolve e Premiere.",
-      "roles": ["Editor(a)", "Colorista"],
+      "city": "Itabuna",
+      "bio": "Edição e color grading para documentário, casamentos e clipes. DaVinci Resolve e Premiere.",
+      "roles": [
+        "Editor(a)",
+        "Colorista"
+      ],
       "day_rate_min": 900,
       "day_rate_max": 1500,
       "available": true,
       "website": null,
-      "gear": "Estação com DaVinci Studio, monitor calibrado",
-      "portfolio_links": ["vimeo.com/caioribeiro"],
+      "gear": "Estação com DaVinci Resolve Studio, Premiere, monitor calibrado",
+      "portfolio_links": [
+        "vimeo.com/caioribeiro"
+      ],
       "personality": "Calmo e detalhista. Pergunta formato de entrega, número de revisões e prazo real.",
       "replies": [
         "Olá, tudo bem? Quantas rodadas de revisão estão previstas?",
         "Prefiro receber o material bruto organizado por cena. Dá pra fazer assim?",
         "Sem pressa para o primeiro corte, mas gosto de combinar a data da entrega final já agora."
       ],
-      "pre_likes": []
+      "pre_likes": [],
+      "radius_km": 80,
+      "created_days_ago": 400,
+      "blocked_offsets": [],
+      "credits": [
+        {
+          "title": "Doc Cacau, Memória e Futuro",
+          "role": "Editor(a)",
+          "genre": "documentario",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Doc Pescadores de Canavieiras",
+          "role": "Editor(a)",
+          "genre": "documentario",
+          "year": 2024,
+          "verified": true
+        },
+        {
+          "title": "Clipe Banda da Praça",
+          "role": "Colorista",
+          "genre": "clipe",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Casamento Itabuna Clube",
+          "role": "Editor(a)",
+          "genre": "casamento",
+          "year": 2024,
+          "verified": true
+        }
+      ],
+      "reputation": {
+        "rating_avg": 4.6,
+        "rating_count": 9,
+        "attendance": 1.0,
+        "on_time": 0.9
+      },
+      "training_badges": [
+        "Formado em Montagem"
+      ],
+      "progress": {
+        "xp": 210,
+        "jobs_done": 6,
+        "on_time_checkins": 3,
+        "on_time_deliveries": 8,
+        "pioneer": true
+      },
+      "jobs": []
     },
     {
       "key": "f3",
@@ -57,14 +176,16 @@
       "account_type": "freelancer",
       "name": "Joana Alencar",
       "cargo": "Técnica de Som Direto",
-      "city": "Recife",
-      "bio": "Som direto para cinema e TV, com equipe própria de boom e mixer. Agenda cheia até o mês que vem.",
-      "roles": ["Técnico(a) de Som Direto"],
+      "city": "Porto Seguro",
+      "bio": "Som direto para eventos, cinema e TV, com equipe própria de boom e mixer. Agenda cheia no próximo mês.",
+      "roles": [
+        "Técnico(a) de Som Direto"
+      ],
       "day_rate_min": 1200,
       "day_rate_max": 1900,
       "available": false,
       "website": null,
-      "gear": "Sound Devices 833, Sennheiser MKH 416, 2 lapelas sem fio",
+      "gear": "Gravador multicanal Sound Devices 833, Sennheiser MKH 416, 2 lapelas sem fio",
       "portfolio_links": [],
       "personality": "Bem-humorada e prática. Está ocupada agora, mas responde rápido e vai direto ao ponto.",
       "replies": [
@@ -72,7 +193,63 @@
         "Rá, se o set for ruidoso eu já aviso: quero ver o local antes.",
         "Combinado. Me manda a data que eu confiro com a equipe."
       ],
-      "pre_likes": ["e4"]
+      "pre_likes": [
+        "e4"
+      ],
+      "radius_km": 180,
+      "created_days_ago": 300,
+      "blocked_offsets": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "credits": [
+        {
+          "title": "Festival de Verão Porto Seguro",
+          "role": "Técnico(a) de Som Direto",
+          "genre": "evento",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Festa da Colheita",
+          "role": "Técnico(a) de Som Direto",
+          "genre": "evento",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Show Beira-Mar",
+          "role": "Técnico(a) de Som Direto",
+          "genre": "evento",
+          "year": 2024,
+          "verified": true
+        },
+        {
+          "title": "Curta Ventania",
+          "role": "Técnico(a) de Som Direto",
+          "genre": "ficcao",
+          "year": 2024,
+          "verified": false
+        }
+      ],
+      "reputation": {
+        "rating_avg": 4.9,
+        "rating_count": 14,
+        "attendance": 1.0,
+        "on_time": 1.0
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 560,
+        "jobs_done": 14,
+        "on_time_checkins": 11,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      },
+      "jobs": []
     },
     {
       "key": "f4",
@@ -81,22 +258,63 @@
       "account_type": "freelancer",
       "name": "Theo Nakamura",
       "cargo": "Motion Designer e VFX",
-      "city": "São Paulo",
+      "city": "Ilhéus",
       "bio": "Motion para redes e TV, After Effects e Cinema 4D. Entrego rápido e aceito prazos apertados.",
-      "roles": ["Motion Designer", "VFX / Animador(a)"],
+      "roles": [
+        "Motion Designer",
+        "VFX / Animador(a)"
+      ],
       "day_rate_min": 700,
       "day_rate_max": 1300,
       "available": true,
       "website": null,
-      "gear": "Workstation RTX 4090, Wacom, licenças Adobe e Maxon",
-      "portfolio_links": ["behance.net/theonakamura"],
+      "gear": "Workstation RTX 4090, Wacom, After Effects, Cinema 4D",
+      "portfolio_links": [
+        "behance.net/theonakamura"
+      ],
       "personality": "Criativo e ansioso com prazo. Responde em segundos e sempre pergunta a data de entrega.",
       "replies": [
         "Opa! Qual é o prazo? Consigo começar amanhã cedo.",
         "Tenho uns testes de animação prontos, te mando agora.",
         "Se tiver trilha já fechada eu sincronizo os cortes com ela."
       ],
-      "pre_likes": ["e2"]
+      "pre_likes": [
+        "e2"
+      ],
+      "radius_km": 100,
+      "created_days_ago": 20,
+      "blocked_offsets": [],
+      "credits": [
+        {
+          "title": "Vinheta Rádio Cacau FM",
+          "role": "Motion Designer",
+          "genre": "publicidade",
+          "year": 2026,
+          "verified": true
+        },
+        {
+          "title": "Lyric video Banda da Praça",
+          "role": "Motion Designer",
+          "genre": "clipe",
+          "year": 2026,
+          "verified": true
+        }
+      ],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 40,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": true
+      },
+      "jobs": []
     },
     {
       "key": "f5",
@@ -105,22 +323,68 @@
       "account_type": "freelancer",
       "name": "Bia Camargo",
       "cargo": "Direção de Arte e Figurino",
-      "city": "Porto Alegre",
-      "bio": "Direção de arte para curtas e publicidade, com acervo próprio de objetos de cena.",
-      "roles": ["Direção de Arte", "Figurinista"],
+      "city": "Itacaré",
+      "bio": "Direção de arte para curtas e publicidade, com acervo próprio de objetos de cena. Prefiro projetos perto de casa.",
+      "roles": [
+        "Direção de Arte",
+        "Figurinista"
+      ],
       "day_rate_min": 800,
       "day_rate_max": 1400,
       "available": true,
       "website": null,
       "gear": "Acervo de objetos de cena e figurinos de época",
-      "portfolio_links": ["instagram.com/biacamargo.arte"],
+      "portfolio_links": [
+        "instagram.com/biacamargo.arte"
+      ],
       "personality": "Entusiasta e fala rápido. Já chega com ideias, referências e perguntas sobre a paleta do filme.",
       "replies": [
         "Oi oi! Amei o projeto, já pensei em umas referências de cor!",
         "Tenho um acervo que cai perfeito nisso, posso te mandar fotos?",
         "Me conta o orçamento de arte pra eu ajustar a proposta, por favor."
       ],
-      "pre_likes": []
+      "pre_likes": [],
+      "radius_km": 60,
+      "created_days_ago": 250,
+      "blocked_offsets": [],
+      "credits": [
+        {
+          "title": "Curta Maré Alta",
+          "role": "Direção de Arte",
+          "genre": "ficcao",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Doc Casarões de Ilhéus",
+          "role": "Direção de Arte",
+          "genre": "documentario",
+          "year": 2025,
+          "verified": true
+        },
+        {
+          "title": "Institucional Pousada Surf",
+          "role": "Direção de Arte",
+          "genre": "institucional",
+          "year": 2024,
+          "verified": true
+        }
+      ],
+      "reputation": {
+        "rating_avg": 4.5,
+        "rating_count": 6,
+        "attendance": 0.95,
+        "on_time": 0.9
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 150,
+        "jobs_done": 4,
+        "on_time_checkins": 2,
+        "on_time_deliveries": 0,
+        "pioneer": true
+      },
+      "jobs": []
     },
     {
       "key": "e1",
@@ -129,9 +393,12 @@
       "account_type": "empresa",
       "name": "Lume Filmes",
       "cargo": "Produtora publicitária",
-      "city": "São Paulo",
+      "city": "Ilhéus",
       "bio": "Produtora de publicidade e videoclipes. Procuramos equipe para campanhas de moda neste trimestre.",
-      "roles": ["Diretor(a) de Fotografia", "Operador(a) de Câmera"],
+      "roles": [
+        "Diretor(a) de Fotografia",
+        "Operador(a) de Câmera"
+      ],
       "day_rate_min": null,
       "day_rate_max": null,
       "available": true,
@@ -144,7 +411,58 @@
         "O orçamento é justo, mas o material vai pro seu portfólio. Topa?",
         "Fechado. Mando o briefing e a ordem do dia por aqui."
       ],
-      "pre_likes": ["f2"]
+      "pre_likes": [
+        "f2"
+      ],
+      "jobs": [
+        {
+          "key": "j1",
+          "title": "Casamento em Itacaré: cobertura de câmera",
+          "role": "Operador(a) de Câmera",
+          "genre": "casamento",
+          "offset_days": 3,
+          "city": "Itacaré",
+          "days": 1,
+          "budget_per_day": 650,
+          "gear": [
+            "Câmera 4K",
+            "Estabilizador"
+          ],
+          "description": "Cobertura da cerimônia e da festa, 10 horas. Entrega de brutos no mesmo dia."
+        },
+        {
+          "key": "j2",
+          "title": "Filme institucional para hotel em Trancoso",
+          "role": "Diretor(a) de Fotografia",
+          "genre": "institucional",
+          "offset_days": 10,
+          "city": "Trancoso",
+          "days": 2,
+          "budget_per_day": 1400,
+          "gear": [
+            "Câmera 4K"
+          ],
+          "description": "Dois dias de captação com equipe reduzida. Luz natural e drone fornecido pelo hotel."
+        }
+      ],
+      "radius_km": 0,
+      "created_days_ago": 300,
+      "blocked_offsets": [],
+      "credits": [],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 0,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      }
     },
     {
       "key": "e2",
@@ -153,9 +471,13 @@
       "account_type": "empresa",
       "name": "Casa Vermelha Produções",
       "cargo": "Documentários e séries",
-      "city": "Rio de Janeiro",
+      "city": "Itabuna",
       "bio": "Documentários e séries para streaming. Pós-produção remota ou presencial, projetos de longo prazo.",
-      "roles": ["Editor(a)", "Colorista", "Motion Designer"],
+      "roles": [
+        "Editor(a)",
+        "Colorista",
+        "Motion Designer"
+      ],
       "day_rate_min": null,
       "day_rate_max": null,
       "available": true,
@@ -168,7 +490,43 @@
         "Trabalhamos com contrato e cronograma de entregas por episódio.",
         "Podemos agendar uma reunião formal na próxima terça?"
       ],
-      "pre_likes": ["f2"]
+      "pre_likes": [
+        "f2"
+      ],
+      "jobs": [
+        {
+          "key": "j3",
+          "title": "Edição de documentário (3 episódios)",
+          "role": "Editor(a)",
+          "genre": "documentario",
+          "offset_days": 7,
+          "city": "Itabuna",
+          "days": 5,
+          "budget_per_day": 900,
+          "gear": [
+            "DaVinci Resolve"
+          ],
+          "description": "Pós-produção presencial em Itabuna. Duas rodadas de revisão por episódio."
+        }
+      ],
+      "radius_km": 0,
+      "created_days_ago": 300,
+      "blocked_offsets": [],
+      "credits": [],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 0,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      }
     },
     {
       "key": "e3",
@@ -177,9 +535,12 @@
       "account_type": "empresa",
       "name": "Estúdio Neon",
       "cargo": "Estúdio de motion e VFX",
-      "city": "Belo Horizonte",
+      "city": "Itacaré",
       "bio": "Vinhetas, lyric videos e animação 2D e 3D para marcas. Equipe fechada no momento.",
-      "roles": ["Motion Designer", "VFX / Animador(a)"],
+      "roles": [
+        "Motion Designer",
+        "VFX / Animador(a)"
+      ],
       "day_rate_min": null,
       "day_rate_max": null,
       "available": false,
@@ -192,7 +553,43 @@
         "Seu trampo é massa. Guarda meu contato pra quando abrir.",
         "Se rolar projeto novo eu te chamo na hora, fechou?"
       ],
-      "pre_likes": ["f5"]
+      "pre_likes": [
+        "f5"
+      ],
+      "jobs": [
+        {
+          "key": "j5",
+          "title": "Motion: vinheta para rede de supermercados",
+          "role": "Motion Designer",
+          "genre": "publicidade",
+          "offset_days": 6,
+          "city": null,
+          "days": 3,
+          "budget_per_day": 700,
+          "gear": [
+            "After Effects"
+          ],
+          "description": "Trabalho remoto. Vinheta de 15 segundos e três variações para redes sociais."
+        }
+      ],
+      "radius_km": 0,
+      "created_days_ago": 300,
+      "blocked_offsets": [],
+      "credits": [],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 0,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      }
     },
     {
       "key": "e4",
@@ -201,9 +598,12 @@
       "account_type": "empresa",
       "name": "Pulso Audiovisual",
       "cargo": "Cobertura de shows e festivais",
-      "city": "Curitiba",
+      "city": "Porto Seguro",
       "bio": "Cobertura de shows e festivais. Equipe de som sempre bem-vinda, trabalhos com datas fixas.",
-      "roles": ["Técnico(a) de Som Direto", "Desenhista de Som"],
+      "roles": [
+        "Técnico(a) de Som Direto",
+        "Desenhista de Som"
+      ],
       "day_rate_min": null,
       "day_rate_max": null,
       "available": true,
@@ -216,7 +616,41 @@
         "Festival grande, 2 palcos. Consegue trazer equipe?",
         "Fechado então. Te mando o rider técnico em 10 minutos."
       ],
-      "pre_likes": []
+      "pre_likes": [],
+      "jobs": [
+        {
+          "key": "j4",
+          "title": "Som direto para festival em Porto Seguro",
+          "role": "Técnico(a) de Som Direto",
+          "genre": "evento",
+          "offset_days": 12,
+          "city": "Porto Seguro",
+          "days": 2,
+          "budget_per_day": 1000,
+          "gear": [
+            "Gravador multicanal"
+          ],
+          "description": "Dois palcos, captação multicanal e mix de referência no fim do dia."
+        }
+      ],
+      "radius_km": 0,
+      "created_days_ago": 300,
+      "blocked_offsets": [],
+      "credits": [],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 0,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      }
     },
     {
       "key": "e5",
@@ -225,9 +659,12 @@
       "account_type": "empresa",
       "name": "Fio Condutor Cinema",
       "cargo": "Cinema autoral",
-      "city": "Porto Alegre",
+      "city": "Valença",
       "bio": "Produtora de cinema autoral. Procuramos direção de arte e figurino para um longa de época.",
-      "roles": ["Direção de Arte", "Figurinista"],
+      "roles": [
+        "Direção de Arte",
+        "Figurinista"
+      ],
       "day_rate_min": null,
       "day_rate_max": null,
       "available": true,
@@ -240,7 +677,41 @@
         "Estou apaixonada pelas referências de cor do Aurora e do Cléo de 5 às 7. Você viu?",
         "Vamos tomar um café virtual e conversar sobre o conceito antes de falar de valores?"
       ],
-      "pre_likes": ["f5"]
+      "pre_likes": [
+        "f5"
+      ],
+      "jobs": [
+        {
+          "key": "j6",
+          "title": "Direção de arte para curta de época",
+          "role": "Direção de Arte",
+          "genre": "ficcao",
+          "offset_days": 20,
+          "city": "Valença",
+          "days": 4,
+          "budget_per_day": 600,
+          "gear": [],
+          "description": "Curta ambientado nos anos 1950, com acervo de cena e figurino a combinar."
+        }
+      ],
+      "radius_km": 0,
+      "created_days_ago": 300,
+      "blocked_offsets": [],
+      "credits": [],
+      "reputation": {
+        "rating_avg": null,
+        "rating_count": 0,
+        "attendance": null,
+        "on_time": null
+      },
+      "training_badges": [],
+      "progress": {
+        "xp": 0,
+        "jobs_done": 0,
+        "on_time_checkins": 0,
+        "on_time_deliveries": 0,
+        "pioneer": false
+      }
     }
   ]
 }

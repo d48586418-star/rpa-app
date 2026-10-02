@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ActivityIndicator, ScrollView } from 'react-native';
 import { ProfileForm } from '../../components/ProfileForm';
 import { Button } from '../../components/ui';
-import { fetchMyProfile } from '../../lib/api';
+import { ProgressSection } from '../../components/ProgressSection';
+import { fetchMyProfile, jobsEnabled } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { signOut } from '../../lib/authActions';
 import { colors } from '../../theme';
@@ -15,6 +16,7 @@ export default function ProfileTab() {
   if (isLoading || !data) return <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />;
   return (
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 110 }} keyboardShouldPersistTaps="handled">
+      {jobsEnabled && data.account_type === 'freelancer' ? <ProgressSection userId={me} roles={data.roles} /> : null}
       <ProfileForm
         userId={me}
         accountType={data.account_type}

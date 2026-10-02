@@ -148,6 +148,36 @@ function genDoc() {
   D.push('- **Filtro por função:** use os chips de função no topo do deck.');
   D.push('- **Chat:** na demo, o outro lado responde com a personalidade da persona.');
   D.push('');
+  D.push('## Jobs de exemplo (aba Jobs, só na demo)');
+  D.push('');
+  D.push('| Job | Publicado por | Função | Gênero | Local | Diárias | Orçamento/diária | Equipamento pedido |');
+  D.push('|---|---|---|---|---|---|---|---|');
+  for (const p of P) for (const j of p.jobs || []) {
+    D.push(`| ${j.title} | ${p.name} | ${j.role} | ${j.genre} | ${j.city || 'remoto'} | ${j.days} | R$ ${j.budget_per_day.toLocaleString('pt-BR')} | ${j.gear.length ? j.gear.join(', ') : '—'} |`);
+  }
+  D.push('');
+  D.push('## Dados de match dos freelancers (créditos, agenda, reputação)');
+  D.push('');
+  D.push('| Persona | Cidade | Raio | Créditos verificados | Nota (avaliações) | Selos de formação | Dias ocupados (a partir de hoje) | Conta criada há |');
+  D.push('|---|---|---|---|---|---|---|---|');
+  for (const p of P.filter((x) => x.account_type === 'freelancer')) {
+    const ver = p.credits.filter((c) => c.verified).length;
+    const rep = p.reputation.rating_count ? `${String(p.reputation.rating_avg).replace('.', ',')} (${p.reputation.rating_count})` : 'sem avaliações';
+    D.push(`| ${p.name} | ${p.city} | ${p.radius_km} km | ${ver} de ${p.credits.length} | ${rep} | ${p.training_badges.join(', ') || '—'} | ${p.blocked_offsets.length ? p.blocked_offsets.map((o) => `+${o}`).join(', ') : '—'} | ${p.created_days_ago} dias |`);
+  }
+  D.push('');
+  D.push('### Cenários para o match %');
+  D.push('');
+  D.push('- **Data bloqueada:** Marina tem o dia +3 ocupado, e o job de casamento em Itacaré cai nele. Disponibilidade zera.');
+  D.push('- **Fora do raio:** Bia (raio de 60 km) vê o job em Valença com distância zerada.');
+  D.push('- **Equipamento:** o job de casamento pede câmera 4K e estabilizador; Marina tem os dois.');
+  D.push('- **Conta nova:** Theo foi criado há 20 dias, não tem avaliações (nota neutra) e ganha bônus de visibilidade na lista do contratante.');
+  D.push('- **Formação:** só Caio tem o selo Formado em Montagem, que conta no job de edição.');
+  D.push('- **Chance de ser chamado:** Alta, Média ou Baixa conforme o match e a posição entre os candidatos.');
+  D.push('- **Agenda cheia:** Joana tem do dia +10 ao +14 ocupado, o que afeta o job de som do festival.');
+  D.push('');
+  D.push('Os números exatos saem do código (`src/lib/matchScore.ts`) e estão cobertos por testes; este guia não repete os percentuais para não ficar desatualizado.');
+  D.push('');
   D.push('## Se o login do seed falhar no Supabase');
   D.push('');
   D.push('O SQL insere direto em `auth.users` e `auth.identities`, o que pode variar com a versão do Supabase. Se o login der erro, crie os 10 usuários em *Authentication → Users → Add user* (com a senha acima e e-mail confirmado) e rode só as partes 2 e 3 do SQL (perfis e likes), trocando os ids pelos ids reais dos usuários.');
