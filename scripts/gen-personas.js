@@ -127,7 +127,7 @@ function genDoc() {
   D.push('');
   D.push('## Cenários de teste');
   D.push('');
-  D.push('Entre como a persona, abra Descobrir e curta quem está na lista. Quem já recebeu seu like antes não aparece de novo no deck.');
+  D.push('Entre como a persona, abra Explorar, toque em Pessoas e curta quem está no deck (o botão do coração). Quem já recebeu seu like antes não aparece de novo no deck.');
   D.push('');
   D.push('| Entre como | Curta | Resultado esperado |');
   D.push('|---|---|---|');
@@ -148,7 +148,7 @@ function genDoc() {
   D.push('- **Filtro por função:** use os chips de função no topo do deck.');
   D.push('- **Chat:** na demo, o outro lado responde com a personalidade da persona.');
   D.push('');
-  D.push('## Jobs de exemplo (aba Jobs, só na demo)');
+  D.push('## Jobs de exemplo (Explorar → Vagas, só na demo)');
   D.push('');
   D.push('| Job | Publicado por | Função | Gênero | Local | Diárias | Orçamento/diária | Equipamento pedido |');
   D.push('|---|---|---|---|---|---|---|---|');

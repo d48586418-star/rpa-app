@@ -65,3 +65,22 @@ Decisão do usuário: mistura das duas direções (base escura e Montserrat do T
 Início, Descobrir (Talentos e Projetos), Cena, Projetos abertos com funções em aberto, perfil com portfólio em primeiro lugar, disponibilidade em 4 estados e onboarding curto. A Cena usa **dados de exemplo** rotulados; nada nela é um evento, edital ou vaga real.
 
 Não foi implementado: equipes completas, mapa, equipamentos, locações, estúdio de formação, observatório, pagamentos reais e as personas 3D do texto original.
+
+---
+
+## Atualização: redesign claro com vidro e azul elétrico
+
+Substitui a mistura "base escura + laranja" descrita acima. As quatro novas referências (cartões de chat em balão com adesivos e barra preta, cartas em leque, busca de vidro sobre mosaico, blobs) e a decisão do usuário (sem laranja, branco primeiro, azul elétrico, mais vidro) mudaram:
+
+| Elemento | Antes | Agora |
+|---|---|---|
+| Fundo | `#050505` | `#F6F4F1` com grade fina (`Screen`) |
+| Cor de ação | laranja `#FC9335` | azul elétrico `#2F5BFF` (`colors.accent`) |
+| Barra inferior | vidro escuro, 5 abas | pílula preta, 4 itens + "+" azul dentro da barra |
+| Cartões | squircle com aura laranja | balões coloridos (`colors.bubbles`), foto como adesivo, canto superior esquerdo reto |
+| Vidro | branco 8% sobre preto | branco 62% a 82% com blur, borda branca; sobre foto, branco 18% |
+| Deck | carta única | leque de 3 cartas, foto de capa e painel de vidro |
+| Ícones | glifos de texto | SVG de traço (`Icon.tsx`, 38 ícones) |
+| Modo escuro | único | preparado em `palette.dark`, ainda não ligado |
+
+Tokens em `src/theme.ts`: `colors`, `glass`, `shadow`, `gradients`, `auras`, `palette`. Análise de usabilidade em [analise-ux.md](analise-ux.md).

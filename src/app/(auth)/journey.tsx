@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { JourneyShapes } from '../../components/JourneyShapes';
-import { T, Wordmark } from '../../components/ui';
+import { IconButton, Screen, T, Wordmark } from '../../components/ui';
 import { PENDING_TYPE_KEY } from '../../lib/pendingType';
 import type { AccountType } from '../../lib/types';
 import { colors, fonts } from '../../theme';
@@ -13,12 +13,11 @@ export default function Journey() {
     router.push('/signup');
   };
   return (
+    <Screen>
     <SafeAreaView style={s.root}>
       <ScrollView contentContainerStyle={s.content}>
         <View style={s.header}>
-          <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Voltar" hitSlop={12}>
-            <T style={{ fontFamily: fonts.light, fontSize: 36, lineHeight: 38 }}>←</T>
-          </Pressable>
+          <IconButton icon="arrow-left" label="Voltar" onPress={() => router.back()} />
           <Wordmark />
         </View>
         <T style={s.title}>
@@ -28,11 +27,12 @@ export default function Journey() {
         <JourneyShapes onFreelancer={() => choose('freelancer')} onCompany={() => choose('empresa')} />
       </ScrollView>
     </SafeAreaView>
+    </Screen>
   );
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1 },
   content: { padding: 28, gap: 24, paddingBottom: 48 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   title: { fontSize: 40, lineHeight: 52 },

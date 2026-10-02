@@ -1,127 +1,162 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import { AuraCard, auraFor } from '../../components/AuraCard';
-import { Icon } from '../../components/Icon';
-import { OwnerJobCard, ProJobCard } from '../../components/JobCard';
-import { ProjectCardView } from '../../components/ProjectCardView';
-import { Glass, T } from '../../components/ui';
-import { KIND_LABEL } from '../../constants/cena';
-import { fetchHome } from '../../lib/api';
-import { useAuth } from '../../lib/auth';
-import { formatShort, greeting } from '../../lib/dates';
+import { Icon, type IconName } from '../../components/Icon';
+import { JobTile, OwnerJobCard, ProJobCard } from '../../components/JobCard';
+import { Photo } from '../../components/Photo';
 import { blobColor } from '../../components/ProfileCard';
-import { colors, fonts } from '../../theme';
+import { SearchHero } from '../../components/SearchHero';
+import { IconButton, Screen, Section, T } from '../../components/ui';
+import { fetchHome, fetchSearch } from '../../lib/api';
+import { useAuth } from '../../lib/auth';
+import { greeting } from '../../lib/dates';
+import { profileSubtitle } from '../../lib/profileText';
+import { hashString } from '../../lib/shapes';
+import { colors, fonts, glass, radius, shadow } from '../../theme';
 
-function Section({ title, action, onAction, children }: { title: string; action?: string; onAction?: () => void; children: React.ReactNode }) {
+function LinkRow({ icon, title, hint, onPress }: { icon: IconName; title: string; hint: string; onPress: () => void }) {
   return (
-    <View style={{ gap: 10 }}>
-      <View style={s.sectionHead}>
-        <T style={s.section}>{title}</T>
-        {action ? <Pressable onPress={onAction} accessibilityRole="button"><T style={s.action}>{action}</T></Pressable> : null}
+    <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={({ pressed }) => [s.link, pressed && { opacity: 0.85 }]}>
+      <View style={s.linkIcon}><Icon name={icon} size={20} color={colors.accent} /></View>
+      <View style={{ flex: 1 }}>
+        <T style={{ fontFamily: fonts.semibold, fontSize: 15 }}>{title}</T>
+        <T style={{ color: colors.muted, fontSize: 12.5 }} numberOfLines={1}>{hint}</T>
       </View>
-      {children}
-    </View>
+      <Icon name="arrow-right" size={18} color={colors.muted} />
+    </Pressable>
   );
 }
 
 export default function Inicio() {
   const { session } = useAuth();
   const me = session!.user.id;
+  const [term, setTerm] = useState('');
   const q = useQuery({ queryKey: ['home', me], queryFn: () => fetchHome(me) });
-  if (q.isLoading || !q.data) return <ActivityIndicator color={colors.accent} style={{ marginTop: 60 }} />;
+  const searching = term.trim().length >= 2;
+  const found = useQuery({ queryKey: ['search', me, term.trim()], queryFn: () => fetchSearch(me, term.trim()), enabled: searching });
+  if (q.isLoading || !q.data) return <Screen><ActivityIndicator color={colors.accent} style={{ marginTop: 60 }} /></Screen>;
   const d = q.data;
   const first = d.profile?.name.split(' ')[0] ?? '';
   const openJob = (id: string) => router.push({ pathname: '/job/[id]', params: { id } });
-  const openProject = (id: string) => router.push({ pathname: '/project/[id]', params: { id } });
+  const bubbleOf = (id: string) => colors.bubbles[hashString(id) % colors.bubbles.length];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={s.box}>
-        <View style={s.top}>
-          <View style={{ flex: 1 }}>
-            <T style={s.hello}>{greeting(new Date().getHours())},</T>
-            <T style={s.name} numberOfLines={1}>{first}.</T>
+    <Screen>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={s.box} keyboardShouldPersistTaps="handled">
+          <View style={s.top}>
+            <View style={{ flex: 1 }}>
+              <T style={s.hello}>{greeting(new Date().getHours())},</T>
+              <T style={s.name} numberOfLines={1}>{first}.</T>
+            </View>
+            <View>
+              <IconButton icon="chat" label={`Conversas, ${d.conversations}`} onPress={() => router.push('/matches')} />
+              {d.conversations > 0 && <View style={s.badge} pointerEvents="none"><T style={s.badgeText}>{d.conversations}</T></View>}
+            </View>
           </View>
-          <Pressable accessibilityRole="button" accessibilityLabel={`Conversas, ${d.conversations}`} onPress={() => router.push('/matches')}>
-            <Glass style={s.chatBtn}>
-              <Icon name="chat" size={22} />
-              {d.conversations > 0 && <View style={s.badge}><T style={s.badgeText}>{d.conversations}</T></View>}
-            </Glass>
-          </Pressable>
-        </View>
 
-        {d.isOwner ? (
-          <Section title="Seus jobs" action="Ver todos" onAction={() => router.push('/projetos')}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
-              {d.jobs.map((r) => <View key={r.job.id} style={s.hcard}><OwnerJobCard r={r} onPress={() => openJob(r.job.id)} /></View>)}
-              {d.jobs.length === 0 && <T style={s.empty}>Publique seu primeiro job pelo botão +.</T>}
-            </ScrollView>
-          </Section>
-        ) : (
-          <Section title="Jobs que combinam com você" action="Ver todos" onAction={() => router.push('/projetos')}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
-              {d.matchingJobs.map((c) => <View key={c.job.id} style={s.hcard}><ProJobCard c={c} compact onPress={() => openJob(c.job.id)} /></View>)}
-              {d.matchingJobs.length === 0 && <T style={s.empty}>Nenhum job aberto agora.</T>}
-            </ScrollView>
-          </Section>
-        )}
+          <SearchHero value={term} onChangeText={setTerm} onFilters={() => router.push('/discover')} />
 
-        <Section title="Projetos procurando equipe" action="Ver todos" onAction={() => router.push('/projetos')}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
-            {d.projects.map((c) => <View key={c.project.id} style={s.hcard}><ProjectCardView c={c} compact onPress={() => openProject(c.project.id)} /></View>)}
-            {d.projects.length === 0 && <T style={s.empty}>Nenhum projeto aberto agora.</T>}
-          </ScrollView>
-        </Section>
+          {searching ? (
+            <Section title={`Resultados para “${term.trim()}”`}>
+              {found.isLoading ? <ActivityIndicator color={colors.accent} /> : (
+                <View style={{ gap: 10 }}>
+                  {found.data?.jobs.map((c) => <ProJobCard key={c.job.id} c={c} onPress={() => openJob(c.job.id)} />)}
+                  {found.data?.people.map((p) => (
+                    <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={p.name} onPress={() => router.push('/discover')} style={s.person}>
+                      <View style={[s.avatarSm, { backgroundColor: blobColor(p.id) }]}>
+                        {p.avatar_url ? <Photo photo={p.avatar_url} style={StyleSheet.absoluteFill} /> : <T style={s.avatarText}>{p.name.charAt(0)}</T>}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <T style={{ fontFamily: fonts.semibold }} numberOfLines={1}>{p.name}</T>
+                        <T style={{ color: colors.muted, fontSize: 12.5 }} numberOfLines={1}>{profileSubtitle(p)}</T>
+                      </View>
+                    </Pressable>
+                  ))}
+                  {found.data && found.data.jobs.length + found.data.people.length === 0 && <T style={s.empty}>Nada encontrado. Tente outra palavra, como uma função ou cidade.</T>}
+                </View>
+              )}
+            </Section>
+          ) : (
+            <>
+              {d.isOwner ? (
+                <Section title="Suas vagas" action="Ver tudo" onAction={() => router.push('/discover')}>
+                  <View style={{ gap: 10 }}>
+                    {d.jobs.slice(0, 2).map((r) => <OwnerJobCard key={r.job.id} r={r} onPress={() => openJob(r.job.id)} />)}
+                    {d.jobs.length === 0 && <T style={s.empty}>Publique sua primeira vaga pelo botão +.</T>}
+                  </View>
+                </Section>
+              ) : (
+                <Section title="Vagas para você" action="Deslizar vagas" onAction={() => router.push('/discover')}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
+                    {d.matchingJobs.map((c) => <JobTile key={c.job.id} c={c} onPress={() => openJob(c.job.id)} />)}
+                    {d.matchingJobs.length === 0 && <T style={s.empty}>Nenhuma vaga aberta agora.</T>}
+                  </ScrollView>
+                </Section>
+              )}
 
-        <Section title="Pessoas que você pode conhecer" action="Descobrir" onAction={() => router.push('/discover')}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
-            {d.people.map((p) => (
-              <AuraCard key={p.id} aura={auraFor(p.id)} onPress={() => router.push('/discover')} label={`${p.name}, ${p.roles[0]}`} style={s.person}>
-                <View style={[s.avatar, { backgroundColor: blobColor(p.id) }]}><T style={s.avatarText}>{p.name.charAt(0)}</T></View>
-                <T style={s.pname} numberOfLines={1}>{p.name}</T>
-                <T style={s.prole} numberOfLines={1}>{p.roles[0]}</T>
-                <T style={s.prole} numberOfLines={1}>{p.city}</T>
-              </AuraCard>
-            ))}
-          </ScrollView>
-        </Section>
+              <Section title="Gente da região" action="Ver pessoas" onAction={() => router.push('/discover')}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hrow}>
+                  {d.people.map((p) => (
+                    <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`${p.name}, ${p.roles[0]}`} onPress={() => router.push('/discover')} style={s.blob}>
+                      <View style={[s.avatar, { backgroundColor: blobColor(p.id) }]}>
+                        {p.avatar_url ? <Photo photo={p.avatar_url} style={StyleSheet.absoluteFill} /> : <T style={s.avatarText}>{p.name.charAt(0)}</T>}
+                      </View>
+                      <T style={s.pname} numberOfLines={1}>{p.account_type === 'empresa' ? p.name : p.name.split(' ')[0]}</T>
+                      <T style={s.prole} numberOfLines={1}>{p.account_type === 'empresa' ? p.city : p.roles[0]}</T>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </Section>
 
-        <Section title="Acontecendo na região" action="Ver a Cena" onAction={() => router.push('/cena')}>
-          <View style={{ gap: 10 }}>
-            {d.cena.map((c) => (
-              <AuraCard key={c.id} aura={auraFor(c.id)} onPress={() => router.push('/cena')} label={c.title}>
-                <T style={s.kind}>{KIND_LABEL[c.kind]} · {c.city.toUpperCase()}</T>
-                <T style={s.ctitle}>{c.title}</T>
-                <T style={s.prole}>{formatShort(c.date)} · exemplo</T>
-              </AuraCard>
-            ))}
-          </View>
-        </Section>
-      </ScrollView>
-    </SafeAreaView>
+              <Section title="Conversas" action={d.conversations > 0 ? 'Abrir' : undefined} onAction={() => router.push('/matches')}>
+                {d.recent.length > 0 ? (
+                  <View style={{ gap: 8 }}>
+                    {d.recent.map((m, i) => (
+                      <Pressable
+                        key={m.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Conversa com ${m.other.name}`}
+                        onPress={() => router.push({ pathname: '/chat/[matchId]', params: { matchId: m.id, name: m.other.name } })}
+                        style={[s.bubble, { backgroundColor: bubbleOf(m.id), alignSelf: i % 2 ? 'flex-end' : 'flex-start' }]}>
+                        <T style={{ fontFamily: fonts.semibold, fontSize: 14 }}>{m.other.name}</T>
+                        <T style={{ fontSize: 12.5, color: 'rgba(11,11,15,0.7)' }} numberOfLines={1}>{profileSubtitle(m.other)} · toque para responder</T>
+                      </Pressable>
+                    ))}
+                  </View>
+                ) : <T style={s.empty}>Nenhuma conversa ainda. Quando houver match, ela aparece aqui.</T>}
+              </Section>
+
+              <View style={{ gap: 10 }}>
+                <LinkRow icon="film" title="Projetos procurando equipe" hint={`${d.projects.length} abertos agora`} onPress={() => router.push('/projetos')} />
+                <LinkRow icon="spark" title="Acontecendo na região" hint={d.cena[0] ? `${d.cena[0].title} (exemplo)` : 'Eventos, editais e oficinas'} onPress={() => router.push('/cena')} />
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </Screen>
   );
 }
 
 const s = StyleSheet.create({
-  box: { padding: 20, gap: 26, paddingBottom: 140 },
+  box: { padding: 20, gap: 26, paddingBottom: 150 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 8 },
   hello: { fontFamily: fonts.light, fontSize: 30, lineHeight: 38, color: colors.muted },
   name: { fontFamily: fonts.semibold, fontSize: 34, lineHeight: 42 },
-  chatBtn: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24 },
-  badge: { position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  badge: { position: 'absolute', top: -2, right: -2, minWidth: 20, height: 20, borderRadius: 10, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
   badgeText: { color: colors.onAccent, fontSize: 11, fontFamily: fonts.semibold },
-  sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  section: { fontFamily: fonts.semibold, fontSize: 18, flexShrink: 1 },
-  action: { color: colors.accent, fontSize: 13 },
-  hrow: { gap: 12, paddingRight: 20 },
-  hcard: { width: 300 },
-  empty: { color: colors.muted, fontSize: 13 },
-  person: { width: 140 },
-  avatar: { width: 56, height: 56, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  avatarText: { color: colors.bg, fontFamily: fonts.black, fontSize: 24 },
-  pname: { fontFamily: fonts.semibold, fontSize: 14 },
-  prole: { color: colors.muted, fontSize: 12 },
-  kind: { color: colors.accent, fontSize: 11, fontFamily: fonts.semibold, letterSpacing: 1.2 },
-  ctitle: { fontFamily: fonts.semibold, fontSize: 15, marginVertical: 4 },
+  hrow: { gap: 12, paddingRight: 20, paddingVertical: 12, marginVertical: -12 },
+  empty: { color: colors.muted, fontSize: 13, lineHeight: 19 },
+  blob: { width: 84, alignItems: 'center', gap: 4 },
+  avatar: { width: 76, height: 76, borderRadius: 34, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff', ...(shadow.card as object) },
+  avatarSm: { width: 48, height: 48, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: '#fff', fontFamily: fonts.black, fontSize: 24 },
+  pname: { fontFamily: fonts.semibold, fontSize: 13 },
+  prole: { color: colors.muted, fontSize: 11, textAlign: 'center' },
+  person: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: radius.lg, backgroundColor: glass.fillStrong, borderWidth: 1, borderColor: glass.border },
+  bubble: { maxWidth: '82%', paddingVertical: 12, paddingHorizontal: 16, borderRadius: radius.lg, borderTopLeftRadius: 8, gap: 2 },
+  link: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, minHeight: 64, borderRadius: radius.lg, backgroundColor: glass.fillStrong, borderWidth: 1, borderColor: glass.border },
+  linkIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' },
 });

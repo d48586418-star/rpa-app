@@ -1,11 +1,12 @@
 import * as ImagePicker from 'expo-image-picker';
-import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { ROLES } from '../constants/roles';
 import { upsertProfile, uploadAvatar } from '../lib/api';
 import type { AccountType, Profile } from '../lib/types';
 import { colors, fonts, radius } from '../theme';
+import { Icon } from './Icon';
+import { Photo } from './Photo';
 import { Button, Chip, Input, T } from './ui';
 
 const toInt = (v: string) => (v.trim() === '' ? null : Math.max(0, parseInt(v, 10) || 0));
@@ -70,7 +71,7 @@ export function ProfileForm({
   return (
     <View style={{ gap: 14 }}>
       <Pressable onPress={pick} style={s.avatar} accessibilityRole="button" accessibilityLabel="Escolher foto">
-        {shown ? <Image source={{ uri: shown }} style={StyleSheet.absoluteFill} /> : <T style={s.avatarText}>+ {company ? 'Logo' : 'Foto'}</T>}
+        {shown ? <Photo photo={shown} style={StyleSheet.absoluteFill} /> : <View style={{ alignItems: 'center', gap: 4 }}><Icon name="image" size={24} color={colors.accent} /><T style={s.avatarText}>{company ? 'Logo' : 'Foto'}</T></View>}
       </Pressable>
       <Input placeholder={company ? 'Nome da produtora / empresa' : 'Nome artístico / profissional'} value={name} onChangeText={setName} />
       <Input placeholder="Cidade" value={city} onChangeText={setCity} />

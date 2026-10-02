@@ -54,11 +54,12 @@ function Gate() {
       </Stack.Protected>
       <Stack.Protected guard={Boolean(session) && hasProfile}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="job/[id]" options={{ headerShown: true, title: 'Job', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
-        <Stack.Screen name="create" options={{ headerShown: true, title: 'Criar' }} />
+        <Stack.Screen name="job/[id]" options={{ headerShown: false, title: 'Vaga', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
+        <Stack.Screen name="create" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }} />
+        <Stack.Screen name="post/new" options={{ headerShown: true, title: 'Postar trabalho', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
         <Stack.Screen name="project/[id]" options={{ headerShown: true, title: 'Projeto', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
         <Stack.Screen name="project/new" options={{ headerShown: true, title: 'Novo projeto', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
-        <Stack.Screen name="job/new" options={{ headerShown: true, title: 'Novo job', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
+        <Stack.Screen name="job/new" options={{ headerShown: true, title: 'Nova vaga', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.text, headerTitleStyle: { fontFamily: fonts.semibold }, headerShadowVisible: false }} />
         <Stack.Screen
           name="chat/[matchId]"
           options={{
@@ -82,11 +83,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <Gate />
           {isDemo && (
-            <View pointerEvents="none" style={{ position: 'absolute', top: 6, right: 12, alignItems: 'flex-end', zIndex: 10 }}>
-              <T style={{ fontSize: 11, color: colors.muted, backgroundColor: 'rgba(17,17,17,0.9)', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, overflow: 'hidden' }}>
+            <View pointerEvents="none" style={{ position: 'absolute', top: 2, left: 0, right: 0, alignItems: 'center', zIndex: 10 }}>
+              <T style={{ fontSize: 10, color: colors.muted, backgroundColor: 'rgba(255,255,255,0.85)', paddingHorizontal: 10, paddingVertical: 2, borderRadius: 999, overflow: 'hidden' }}>
                 Modo demo · dados não são salvos
               </T>
             </View>

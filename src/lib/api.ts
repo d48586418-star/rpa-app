@@ -161,6 +161,11 @@ export const fetchJobFeed = async (me: string): Promise<JobCard[]> => jobs().fee
 export const fetchMyJobs = async (me: string): Promise<OwnerJobRow[]> => jobs().feedForOwner(me);
 export const fetchJob = async (jobId: string, me: string): Promise<JobDetail> => jobs().detail(jobId, me);
 export const createJob = async (me: string, input: NewJob) => jobs().createJob(me, input);
+export const fetchJobDeck = async (me: string): Promise<JobCard[]> => jobs().deckForPro(me);
+export const fetchSavedJobs = async (me: string): Promise<JobCard[]> => jobs().savedForPro(me);
+export const skipJob = async (jobId: string, me: string) => jobs().skip(jobId, me);
+export const saveJob = async (jobId: string, me: string) => jobs().save(jobId, me);
+export const undoJobChoice = async (jobId: string, me: string) => jobs().undo(jobId, me);
 export const applyToJob = async (jobId: string, me: string) => jobs().apply(jobId, me);
 export const inviteCandidate = async (jobId: string, me: string, proId: string) => jobs().invite(jobId, me, proId);
 export const selectCandidate = async (jobId: string, me: string, proId: string) => jobs().select(jobId, me, proId);
@@ -178,6 +183,8 @@ import { upcomingCena, type CenaView } from './cena';
 import type { NewProject, ProjectCard } from './demoProjects';
 import type { Availability, CenaKind, OpenProject } from './types';
 import { oppositeType } from './matching';
+import { textMatches } from './search';
+import { genreLabel } from '../constants/genres';
 
 export type { NewProject, ProjectCard, CenaView };
 
@@ -207,6 +214,35 @@ export async function fetchHome(me: string) {
     people: profile ? demoStore.candidates(me, { accountType: oppositeType(profile.account_type) }).slice(0, 6) : [],
     cena: upcomingCena(demoStore.todayISO(), { limit: 3 }),
     conversations: demoStore.listMatches(me).length,
+    recent: demoStore.listMatches(me).slice(0, 2),
   };
 }
 export type HomeData = Awaited<ReturnType<typeof fetchHome>>;
+
+// ---------- Rede (só na demo) ----------
+
+import type { NewPost, PostView } from './demoFeed';
+export type { NewPost, PostView };
+
+const feed = () => (isDemo ? demoStore.feed : demoOnly());
+
+export const fetchPosts = async (me: string, opts: { authorId?: string; savedOnly?: boolean } = {}): Promise<PostView[]> => feed().list(me, opts);
+export const createPost = async (me: string, input: NewPost) => feed().create(me, input);
+export const likePost = async (id: string, me: string) => feed().toggleLike(id, me);
+export const savePost = async (id: string, me: string) => feed().toggleSave(id, me);
+export const commentOnPost = async (id: string, me: string, body: string) => feed().comment(id, me, body);
+export const fetchPostComments = async (id: string) => feed().commentViews(id);
+
+/** Busca do Início: vagas abertas e pessoas cujo texto contém o termo (sem acento, sem maiúsculas). */
+export async function fetchSearch(me: string, q: string): Promise<{ jobs: JobCard[]; people: Profile[] }> {
+  if (!isDemo) return demoOnly();
+  const profile = demoStore.profileOf(me);
+  const jobsFound = profile?.account_type === 'empresa'
+    ? []
+    : demoStore.jobs.feedForPro(me).filter((c) => textMatches(q, c.job.title, c.job.role, c.job.city ?? 'remoto', genreLabel(c.job.genre), c.ownerName));
+  const people = profile
+    ? demoStore.candidates(me, { accountType: oppositeType(profile.account_type) })
+        .filter((p) => textMatches(q, p.name, p.city ?? '', ...p.roles))
+    : [];
+  return { jobs: jobsFound.slice(0, 6), people: people.slice(0, 6) };
+}

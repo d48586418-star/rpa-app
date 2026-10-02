@@ -8,7 +8,7 @@ export const auraFor = (seed: string): AuraName => auraOrder[hashString(seed) % 
 
 /** Cartão squircle com uma aura de degradê suave no canto, como nas referências. */
 export function AuraCard({
-  aura = 'orange', children, style, onPress, label,
+  aura = 'blue', children, style, onPress, label,
 }: { aura?: AuraName; children: React.ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; label?: string }) {
   const body = (
     <>

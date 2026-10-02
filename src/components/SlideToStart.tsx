@@ -5,6 +5,7 @@ import Animated, {
   interpolate, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming,
 } from 'react-native-reanimated';
 import { colors, fonts } from '../theme';
+import { Icon } from './Icon';
 import { Glass, T } from './ui';
 
 const THUMB = 60;
@@ -50,11 +51,11 @@ export function SlideToStart({ label, onComplete }: { label: string; onComplete:
       />
       <Animated.View style={[s.labelWrap, text]} pointerEvents="none">
         <T style={s.label}>{label}</T>
-        <T style={s.chevron}>›</T>
+        <Icon name="arrow-right" size={22} color={colors.muted} />
       </Animated.View>
       <GestureDetector gesture={pan}>
         <Animated.View style={[s.thumb, thumb]}>
-          <T style={{ color: colors.onLight, fontFamily: fonts.light, fontSize: 30, lineHeight: 34 }}>→</T>
+          <Icon name="arrow-right" size={26} color={colors.onAccent} stroke={2.2} />
         </Animated.View>
       </GestureDetector>
     </Glass>
@@ -64,7 +65,7 @@ export function SlideToStart({ label, onComplete }: { label: string; onComplete:
 const s = StyleSheet.create({
   track: { height: THUMB + PAD * 2, justifyContent: 'center', padding: PAD },
   thumb: {
-    width: THUMB, height: THUMB, borderRadius: THUMB / 2, backgroundColor: colors.light,
+    width: THUMB, height: THUMB, borderRadius: THUMB / 2, backgroundColor: colors.accent,
     alignItems: 'center', justifyContent: 'center',
   },
   labelWrap: {
@@ -72,5 +73,4 @@ const s = StyleSheet.create({
     justifyContent: 'space-between', paddingLeft: THUMB + PAD * 2 + 16, paddingRight: 24,
   },
   label: { fontFamily: fonts.light, fontSize: 18 },
-  chevron: { fontFamily: fonts.light, fontSize: 38, lineHeight: 40 },
 });

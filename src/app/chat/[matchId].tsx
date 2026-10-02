@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
-import { Button, Input, T } from '../../components/ui';
+import { Input, IconButton, T } from '../../components/ui';
 import { fetchMessages, sendMessage, subscribeMessages } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import type { Message } from '../../lib/types';
@@ -49,13 +49,13 @@ export default function Chat() {
         ListEmptyComponent={<T style={s.hint}>Diga oi e combine o projeto</T>}
         renderItem={({ item }) => (
           <View style={[s.bubble, item.sender_id === me ? s.mine : s.theirs]}>
-            <T style={{ color: item.sender_id === me ? colors.onLight : colors.text }}>{item.body}</T>
+            <T style={{ color: item.sender_id === me ? colors.onAccent : colors.text }}>{item.body}</T>
           </View>
         )}
       />
       <View style={s.bar}>
         <Input style={{ flex: 1 }} placeholder="Mensagem" value={text} onChangeText={setText} onSubmitEditing={send} maxLength={2000} />
-        <Button title="Enviar" onPress={send} />
+        <IconButton icon="send" label="Enviar mensagem" onPress={send} tone="accent" size={48} />
       </View>
     </KeyboardAvoidingView>
   );
@@ -63,8 +63,8 @@ export default function Chat() {
 
 const s = StyleSheet.create({
   bubble: { maxWidth: '80%', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 20 },
-  mine: { alignSelf: 'flex-end', backgroundColor: colors.light },
-  theirs: { alignSelf: 'flex-start', backgroundColor: colors.surface },
+  mine: { alignSelf: 'flex-end', backgroundColor: colors.accent, borderBottomRightRadius: 6 },
+  theirs: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderBottomLeftRadius: 6 },
   bar: { flexDirection: 'row', gap: 8, padding: 12, alignItems: 'center' },
   hint: { color: colors.muted, textAlign: 'center', marginTop: 40 },
 });

@@ -30,8 +30,11 @@ type Extras = {
 };
 
 export type JobCard = {
-  job: Job; ownerName: string; score: number; chance: Chance; applied: boolean; selected: boolean; distanceKm: number | null;
+  job: Job; ownerName: string; ownerPhoto: string | null; score: number; chance: Chance; applied: boolean; selected: boolean;
+  distanceKm: number | null; saved: boolean;
 };
+/** O que o profissional decidiu sobre uma vaga no deck (candidatar fica em `Application`). */
+export type JobChoice = 'pass' | 'save';
 export type OwnerJobRow = { job: Job; applicants: number; stage: Engagement['stage'] | null };
 export type CandidateRow = {
   profile: Profile; score: number; breakdown: Breakdown; chance: Chance; status: Application['status']; isNew: boolean;
@@ -41,7 +44,7 @@ export type EngagementView = {
   quote: Quote; clauses: Clause[]; review: Review | null; next: Action | null; side: 'pro' | 'owner';
 };
 export type JobDetail = {
-  job: Job; owner: Profile; side: 'pro' | 'owner'; applicants: number; applied: boolean;
+  job: Job; owner: Profile; side: 'pro' | 'owner'; applicants: number; applied: boolean; saved: boolean; similar: JobCard[];
   breakdown: Breakdown | null; suggestions: Suggestion[]; chance: Chance | null;
   candidates: CandidateRow[]; engagement: EngagementView | null;
 };
@@ -53,6 +56,7 @@ export type ProgressView = {
 export type NewJob = {
   title: string; role: string; genre: Genre; date: string; days: number; city: string | null;
   budget_per_day: number; gear: string[]; description: string;
+  cover?: string | null; requirements?: string[]; perks?: string[];
 };
 
 type Ctx = {
@@ -71,6 +75,7 @@ export class JobsModule {
   private reviews: Review[] = [];
   private extras = new Map<string, Extras>();
   private convos = new Map<string, string>(); // engagement id -> match id
+  private choices = new Map<string, Map<string, JobChoice>>(); // profissional -> vaga -> escolha
   private seq = 0;
 
   constructor(private ctx: Ctx) {}
@@ -82,6 +87,7 @@ export class JobsModule {
     this.reviews = [];
     this.extras.clear();
     this.convos.clear();
+    this.choices.clear();
     const today = this.ctx.today();
     for (const p of PERSONAS) {
       const x = p.extras;
@@ -116,6 +122,7 @@ export class JobsModule {
     this.engagements = this.engagements.filter((e) => e.pro_id !== id && e.owner_id !== id);
     this.apps = this.apps.filter((a) => a.pro_id !== id && !mine.has(a.job_id));
     this.jobs = this.jobs.filter((j) => j.owner_id !== id);
+    this.choices.delete(id);
     this.reviews = this.reviews.filter((r) => r.reviewer_id !== id && r.reviewee_id !== id);
   }
 
@@ -187,13 +194,60 @@ export class JobsModule {
         const total = this.score(job.id, me).total;
         const app = this.application(job.id, me);
         return {
-          job, ownerName: this.profile(job.owner_id).name, score: total,
+          job, ownerName: this.profile(job.owner_id).name, ownerPhoto: this.profile(job.owner_id).avatar_url, score: total,
           chance: chanceOfCall(total, this.rankOf(job.id, me)),
           applied: Boolean(app), selected: app?.status === 'selected',
+          saved: this.choices.get(me)?.get(job.id) === 'save',
           distanceKm: job.city ? distanceKm(this.ctx.profiles.get(me)?.city, job.city) : null,
         };
       })
       .sort((a, b) => b.score - a.score || a.job.date.localeCompare(b.job.date));
+  }
+
+  /** Deck de swipe do profissional: vagas abertas que ele ainda não candidatou, pulou nem salvou. */
+  deckForPro(me: string): JobCard[] {
+    const mine = this.choices.get(me);
+    return this.feedForPro(me).filter((c) => c.job.status === 'open' && !c.applied && !mine?.has(c.job.id));
+  }
+
+  /** Vagas que o profissional salvou para ver depois. */
+  savedForPro(me: string): JobCard[] {
+    return this.feedForPro(me).filter((c) => c.saved && !c.applied);
+  }
+
+  skip(jobId: string, me: string) {
+    this.job(jobId);
+    this.setChoice(me, jobId, 'pass');
+  }
+
+  save(jobId: string, me: string) {
+    this.job(jobId);
+    if (this.application(jobId, me)) fail('Você já se candidatou a esta vaga.');
+    this.setChoice(me, jobId, 'save');
+  }
+
+  /** Desfaz a última decisão sobre a vaga: tira de "pulada"/"salva" ou cancela a candidatura ainda não respondida. */
+  undo(jobId: string, me: string) {
+    const app = this.application(jobId, me);
+    if (app) {
+      if (app.status !== 'applied') fail('A empresa já respondeu; não dá para desfazer.');
+      this.apps = this.apps.filter((a) => a !== app);
+    }
+    this.choices.get(me)?.delete(jobId);
+  }
+
+  private setChoice(me: string, jobId: string, c: JobChoice) {
+    const m = this.choices.get(me) ?? new Map<string, JobChoice>();
+    m.set(jobId, c);
+    this.choices.set(me, m);
+  }
+
+  /** Vagas parecidas (mesma função ou gênero), melhores primeiro. */
+  similarTo(jobId: string, me: string, limit = 3): JobCard[] {
+    const base = this.job(jobId);
+    return this.feedForPro(me)
+      .filter((c) => c.job.id !== jobId && c.job.status === 'open' && (c.job.role === base.role || c.job.genre === base.genre))
+      .slice(0, limit);
   }
 
   /** Contratante: os próprios jobs. */
@@ -217,11 +271,12 @@ export class JobsModule {
       applicants: this.apps.filter((a) => a.job_id === jobId && a.status !== 'declined').length,
     } as const;
     if (side === 'owner') {
-      return { ...base, applied: false, breakdown: null, suggestions: [], chance: null, candidates: this.candidates(jobId, me) };
+      return { ...base, applied: false, saved: false, similar: [], breakdown: null, suggestions: [], chance: null, candidates: this.candidates(jobId, me) };
     }
     const breakdown = this.score(jobId, me);
     return {
-      ...base, applied: Boolean(this.application(jobId, me)), breakdown,
+      ...base, applied: Boolean(this.application(jobId, me)), saved: this.choices.get(me)?.get(jobId) === 'save',
+      similar: this.similarTo(jobId, me), breakdown,
       suggestions: suggestions(job, this.proInput(me), breakdown),
       chance: chanceOfCall(breakdown.total, this.rankOf(jobId, me)), candidates: [],
     };
@@ -251,6 +306,7 @@ export class JobsModule {
     if (job.status !== 'open') fail('Este job não está mais aberto.');
     if (this.application(jobId, me)) fail('Você já se candidatou a este job.');
     this.apps.push({ job_id: jobId, pro_id: me, status: 'applied', created_at: this.ctx.today() });
+    this.choices.get(me)?.delete(jobId);
   }
 
   candidates(jobId: string, owner: string): CandidateRow[] {

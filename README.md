@@ -20,11 +20,17 @@ Splash (deslizar) → **Selecione a sua jornada** (Freelancer ou Empresa) → ca
 
 ## Navegação (demo)
 
-Início, Descobrir (Talentos e Projetos), botão **+** (criar projeto aberto ou job), Cena e Projetos, e Perfil. Veja [docs/direcao-visual.md](docs/direcao-visual.md).
+Barra preta em pílula: **Início, Explorar, + , Rede e Perfil**. O **+** abre uma folha de vidro com três ações (publicar vaga, postar trabalho, projeto aberto). Em **Explorar**, o profissional desliza **vagas** (direita candidata, esquerda pula, para cima salva) e também vê pessoas, salvas e projetos; a empresa desliza talentos e vê as próprias vagas. A **Rede** é o feed de trabalhos (foto, curtir, comentar, salvar). Cena e Conversas abrem pelo Início. Veja [docs/direcao-visual.md](docs/direcao-visual.md) e [docs/analise-ux.md](docs/analise-ux.md).
+
+O app é **claro primeiro**, com vidro fosco e azul elétrico como única cor de ação; o modo escuro está preparado em `src/theme.ts` (`palette.dark`), mas ainda não está ligado.
+
+### Fotos
+
+As fotos de capas, posts e perfis de exemplo são **CC0** (StockSnap, via Openverse) e estão em `assets/photos` e `assets/portraits`, com créditos em [assets/photos/CREDITS.md](assets/photos/CREDITS.md). São **ilustrativas**: não mostram as pessoas, empresas ou trabalhos de exemplo. Para trocar, edite `src/constants/photos.ts`.
 
 ## Jobs e match %
 
-Na demo há uma aba **Jobs**: a empresa publica um job, o profissional vê o match % explicado e se candidata, e os dois seguem por contrato, custódia (simulada), avaliação e XP. Veja [docs/jobs-e-match.md](docs/jobs-e-match.md).
+Na demo, a empresa publica uma vaga em 4 passos (com capa e prévia), o profissional vê o match % explicado e se candidata, abre o detalhe (galeria, requisitos, empresa, vagas parecidas), e os dois seguem por contrato, custódia (simulada), avaliação e XP. Veja [docs/jobs-e-match.md](docs/jobs-e-match.md).
 
 ## Personas de teste
 
@@ -41,7 +47,7 @@ Dez contas prontas (5 freelancers e 5 empresas) para testar o match: veja [docs/
 
 - `supabase/migrations/0001_init.sql`: tabelas `profiles`, `swipes`, `matches`, `messages`; um *trigger* cria o match quando há dois likes opostos; RLS garante que cada pessoa só edita o próprio perfil e só lê mensagens dos seus matches.
 - `src/app/`: telas (login, onboarding, descobrir, matches, perfil, chat).
-- `src/components/SwipeDeck.tsx`: deck com gesto de arrastar (Reanimated + Gesture Handler) e botões.
+- `src/components/CardDeck.tsx`: pilha de cartas em leque com gesto de arrastar (Reanimated + Gesture Handler) e botões; `SwipeDeck` (pessoas) e `JobDeck` (vagas) usam ele.
 - `src/lib/matching.ts`: regras puras (filtros, par de match), cobertas por testes.
 
 ## Fora do MVP (próximos passos)

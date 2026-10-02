@@ -66,6 +66,10 @@ export type Job = {
   description: string;
   status: 'open' | 'closed' | 'done';
   created_at: string;
+  /** Chave de foto empacotada escolhida na criação (senão usa a do gênero). */
+  cover?: string | null;
+  requirements?: string[];
+  perks?: string[];
 };
 
 export type Application = {
@@ -138,4 +142,23 @@ export type CenaItem = {
   /** Dias a partir de hoje. */
   offsetDays: number;
   description: string;
+};
+
+// ---- Rede (posts de trabalhos) ----
+
+export type Comment = { id: string; author_id: string; body: string; created_at: string };
+
+export type Post = {
+  id: string;
+  author_id: string;
+  /** Chave de foto empacotada ou URI local escolhida pelo usuário. */
+  photo: string;
+  caption: string;
+  role: string | null;
+  /** Título do trabalho marcado como crédito (opcional). */
+  credit: string | null;
+  created_at: string;
+  likes: string[]; // ids de quem curtiu
+  saves: string[];
+  comments: Comment[];
 };

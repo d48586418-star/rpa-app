@@ -8,8 +8,9 @@ import { addDays, formatShort } from '../lib/dates';
 import type { Genre } from '../lib/types';
 import { colors, fonts, radius } from '../theme';
 import { AuraCard, auraFor } from './AuraCard';
+import { Icon } from './Icon';
 import { LevelBar } from './LevelBar';
-import { Button, Chip, Input, T } from './ui';
+import { Button, Chip, Collapsible, Input, T } from './ui';
 
 /** Portfólio primeiro: trabalhos, disponibilidade, nível, selos e agenda (só na demo por enquanto). */
 export function ProgressSection({ userId, roles }: { userId: string; roles: string[] }) {
@@ -62,7 +63,7 @@ export function ProgressSection({ userId, roles }: { userId: string; roles: stri
                 <T style={s.hint}>{genreLabel(c.genre)} · {c.year}</T>
                 <View style={{ flex: 1 }} />
                 {c.verified ? (
-                  <Chip label="✓ Verificado" tint={colors.like} />
+                  <Chip label="Verificado" icon="check" tint={colors.like} />
                 ) : (
                   <Chip label="Pendente · simular confirmação" tint={colors.accent} onPress={async () => { await confirmCreditDemo(userId, c.id); await refresh(); }} />
                 )}
@@ -80,7 +81,7 @@ export function ProgressSection({ userId, roles }: { userId: string; roles: stri
             <Button title="Adicionar (fica pendente)" onPress={save} />
           </View>
         ) : (
-          <Chip label="+ Adicionar trabalho" onPress={() => setAdding(true)} />
+          <Chip label="Adicionar trabalho" icon="plus" onPress={() => setAdding(true)} />
         )}
       </View>
 
@@ -103,14 +104,13 @@ export function ProgressSection({ userId, roles }: { userId: string; roles: stri
         <LevelBar level={p.level} xp={p.progress.xp} />
       </View>
 
-      <View style={{ gap: 10 }}>
-        <T style={s.section}>Conquistas</T>
+      <Collapsible title="Conquistas" hint={`${p.badges.length} de ${p.allBadges.length}`}>
         <View style={s.wrap}>
           {p.allBadges.map((b) => {
             const has = p.badges.some((x) => x.id === b.id);
             return (
               <View key={b.id} style={[s.badge, has && s.badgeOn]} accessible accessibilityLabel={`${b.name}: ${has ? 'conquistado' : b.how}`}>
-                <T style={[s.badgeName, has && { color: colors.onAccent }]}>{has ? '★ ' : ''}{b.name}</T>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>{has ? <Icon name="star" size={14} color={colors.onAccent} fill={colors.onAccent} /> : null}<T style={[s.badgeName, has && { color: colors.onAccent }]}>{b.name}</T></View>
                 {!has && <T style={s.hint}>{b.how}</T>}
               </View>
             );
@@ -121,10 +121,9 @@ export function ProgressSection({ userId, roles }: { userId: string; roles: stri
             ? `Nota ${rep.ratingAvg!.toFixed(1).replace('.', ',')} em ${rep.ratingCount} avaliações · ${Math.round((rep.attendance ?? 1) * 100)}% de comparecimento`
             : 'Conta nova: ainda sem avaliações.'}
         </T>
-      </View>
+      </Collapsible>
 
-      <View style={{ gap: 10 }}>
-        <T style={s.section}>Agenda dos próximos 14 dias</T>
+      <Collapsible title="Agenda" hint="próximos 14 dias">
         <T style={s.hint}>Toque para alternar entre livre (verde) e ocupado (vermelho). Dia ocupado zera a disponibilidade no match.</T>
         <View style={s.wrap}>
           {days.map((d) => {
@@ -139,7 +138,7 @@ export function ProgressSection({ userId, roles }: { userId: string; roles: stri
             );
           })}
         </View>
-      </View>
+      </Collapsible>
     </View>
   );
 }

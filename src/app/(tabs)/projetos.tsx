@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { OwnerJobCard, ProJobCard } from '../../components/JobCard';
 import { ProjectCardView } from '../../components/ProjectCardView';
 import { Segmented } from '../../components/Segmented';
-import { Button, T, Title } from '../../components/ui';
+import { Button, Header, Screen, T } from '../../components/ui';
 import { fetchJobFeed, fetchMyJobs, fetchMyProfile, fetchProjects } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { colors } from '../../theme';
@@ -23,10 +23,12 @@ export default function Projetos() {
   if (mine.isLoading || projects.isLoading) return <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />;
 
   return (
-    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={s.box}>
-      <Title lead="Projetos" rest={tab === 'projetos' ? 'que procuram equipe.' : isOwner ? 'que você publicou.' : 'para você.'} />
+    <Screen>
+    <SafeAreaView style={{ flex: 1 }}>
+    <Header lead="Projetos" rest={tab === 'projetos' ? 'com vagas na equipe.' : isOwner ? 'e vagas suas.' : 'e vagas.'} onBack={() => (router.canGoBack() ? router.back() : router.replace('/inicio'))} />
+    <ScrollView contentContainerStyle={s.box}>
       <Segmented
-        options={[{ id: 'projetos', label: 'Projetos abertos' }, { id: 'jobs', label: isOwner ? 'Meus jobs' : 'Jobs' }]}
+        options={[{ id: 'projetos', label: 'Projetos abertos' }, { id: 'jobs', label: isOwner ? 'Minhas vagas' : 'Vagas' }]}
         value={tab}
         onChange={setTab}
       />
@@ -36,23 +38,25 @@ export default function Projetos() {
           <T style={s.hint}>Qualquer pessoa pode publicar uma ideia e montar a equipe. Marque interesse nas funções que combinam com você.</T>
           {projects.data?.map((c) => <ProjectCardView key={c.project.id} c={c} onPress={() => router.push({ pathname: '/project/[id]', params: { id: c.project.id } })} />)}
           {projects.data?.length === 0 && <T style={s.empty}>Nenhum projeto procurando equipe agora.</T>}
-          <Button title="Criar projeto aberto" arrow onPress={() => router.push('/project/new')} />
+          <Button title="Criar projeto aberto" icon="plus" onPress={() => router.push('/project/new')} />
         </View>
       ) : isOwner ? (
         <View style={{ gap: 12 }}>
-          <T style={s.hint}>Jobs são vagas pagas por diária, com match e contrato.</T>
+          <T style={s.hint}>Vagas pagas por diária, com match e contrato.</T>
           {own.data?.map((r) => <OwnerJobCard key={r.job.id} r={r} onPress={() => router.push({ pathname: '/job/[id]', params: { id: r.job.id } })} />)}
-          {own.data?.length === 0 && <T style={s.empty}>Você ainda não publicou nenhum job.</T>}
-          <Button title="Publicar novo job" arrow onPress={() => router.push('/job/new')} />
+          {own.data?.length === 0 && <T style={s.empty}>Você ainda não publicou vagas.</T>}
+          <Button title="Publicar vaga" icon="plus" onPress={() => router.push('/job/new')} />
         </View>
       ) : (
         <View style={{ gap: 12 }}>
           <T style={s.hint}>Do melhor match para o pior. Candidatar-se é grátis.</T>
           {feed.data?.map((c) => <ProJobCard key={c.job.id} c={c} onPress={() => router.push({ pathname: '/job/[id]', params: { id: c.job.id } })} />)}
-          {feed.data?.length === 0 && <T style={s.empty}>Nenhum job aberto agora.</T>}
+          {feed.data?.length === 0 && <T style={s.empty}>Nenhuma vaga aberta agora.</T>}
         </View>
       )}
     </ScrollView>
+    </SafeAreaView>
+    </Screen>
   );
 }
 

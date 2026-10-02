@@ -2,7 +2,7 @@
 
 Esta fatia traz para o app o núcleo do documento de produto "Diária": o contratante publica um **job**, o profissional vê o **match %** explicado, se candidata de graça, e os dois seguem por **contrato, pagamento em custódia (simulado), avaliação e XP**.
 
-> **Só roda na demo** (`EXPO_PUBLIC_DEMO=1`). O backend Supabase dos jobs ainda não existe, e a aba Jobs fica oculta fora da demo.
+> **Só roda na demo** (`EXPO_PUBLIC_DEMO=1`). O backend Supabase dos jobs ainda não existe, e as vagas, o deck de vagas e a Rede ficam ocultos fora da demo.
 
 ## O que é simulado
 

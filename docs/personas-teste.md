@@ -51,7 +51,7 @@ Só um lado curtiu. O match acontece quando você entra como o outro lado e curt
 
 ## Cenários de teste
 
-Entre como a persona, abra Descobrir e curta quem está na lista. Quem já recebeu seu like antes não aparece de novo no deck.
+Entre como a persona, abra Explorar, toque em Pessoas e curta quem está no deck (o botão do coração). Quem já recebeu seu like antes não aparece de novo no deck.
 
 | Entre como | Curta | Resultado esperado |
 |---|---|---|
@@ -80,7 +80,7 @@ Entre como a persona, abra Descobrir e curta quem está na lista. Quem já receb
 - **Filtro por função:** use os chips de função no topo do deck.
 - **Chat:** na demo, o outro lado responde com a personalidade da persona.
 
-## Jobs de exemplo (aba Jobs, só na demo)
+## Jobs de exemplo (Explorar → Vagas, só na demo)
 
 | Job | Publicado por | Função | Gênero | Local | Diárias | Orçamento/diária | Equipamento pedido |
 |---|---|---|---|---|---|---|---|

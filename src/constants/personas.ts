@@ -1,4 +1,5 @@
 import data from './personas.json';
+import { PERSONA_PHOTO, photoRef } from '../lib/photoKeys';
 import type { AccountType, Credit, Genre, Profile, Reputation } from '../lib/types';
 import type { Progress } from '../lib/xp';
 
@@ -102,7 +103,7 @@ export const PERSONAS: Persona[] = data.personas.map((p) => ({
     id: p.id,
     account_type: p.account_type as AccountType,
     name: p.name,
-    avatar_url: null,
+    avatar_url: PERSONA_PHOTO[p.key] ? photoRef(PERSONA_PHOTO[p.key]) : null,
     city: p.city,
     bio: p.bio,
     roles: p.roles,
