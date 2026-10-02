@@ -1,9 +1,9 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { Button, Input } from '../../components/ui';
+import { Alert, SafeAreaView, StyleSheet, View } from 'react-native';
+import { Button, Input, T, Wordmark } from '../../components/ui';
 import { supabase } from '../../lib/supabase';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,12 +20,12 @@ export default function Login() {
   return (
     <SafeAreaView style={s.root}>
       <View style={s.box}>
-        <Text style={s.logo}>🎬 Claquete</Text>
-        <Text style={s.tag}>Encontre sua próxima equipe.</Text>
+        <View style={{ alignSelf: 'flex-end' }}><Wordmark /></View>
+        <T style={s.title}><T style={s.bold}>Bem-vindo</T><T style={s.thin}> de volta</T></T>
         <Input placeholder="E-mail" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
         <Input placeholder="Senha" value={password} onChangeText={setPassword} secureTextEntry />
-        <Button title="Entrar" onPress={submit} loading={loading} />
-        <Link href="/signup" style={s.link}>Não tem conta? Criar conta</Link>
+        <Button title="Entrar" onPress={submit} loading={loading} arrow />
+        <Link href="/journey" style={s.link}>Não tem conta? Criar conta</Link>
       </View>
     </SafeAreaView>
   );
@@ -34,7 +34,8 @@ export default function Login() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, justifyContent: 'center' },
   box: { padding: 24, gap: 14 },
-  logo: { color: colors.accent, fontSize: 36, fontWeight: '900' },
-  tag: { color: colors.muted, marginBottom: 12 },
-  link: { color: colors.accent, textAlign: 'center', marginTop: 8 },
+  title: { fontSize: 32, lineHeight: 42, marginBottom: 8 },
+  thin: { fontFamily: fonts.light, fontSize: 32 },
+  bold: { fontFamily: fonts.semibold, fontSize: 32 },
+  link: { color: colors.muted, textAlign: 'center', marginTop: 8, fontFamily: fonts.regular },
 });

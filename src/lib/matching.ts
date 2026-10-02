@@ -1,6 +1,7 @@
-import type { Profile } from './types';
+import type { AccountType, Profile } from './types';
 
 export type DiscoverFilters = {
+  accountType?: AccountType;
   role?: string;
   city?: string;
   onlyAvailable?: boolean;
@@ -28,11 +29,17 @@ export function filterCandidates(
 ): Profile[] {
   return profiles.filter((p) => {
     if (p.id === me || swipedIds.has(p.id)) return false;
+    if (filters.accountType && p.account_type !== filters.accountType) return false;
     if (filters.role && !p.roles.includes(filters.role)) return false;
     if (filters.city && !(p.city && norm(p.city).includes(norm(filters.city)))) return false;
     if (filters.onlyAvailable && !p.available) return false;
     return true;
   });
+}
+
+/** Por padrão o deck mostra o lado oposto: freelancer vê empresas e vice-versa. */
+export function oppositeType(t: AccountType): AccountType {
+  return t === 'freelancer' ? 'empresa' : 'freelancer';
 }
 
 export function formatRate(min: number | null, max: number | null): string | null {

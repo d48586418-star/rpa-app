@@ -14,9 +14,10 @@ export default function ProfileTab() {
   const { data, isLoading } = useQuery({ queryKey: ['my-profile', me], queryFn: () => fetchMyProfile(me) });
   if (isLoading || !data) return <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />;
   return (
-    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 20, gap: 16 }} keyboardShouldPersistTaps="handled">
+    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 110 }} keyboardShouldPersistTaps="handled">
       <ProfileForm
         userId={me}
+        accountType={data.account_type}
         initial={data}
         submitLabel="Salvar alterações"
         onSaved={() => qc.invalidateQueries({ queryKey: ['my-profile'] })}

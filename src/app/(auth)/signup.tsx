@@ -1,9 +1,9 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { Button, Input } from '../../components/ui';
+import { Alert, SafeAreaView, StyleSheet, View } from 'react-native';
+import { Button, Input, T, Wordmark } from '../../components/ui';
 import { supabase } from '../../lib/supabase';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -22,10 +22,11 @@ export default function Signup() {
   return (
     <SafeAreaView style={s.root}>
       <View style={s.box}>
-        <Text style={s.title}>Criar conta</Text>
+        <View style={{ alignSelf: 'flex-end' }}><Wordmark /></View>
+        <T style={s.title}><T style={s.bold}>Criar</T><T style={s.thin}> conta</T></T>
         <Input placeholder="E-mail" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
         <Input placeholder="Senha (mín. 6 caracteres)" value={password} onChangeText={setPassword} secureTextEntry />
-        <Button title="Criar conta" onPress={submit} loading={loading} />
+        <Button title="Criar conta" onPress={submit} loading={loading} arrow />
         <Link href="/login" style={s.link}>Já tem conta? Entrar</Link>
       </View>
     </SafeAreaView>
@@ -35,6 +36,8 @@ export default function Signup() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, justifyContent: 'center' },
   box: { padding: 24, gap: 14 },
-  title: { color: colors.text, fontSize: 28, fontWeight: '800', marginBottom: 8 },
-  link: { color: colors.accent, textAlign: 'center', marginTop: 8 },
+  title: { fontSize: 32, lineHeight: 42, marginBottom: 8 },
+  thin: { fontFamily: fonts.light, fontSize: 32 },
+  bold: { fontFamily: fonts.semibold, fontSize: 32 },
+  link: { color: colors.muted, textAlign: 'center', marginTop: 8, fontFamily: fonts.regular },
 });

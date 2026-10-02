@@ -1,8 +1,8 @@
-import { filterCandidates, formatRate, matchPair, otherUserId } from './matching';
+import { filterCandidates, formatRate, matchPair, oppositeType, otherUserId } from './matching';
 import type { Profile } from './types';
 
 const p = (over: Partial<Profile>): Profile => ({
-  id: 'x', name: 'Fulano', avatar_url: null, city: 'São Paulo', bio: null, roles: ['Editor(a)'],
+  id: 'x', account_type: 'freelancer', website: null, name: 'Fulano', avatar_url: null, city: 'São Paulo', bio: null, roles: ['Editor(a)'],
   day_rate_min: null, day_rate_max: null, available: true, portfolio_links: [], gear: null, ...over,
 });
 
@@ -39,6 +39,20 @@ describe('filterCandidates', () => {
   });
   it('filtra só disponíveis', () => {
     expect(filterCandidates(all, 'me', new Set(), { onlyAvailable: true }).map((x) => x.id)).toEqual(['1', '3']);
+  });
+});
+
+describe('tipo de conta', () => {
+  const mix = [
+    p({ id: 'f', account_type: 'freelancer' }),
+    p({ id: 'e', account_type: 'empresa' }),
+  ];
+  it('filtra pelo tipo', () => {
+    expect(filterCandidates(mix, 'me', new Set(), { accountType: 'empresa' }).map((x) => x.id)).toEqual(['e']);
+  });
+  it('oppositeType inverte', () => {
+    expect(oppositeType('freelancer')).toBe('empresa');
+    expect(oppositeType('empresa')).toBe('freelancer');
   });
 });
 

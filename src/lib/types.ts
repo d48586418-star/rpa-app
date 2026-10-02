@@ -1,5 +1,9 @@
+export type AccountType = 'freelancer' | 'empresa';
+
 export type Profile = {
   id: string;
+  account_type: AccountType;
+  website: string | null;
   name: string;
   avatar_url: string | null;
   city: string | null;

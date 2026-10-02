@@ -3,7 +3,7 @@ import type { Match, Message, Profile } from './types';
 import { filterCandidates, type DiscoverFilters } from './matching';
 
 const PROFILE_COLS =
-  'id,name,avatar_url,city,bio,roles,day_rate_min,day_rate_max,available,portfolio_links,gear';
+  'id,account_type,website,name,avatar_url,city,bio,roles,day_rate_min,day_rate_max,available,portfolio_links,gear';
 
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase

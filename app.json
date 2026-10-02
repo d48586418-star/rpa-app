@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Claquete",
-    "slug": "claquete",
+    "name": "Take One",
+    "slug": "take-one",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,7 +21,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "claquete",
+    "scheme": "takeone",
     "plugins": [
       "expo-router",
       "expo-secure-store",
@@ -34,6 +34,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "backgroundColor": "#050505"
   }
 }

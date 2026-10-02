@@ -1,13 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
-import { Button, Input } from '../../components/ui';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Button, Input, T } from '../../components/ui';
 import { fetchMessages, sendMessage } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { supabase } from '../../lib/supabase';
 import type { Message } from '../../lib/types';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 export default function Chat() {
   const { matchId, name } = useLocalSearchParams<{ matchId: string; name?: string }>();
@@ -56,10 +56,10 @@ export default function Chat() {
         keyExtractor={(m) => m.id}
         contentContainerStyle={{ padding: 16, gap: 8 }}
         onContentSizeChange={() => list.current?.scrollToEnd({ animated: true })}
-        ListEmptyComponent={<Text style={s.hint}>Diga oi e combine o projeto 👋</Text>}
+        ListEmptyComponent={<T style={s.hint}>Diga oi e combine o projeto</T>}
         renderItem={({ item }) => (
           <View style={[s.bubble, item.sender_id === me ? s.mine : s.theirs]}>
-            <Text style={{ color: item.sender_id === me ? colors.accentText : colors.text }}>{item.body}</Text>
+            <T style={{ color: item.sender_id === me ? colors.onLight : colors.text }}>{item.body}</T>
           </View>
         )}
       />
@@ -72,9 +72,9 @@ export default function Chat() {
 }
 
 const s = StyleSheet.create({
-  bubble: { maxWidth: '80%', padding: 10, borderRadius: 14 },
-  mine: { alignSelf: 'flex-end', backgroundColor: colors.accent },
-  theirs: { alignSelf: 'flex-start', backgroundColor: colors.card },
+  bubble: { maxWidth: '80%', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 20 },
+  mine: { alignSelf: 'flex-end', backgroundColor: colors.light },
+  theirs: { alignSelf: 'flex-start', backgroundColor: colors.surface },
   bar: { flexDirection: 'row', gap: 8, padding: 12, alignItems: 'center' },
   hint: { color: colors.muted, textAlign: 'center', marginTop: 40 },
 });

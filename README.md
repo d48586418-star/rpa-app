@@ -1,4 +1,4 @@
-# 🎬 Claquete
+# Take One
 
 Tinder para profissionais do audiovisual: deslize perfis de diretores, fotógrafos, editores, som e mais; quando o interesse é mútuo, vira **match** e abre um chat para combinar o trabalho.
 
@@ -7,12 +7,16 @@ Tinder para profissionais do audiovisual: deslize perfis de diretores, fotógraf
 ## Como rodar
 
 1. Crie um projeto gratuito em [supabase.com](https://supabase.com).
-2. No **SQL Editor**, execute `supabase/migrations/0001_init.sql`.
+2. No **SQL Editor**, execute em ordem `supabase/migrations/0001_init.sql` e `0002_account_type.sql`.
 3. (Para testar rápido) em *Authentication → Providers → Email*, desative "Confirm email".
 4. `cp .env.example .env` e preencha `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` (Settings → API).
 5. `npm install && npx expo start` e abra no celular com o app **Expo Go**.
 
 Para testar o match, crie duas contas (dois aparelhos/emuladores) e dê "chamar" nas duas.
+
+## Fluxo
+
+Splash (deslizar) → **Selecione a sua jornada** (Freelancer ou Empresa) → cadastro → perfil por tipo → deck. Freelancers veem empresas e empresas veem freelancers; match mútuo abre o chat.
 
 ## Scripts
 
