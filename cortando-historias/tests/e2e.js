@@ -18,7 +18,7 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
   console.log('\n0. Abertura (index.html): corte para iniciar, texto e botão surgem, botão leva às boas-vindas');
   for(const w of [390,1280]){
     const q=await newPage(w,800);await q.goto(LAND);await q.waitForTimeout(900);
-    ok(await q.evaluate(()=>/Corte para iniciar/.test(document.querySelector('#instr').textContent)&&!/Desenvolvido/.test(document.body.innerText)),w+'px: instrução "Corte para iniciar", sem crédito');
+    ok(await q.evaluate(()=>/Puxe pelo meio/.test(document.querySelector('#instr').textContent)&&!/Desenvolvido/.test(document.body.innerText)),w+'px: instrução "Puxe pelo meio", sem crédito');
     await q.mouse.move(200,200);await q.mouse.down();for(let i=1;i<=20;i++){await q.mouse.move(200,200+i*25);await q.waitForTimeout(16)}await q.mouse.up();await q.waitForTimeout(1200);
     ok(await q.evaluate(()=>+getComputedStyle(document.querySelector('#rip')).getPropertyValue('--t')>.9&&document.documentElement.classList.contains('aberta')),w+'px: arrastar para baixo abre o papel');
     await q.click('#entrar');await q.waitForTimeout(1500);

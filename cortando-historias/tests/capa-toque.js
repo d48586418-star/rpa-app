@@ -1,4 +1,4 @@
-/* Capa: "Corte para iniciar"; arrastar para baixo (toque CDP) abre o papel, surgem texto e botão "Iniciar jornada".
+/* Capa: "Puxe pelo meio"; arrastar para baixo (toque CDP) abre o papel, surgem texto e botão "Iniciar jornada".
    360/390/414 × (normal, Reduzir Movimento). */
 const {chromium}=require('playwright');
 const URL=process.env.CAPA||'http://localhost:8766/index.html';
@@ -9,7 +9,7 @@ const URL=process.env.CAPA||'http://localhost:8766/index.html';
     const c=await b.newContext({viewport:{width:w,height:h},hasTouch:true,isMobile:true,reducedMotion:reduzido?'reduce':'no-preference'});
     const p=await c.newPage();const cdp=await c.newCDPSession(p);const errs=[];p.on('pageerror',e=>errs.push(e.message));
     await p.goto(URL);await p.waitForTimeout(800);
-    ok(await p.evaluate(()=>/Corte para iniciar/.test(document.querySelector('#instr').textContent)&&!/Desenvolvido|Claude/.test(document.body.innerText)),`${rot}: instrução e nenhum crédito`);
+    ok(await p.evaluate(()=>/Puxe pelo meio/.test(document.querySelector('#instr').textContent)&&!/Desenvolvido|Claude/.test(document.body.innerText)),`${rot}: instrução e nenhum crédito`);
     ok(await p.evaluate(()=>getComputedStyle(document.querySelector('#entrar')).visibility==='hidden'),`${rot}: botão ainda escondido`);
     const t=()=>p.evaluate(()=>+getComputedStyle(document.documentElement).getPropertyValue('--t')||0);
     const sy=(type,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x:60,y}]});
@@ -21,6 +21,18 @@ const URL=process.env.CAPA||'http://localhost:8766/index.html';
     await p.waitForTimeout(1200);
     ok(await t()>.95,`${rot}: soltando depois de 35% conclui`);
     ok(await p.evaluate(()=>{const g=document.querySelector('#entrar'),r=g.getBoundingClientRect();return getComputedStyle(g).visibility==='visible'&&+getComputedStyle(g).opacity>.95&&r.height>=48&&/Iniciar jornada/.test(g.textContent)}),`${rot}: botão "Iniciar jornada" visível`);
+    if(!reduzido){ /* puxar pelo meio: toque no meio da lateral esquerda e puxar para a direita; depois pela direita */
+      for(const lado of ['esquerda','direita']){
+        const c3=await b.newContext({viewport:{width:w,height:h},hasTouch:true,isMobile:true});const q=await c3.newPage();const cd=await c3.newCDPSession(q);await q.goto(URL);await q.waitForTimeout(700);
+        const x1=lado==='esquerda'?6:w-6,x2=lado==='esquerda'?w*.8:w*.2,tp=(type,x)=>cd.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x,y:h/2}]});
+        await tp('touchStart',x1);for(let i=1;i<=24;i++){await tp('touchMove',x1+(x2-x1)*i/24);await q.waitForTimeout(16)}
+        const meio=await q.evaluate(()=>+getComputedStyle(document.querySelector('#rip')).getPropertyValue('--t'));
+        await tp('touchEnd',0);await q.waitForTimeout(1200);
+        ok(meio>.2&&meio<1,`${rot}: puxar pelo meio (${lado}) abre aos poucos (--t ${meio.toFixed(2)})`);
+        ok(await q.evaluate(()=>document.documentElement.classList.contains('aberta')&&getComputedStyle(document.querySelector('#entrar')).visibility==='visible'),`${rot}: puxar pelo meio (${lado}) conclui e mostra o botão`);
+        await c3.close();
+      }
+    }
     if(reduzido)ok(await p.evaluate(()=>!document.querySelector('#cam').style.transform),`${rot}: sem zoom`);
     await p.tap('#entrar');await p.waitForTimeout(1500);
     ok(/lab\.html/.test(p.url())&&/boas-vindas/.test(p.url()),`${rot}: botão leva às boas-vindas`);
