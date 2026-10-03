@@ -10,27 +10,30 @@
 <link rel="stylesheet" href="css/abertura.css">
 </head>
 <body>
-<main>
- <div class="stage" id="stage">
+<main class="stage" id="stage">
+  <!-- o laboratório de verdade, por trás do vidro: só aparece no vão do corte -->
+  <iframe class="lab" id="lab" title="" tabindex="-1" aria-hidden="true" inert></iframe>
   <h1 class="sr">Cortando Histórias</h1>
-  <div class="cam" id="cam">
-    <div class="deep">
-      <div class="reveal">
-        <p class="txt" id="txt" aria-hidden="true"><span class="l"><span class="w w1">Cortando</span></span><span class="l"><span class="w w2">Histórias</span></span></p>
-        <a class="go" id="entrar" href="lab.html#/boas-vindas">Iniciar jornada</a>
-      </div>
-    </div>
-  </div>
-  <div class="rip" id="rip" aria-hidden="true">
-    <div class="rip-full"></div>
-    <div class="half top"><div class="part torn"><div class="sheet"></div></div><div class="part whole"><div class="sheet"></div></div></div>
-    <div class="half bot"><div class="part torn"><div class="sheet"></div></div><div class="part whole"><div class="sheet"></div></div></div>
-    <i class="pull pl"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></i>
-    <i class="pull pr"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></i>
-  </div>
-  <button type="button" class="instr" id="instr"><span>Puxe pelo meio para abrir</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M3 12h18"/></svg></button>
- </div>
+  <!-- duas metades da camada de vidro e das letras; tudo irmão direto do palco para o blur enxergar o laboratório -->
+  <div class="pane pa" aria-hidden="true"></div>
+  <div class="pane pl" aria-hidden="true"></div>
+  <div class="pane pr" aria-hidden="true"></div>
+  <div class="gl gl-a" aria-hidden="true"></div>
+  <div class="gl gl-l" aria-hidden="true"></div>
+  <div class="gl gl-r" aria-hidden="true"></div>
+  <svg class="edge" id="edge" aria-hidden="true" focusable="false"><defs id="defs"></defs>
+    <g id="eg-a"></g><g id="eg-l"></g><g id="eg-r"></g>
+  </svg>
+  <div class="band" id="band" role="slider" tabindex="0" aria-label="Linha de corte: use as setas para mover e Enter para cortar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></div>
+  <svg class="blade" id="blade" aria-hidden="true" focusable="false">
+    <line id="bf" class="guide"/><line id="bs" class="solid"/>
+    <path id="bt" class="cap"/><path id="bb" class="cap"/>
+    <g id="razor"><path class="rz" d="M-7 -11H7V5L0 12L-7 5Z"/><path class="rz" d="M-3 -6H3"/><path class="rz" d="M0 -11V-17"/></g>
+  </svg>
+  <p class="hint" id="hint">arraste para cortar</p>
+  <a class="go" id="entrar" href="lab.html#/boas-vindas" hidden><span>Iniciar jornada</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
 </main>
+<noscript><style>.pane,.gl,.edge,.band,.hint,.blade,.lab{display:none}.stage{display:grid;place-content:center;gap:24px;padding:24px}.sr{position:static;width:auto;height:auto;clip:auto;font:700 clamp(3rem,16vw,9rem)/.88 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.06em;color:#fff4ee}.ns{color:#fff4ee;font:500 1rem/1 Helvetica,Arial,sans-serif}</style><a class="ns" href="lab.html#/boas-vindas">Entrar no laboratório</a></noscript>
 <script src="js/abertura.js"></script>
 </body>
 </html>

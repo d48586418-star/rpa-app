@@ -1,69 +1,60 @@
-/* abertura.css — capa: papel vermelho de embalagem dividido ao meio. O aluno põe o dedo no meio de uma lateral e puxa:
-   o rasgo acompanha o dedo, as duas metades se abrem em boca e, por baixo, surge "Cortando Histórias". */
+/* abertura.css — a entrada é um corte de edição. Uma camada de vidro cobre o laboratório; o título está nela.
+   Arrastar a lâmina (Razor) através do título divide a camada; no vão aparece o laboratório de verdade. */
 @font-face{font-family:"DM Sans";src:url(../fonts/dm-sans-latin-wght-normal.woff2) format("woff2");font-weight:100 1000;font-style:normal;font-display:swap}
-:root{--hero-bg:#a81020;--hero-fg:#fff4ee;--display:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;--sans:var(--display);--t:0;--tip:0px;--rt:0deg;--rb:0deg;--oyt:0px;--oyb:0px}
+:root{--hero-bg:#a81020;--hero-fg:#fff4ee;--display:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;--sans:var(--display);
+  --ease:cubic-bezier(.22,1,.36,1);--cx:50vw;--dxl:0px;--dxr:0px;--rdy:0px;--dur:0ms}
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;background:#7d0a18;overscroll-behavior:none}
-body{margin:0;background:#7d0a18;color:var(--hero-fg);font:400 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
+html{-webkit-text-size-adjust:100%;background:var(--hero-bg);overscroll-behavior:none}
+body{margin:0;background:var(--hero-bg);color:var(--hero-fg);font:400 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
 h1,p{margin:0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:#7d0a18;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-.anim .stage{touch-action:none}
-.cam{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform}
-.deep{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%,#ff5266 0,#d8223a 14%,#9c1226 34%,#5a0715 62%,#2a0209 100%)}
-.reveal{display:flex;flex-direction:column;align-items:center;gap:clamp(1.2rem,3.4vh,2rem);padding:0 1rem;text-align:center}
-/* título grosso, na mesma família e peso dos títulos do site */
-.txt{display:flex;flex-direction:column;align-items:center;font-family:var(--display);font-weight:800;font-size:clamp(2.9rem,17.5vw,10rem);line-height:.9;letter-spacing:-.05em;color:var(--hero-fg);filter:drop-shadow(0 4px 22px rgb(42 2 9 / .5))}
-.l{display:block;overflow:hidden;padding:.03em .08em .12em}
-.w{display:block}
-.go{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 1.5rem;border-radius:999px;background:#fff4ee;color:#7d0a18;font-weight:600;font-size:.95rem;letter-spacing:.01em;text-decoration:none;box-shadow:0 8px 24px rgb(42 2 9 / .45)}
-.go:focus-visible,.instr:focus-visible{outline:2px solid #fff;outline-offset:5px}
-/* o nome sobe de uma máscara, linha por linha, conforme o papel se abre */
-.anim .w{transform:translateY(calc((1 - var(--k,0)) * 108%))}
-.anim .w1{--k:min(1,max(0,(var(--t,0) - .3) * 2.6))}
-.anim .w2{--k:min(1,max(0,(var(--t,0) - .42) * 2.6))}
-.anim .go{opacity:calc(max(0,min(1,(var(--t,0) - .8) * 5)));pointer-events:none}
-.anim.aberta .go{pointer-events:auto}
-.anim:not(.aberta) .go{visibility:hidden}
-/* papel: duas metades unidas por uma costura irregular no meio. Cada metade tem a parte já rasgada (gira em torno da ponta do rasgo) e a parte ainda inteira */
-.rip{position:absolute;inset:0;display:none;pointer-events:none;overflow:hidden}
-.anim .rip{display:block}
-.rip.fromR{transform:scaleX(-1)}
-.rip-full,.sheet{background:radial-gradient(120% 80% at 50% 38%,#c01a2c 0,var(--hero-bg) 55%,#7d0a18 100%)}
-.rip-full{position:absolute;inset:0}
-.rip.split .rip-full{display:none}
-.rip:not(.split) .half{visibility:hidden}
-.half{position:absolute;inset:0;will-change:transform}
-.half.top{filter:drop-shadow(0 1px 0 rgb(255 255 255 / .5)) drop-shadow(0 10px 16px rgb(30 0 5 / .5))}
-.half.bot{filter:drop-shadow(0 -1px 0 rgb(255 255 255 / .5)) drop-shadow(0 -10px 16px rgb(30 0 5 / .5))}
-.part{position:absolute;inset:0}
-.sheet{position:absolute;inset:0}
-.top .sheet{clip-path:polygon(var(--cp-top,0 0,100% 0,100% 50%,0 50%))}
-.bot .sheet{clip-path:polygon(var(--cp-bot,0 50%,100% 50%,100% 100%,0 100%))}
-.part.whole{clip-path:inset(0 0 0 var(--tip));transform:translate3d(0,var(--oy),0)}
-.part.torn{clip-path:inset(0 calc(100% - var(--tip)) 0 0);transform-origin:var(--tip) 50%;transform:translate3d(0,var(--oy),0) rotate(var(--rot))}
-.top .part{--oy:var(--oyt);--rot:var(--rt)}
-.bot .part{--oy:var(--oyb);--rot:var(--rb)}
-/* abas de puxar, no meio de cada lateral */
-.pull{position:absolute;top:calc(50% - 34px);width:22px;height:68px;border-radius:0 12px 12px 0;background:#fff4ee;color:#7d0a18;display:grid;place-items:center;opacity:calc(max(0,1 - var(--t,0) * 60));box-shadow:0 6px 18px rgb(42 2 9 / .4)}
-.pl{left:0}
-.pr{right:0;border-radius:12px 0 0 12px}
-.rip.fromR .pl,.rip:not(.fromR) .pr{opacity:calc(max(0,1 - var(--t,0) * 60) * .55)}
-.pull svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;animation:puxa 1.6s ease-in-out infinite}
-.pr svg{animation-name:puxa-r}
-@keyframes puxa{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
-@keyframes puxa-r{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
-.rip.fromR .pull svg{transform:scaleX(-1)}
-.instr{position:absolute;left:0;right:0;bottom:calc(max(2.4rem,env(safe-area-inset-bottom) + 1.8rem));display:flex;flex-direction:column;align-items:center;gap:6px;min-height:48px;justify-content:center;background:none;border:0;font-family:inherit;color:var(--hero-fg);font-size:.9rem;font-weight:500;letter-spacing:.02em;opacity:calc(.9 - var(--t,0) * 9);z-index:3;cursor:pointer}
-.aberta .instr{visibility:hidden}
-.instr svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-/* Reduzir Movimento: sem rotação nem zoom — o papel só esmaece */
-.redmo .cam{transform:none!important}
-.redmo .half{transform:none!important}
-.redmo .part.torn,.redmo .part.whole{clip-path:none;transform:none}
-.redmo .sheet{opacity:calc(1 - var(--t,0) * 1.3)}
-.redmo .half{filter:none}
-.redmo .pull svg{animation:none}
-.redmo .w{transform:none}
-@media (prefers-reduced-motion:reduce){.pull svg{animation:none}}
-.noanim .instr{display:none}
+.stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:var(--hero-bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.stage.aim{cursor:none}
+.lab{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fbfbfc;pointer-events:none;opacity:0;transition:opacity .4s linear}
+.stage.lab-on .lab{opacity:1}
+/* camada de vidro, em duas metades pelo x do corte (1px de sobreposição para não aparecer emenda) */
+.pane{position:absolute;inset:0;background:rgb(168 16 32 / .93);-webkit-backdrop-filter:blur(34px) saturate(110%);backdrop-filter:blur(34px) saturate(110%);pointer-events:none;transition:transform var(--dur) var(--ease)}
+.pl{clip-path:inset(0 calc(100% - var(--cx) + 1px) 0 0);transform:translateX(var(--dxl))}
+.pr{clip-path:inset(0 0 0 var(--cx));transform:translateX(var(--dxr))}
+/* letras de vidro: o próprio backdrop-filter recortado pelo desenho do texto (clipPath SVG) */
+.gl{position:absolute;inset:0;background:rgb(255 244 238 / .2);-webkit-backdrop-filter:blur(6px) brightness(1.1) saturate(85%);backdrop-filter:blur(6px) brightness(1.1) saturate(85%);pointer-events:none;transition:transform var(--dur) var(--ease)}
+.gl-a{clip-path:url(#c-a)}
+.gl-l{clip-path:url(#c-l);transform:translateX(var(--dxl))}
+.gl-r{clip-path:url(#c-r);transform:translateX(var(--dxr))}
+/* antes do corte: uma camada só (sem emenda); no corte, trocam-se pelas duas metades no mesmo quadro */
+.pl,.pr,.gl-l,.gl-r,#eg-l,#eg-r{display:none}
+.cut .pl,.cut .pr,.cut .gl-l,.cut .gl-r{display:block}
+.cut #eg-l,.cut #eg-r{display:inline}
+.cut .pa,.cut .gla,.cut .gl-a,.cut #eg-a{display:none}
+.edge{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.edge text{fill:none;stroke:rgb(255 255 255 / .42);stroke-width:1.2;stroke-linejoin:round;font-family:var(--display);font-weight:700}
+.edge line{stroke:rgb(255 255 255 / .55);stroke-width:1;opacity:0;transition:opacity .25s linear .1s}
+.cut .edge line{opacity:1}
+#eg-l{transform:translateX(var(--dxl));transition:transform var(--dur) var(--ease)}
+#eg-r{transform:translateX(var(--dxr));transition:transform var(--dur) var(--ease)}
+/* lâmina: linha de corte e ícone de navalha, só quando a pessoa explora */
+.blade{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .16s linear}
+.blade.on{opacity:1}
+.blade .guide{stroke:rgb(255 244 238 / .5);stroke-width:1}
+.blade .solid{stroke:#fff4ee;stroke-width:1.5}
+.blade .cap{stroke:rgb(255 244 238 / .75);stroke-width:1.5;fill:none}
+.blade .rz{stroke:#fff4ee;stroke-width:1.4;fill:rgb(168 16 32 / .6);stroke-linejoin:round;stroke-linecap:round}
+.cut .blade{opacity:0}
+.band{position:absolute;left:0;width:100%;pointer-events:none;border-radius:6px}
+.band:focus-visible{outline:2px solid #fff4ee;outline-offset:4px}
+.hint{position:absolute;font:400 .8rem/1 var(--sans);letter-spacing:.01em;color:rgb(255 244 238 / .72);transition:opacity .25s linear;pointer-events:none}
+.stage.touched .hint,.cut .hint{opacity:0}
+/* depois do corte: micro-ação de vidro, bem menor que o título */
+.go{position:absolute;display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 16px 0 20px;border-radius:999px;color:var(--hero-fg);text-decoration:none;font:500 .95rem/1 var(--sans);letter-spacing:-.005em;
+  background:rgb(255 255 255 / .12);border:1px solid rgb(255 255 255 / .34);-webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%);
+  box-shadow:inset 1px 1px 0 rgb(255 255 255 / .28);opacity:0;transform:translateY(6px);transition:opacity .35s linear,transform .45s var(--ease),background-color .25s linear}
+.go.show{opacity:1;transform:none}
+.go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ease)}
+.go:hover,.go:focus-visible{background:rgb(255 255 255 / .2)}
+.go:hover svg,.go:focus-visible svg{transform:translateX(3px)}
+.go:active{transform:scale(.98)}
+.go:focus-visible{outline:2px solid #fff4ee;outline-offset:3px}
+.leave .pane,.leave .gl,.leave #eg-l,.leave #eg-r{transition-timing-function:cubic-bezier(.65,0,.35,1)}
+.leave .go{opacity:0;transition-duration:.15s}
+/* Reduzir Movimento: sem deslocamento gradual, só troca de estado */
+@media (prefers-reduced-motion:reduce){:root{--dur:1ms!important}.go,.go svg,.blade,.hint,.lab{transition-duration:.15s}}
