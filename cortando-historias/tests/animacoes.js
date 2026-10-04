@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 const URL=process.env.URL||'http://localhost:8766/lab.html';
 (async()=>{
-  const b=await chromium.launch();let bad=0;const ok=(c,m)=>{console.log((c?'  ✓ ':'  ✗ ')+m);if(!c)bad++};
+  const b=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM?{executablePath:process.env.PLAYWRIGHT_CHROMIUM}:{});let bad=0;const ok=(c,m)=>{console.log((c?'  ✓ ':'  ✗ ')+m);if(!c)bad++};
   const mk=async(rm,fx)=>{const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:rm?'reduce':'no-preference'});
     await c.addInitScript(fx=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'M',persona:'ritmo',onboarded:true},seen:{tour:1,lvl:1},prefs:{motion:'auto',fx:fx,fxSet:1}}));
       window.__osc=0;window.__rv=[];new MutationObserver((m,o)=>{const e=document.querySelector('.rv');if(e){o.disconnect();const t0=performance.now();(function f(){const x=[...document.querySelectorAll('.rv')].map(y=>+getComputedStyle(y).opacity);window.__rv.push(Math.min(...x));if(performance.now()-t0<900)requestAnimationFrame(f)})()}}).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});const A=window.AudioContext||window.webkitAudioContext;if(A){const o=A.prototype.createOscillator;A.prototype.createOscillator=function(){window.__osc++;return o.call(this)}}},fx);

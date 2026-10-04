@@ -24,7 +24,7 @@
 /* abas e segmentos: contorno fino; ativo = tinta cheia */
 .seg button,.ptabs button,.subnav a,.nb-f button{border-radius:var(--r-ctl);box-shadow:inset 0 0 0 1px var(--rule);background:transparent;transition:transform .2s var(--ease-ds),background .2s var(--ease-ds),color .2s}
 .seg button:hover,.ptabs button:hover,.subnav a:hover{transform:translateY(-1px)}
-.seg button[aria-pressed="true"],.ptabs button[aria-selected="true"],.subnav a[aria-current="page"]{background:var(--ink);color:var(--bg);box-shadow:none}
+.seg button[aria-pressed="true"],.ptabs button[aria-selected="true"],.subnav a[aria-current="page"]{background:color-mix(in srgb,currentColor 14%,transparent);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);font-weight:600}
 /* cartões: contorno fino, sem sombra pesada */
 .card,.card-flat,.me-blk,.nn,.nbv{border:var(--hair-ds);box-shadow:none}
 /* listas de nomes sem sublinhado */
@@ -103,9 +103,9 @@
   .transport .btn.icon-only{width:44px;padding:0;flex:none}
   #b-play{flex:none;min-width:0}
   .transport .btn svg{width:16px;height:16px}
-  #b-play[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:none}
+  #b-play[aria-pressed="true"]{background:color-mix(in srgb,currentColor 14%,transparent);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);font-weight:600}
 }
-.transport .btn:hover{transform:none;background:var(--bg-alt)}
+.transport .btn:hover{transform:none}
 /* enunciado: contorno fino, rótulos discretos, uma linha por pergunta */
 .brief{display:grid;gap:0;padding:4px 18px;border-radius:var(--r3);background:transparent;box-shadow:inset 0 0 0 1px var(--rule)}
 .brief-row{grid-template-columns:5.4rem minmax(0,1fr);gap:14px;align-items:baseline;padding:14px 0;border-top:1px solid var(--rule)}
@@ -137,7 +137,7 @@
 .mt-s,.mt-n{font-size:.88rem;line-height:1.45}
 .mt-set{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.9rem}
 .mt-set button{min-width:44px;min-height:44px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--rule);font-weight:500}
-.mt-set button[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:none}
+.mt-set button[aria-pressed="true"]{background:color-mix(in srgb,currentColor 14%,transparent);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);font-weight:600}
 .ini .mt,.ini .ev{margin-top:var(--s4)}
 /* ritual de conquista */
 .rit{border:0;padding:0;background:transparent;max-width:min(420px,92vw);width:100%;color:var(--ink);overflow:visible}
@@ -205,9 +205,6 @@ textarea{border-radius:var(--r3)}
 .tag[data-film]{background:color-mix(in srgb,var(--fc,#555) 40%,#000)!important}
 :root[data-theme="dark"] .tag[data-film]{background:color-mix(in srgb,var(--fc,#555) 50%,#000)!important}
 .mu-ppl a.link,.mu-note a.link,.mu-src a.link,.mu-fonte a.link{display:inline-flex;align-items:center;min-height:44px}
-.tabbar{background:rgb(15 15 15 / .82);border-color:rgb(255 255 255 / .16);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);box-shadow:0 14px 36px rgb(0 0 0 / .28),inset 1px 1px 0 rgb(255 255 255 / .16)}
-.tabbar a{color:#fff;text-shadow:none}
-.tabbar a[aria-current="page"]{background:rgb(255 255 255 / .18);box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22)}
 @media (max-width:400px){.contact-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 @media (min-width:1000px){
   /* o painel lateral acompanha a altura da coluna do player (não a aumenta) e rola por dentro */
@@ -229,7 +226,6 @@ textarea{border-radius:var(--r3)}
 .mh-tx .display{font-size:clamp(2.2rem,1.4rem + 4vw,4rem);line-height:.95;color:var(--pf)}
 .mh-q{font-size:1.02rem;line-height:1.45;max-width:34ch}
 .mh-tx .btn{margin-top:6px;background:transparent;color:var(--pf);box-shadow:inset 0 0 0 1.5px var(--pf)}
-.mh-tx .btn:hover{background:rgb(255 255 255 / .12)}
 .mh-cr{font-size:.78rem;opacity:.85!important}
 @media (min-width:900px){
   .me-hero{min-height:440px;margin-inline:0;border-radius:var(--r4)}
@@ -248,10 +244,10 @@ textarea{border-radius:var(--r3)}
 .ini-cr{margin-top:var(--s6);font-size:.82rem;line-height:1.5}.ini-cr .link{display:inline-flex;align-items:center;min-height:44px}
 /* textos sobre a cor do perfil: sempre opacos e na cor de maior contraste (--pf) */
 .ws3.colored .w-hint,.ws3.colored .w-back,.ws3.colored .pd-rep,.ws3.colored .pd-more summary,.ws3.colored .pd-more p,.ws3.colored .pd-more li,.ws3.colored .pd-ia,.ws3.colored .eyebrow,.ws4 .go-q,.ws4 .go-q b,.ws4 .eyebrow,.ws4 .pd-ia,.ws4 .w-link,.me-hero .eyebrow,.me-hero .mh-q,.me-hero .mh-cr{opacity:1!important;color:var(--pf)!important}
-.mh-tx .btn:hover{background:transparent;box-shadow:inset 0 0 0 3px var(--pf)}
+.mh-tx .btn:hover{background:transparent}
 .ws3.colored .chips li{background:transparent!important;color:var(--pf)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pf) 60%,transparent)}
-/* chegada vinda da capa: a câmera termina de entrar e a tela aparece do vermelho profundo */
-.from-cap{background:#7d0a18}
-.from-cap body{animation:chegada .9s cubic-bezier(.2,.715,.205,.99) both}
-@keyframes chegada{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:none}}
+/* chegada vinda da abertura: a câmera acabou de entrar na bolinha branca; a escolha de perfil aparece do branco e a câmera recua (1,12 → 1) */
+.from-cap{background:#fff}
+.from-cap body{animation:chegada .7s cubic-bezier(.2,.715,.205,.99) both}
+@keyframes chegada{from{opacity:0;transform:scale(1.12)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.from-cap body{animation:chegada-r .4s linear both}@keyframes chegada-r{from{opacity:0}to{opacity:1}}}

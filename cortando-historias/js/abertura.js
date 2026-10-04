@@ -24,7 +24,7 @@ function layout(){
   bx0=L*.38;by=H*.484+L*.45;yc=H*.484;
   stage.style.setProperty("--yc",yc.toFixed(1)+"px");stage.style.setProperty("--W",W+"px");stage.style.setProperty("--H",H+"px");
   var wH=probe.getBoundingClientRect().width/100,alvo=W<700?.78:W<1100?.56:.359;
-  stage.style.setProperty("--fsH",(alvo*W/wH).toFixed(1)+"px");stage.style.setProperty("--ty","45.2%");
+  stage.style.setProperty("--fsH",Math.min(alvo*W/wH,H*.22).toFixed(1)+"px");stage.style.setProperty("--ty","45.2%");
   var pw=pill.offsetWidth||250,kh=pill.offsetHeight*.8;pillState.travel=Math.max(1,pw-kh-pill.offsetHeight*.2);
   if(phase==="enter"||phase==="idle")bx=bx0;
 }

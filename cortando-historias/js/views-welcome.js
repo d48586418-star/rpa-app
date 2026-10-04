@@ -44,7 +44,7 @@ CH.views.welcome=function(root,mode){
     <div class="pk2" id="pick" data-state="base">
       <div class="pk2-track" id="pk2-track" role="group" aria-roledescription="carrossel" aria-label="Perfis de editor" tabindex="0">${P.map((p,k)=>{
         const src="assets/personas/full/"+p.id,w=p.nome.split(" "),l=w.pop();
-        return `<article class="pf" data-id="${p.id}" aria-roledescription="perfil" aria-label="${esc(p.nome)}, ${k+1} de ${P.length}" style="--pc:${FULLBG[p.id]||p.bg||p.cor};--pf:${p.bgfg||p.fg}">
+        return `<article class="pf ${(p.bgfg||p.fg)==="#ffffff"||(p.bgfg||p.fg)==="#fff"?"pf-lt":"pf-dk"}" data-id="${p.id}" aria-roledescription="perfil" aria-label="${esc(p.nome)}, ${k+1} de ${P.length}" style="--pc:${FULLBG[p.id]||p.bg||p.cor};--pf:${p.bgfg||p.fg}">
         <div class="pf-stage" aria-hidden="true"><video class="pf-v" muted playsinline preload="none" poster="${src}.jpg">${CH.videoSources(src)}</video><video class="pf-v pf-v2" muted playsinline preload="none">${CH.videoSources(src)}</video></div>
         <div class="pf-tx">
           <h2 class="pf-kick"${k===0?' id="w3-t" tabindex="-1"':''}>Escolha o seu perfil de editor</h2>
@@ -150,8 +150,8 @@ CH.views.welcome=function(root,mode){
   cells.addEventListener("focusin",e=>{const b=e.target.closest(".pk-b");if(b&&idle())setIndex(btns().indexOf(b)+1)});
   cells.addEventListener("focusout",e=>{if(idle()&&!cells.contains(e.relatedTarget)&&!ctl.matches(":hover"))setIndex(0)});
   cells.addEventListener("keydown",e=>{const bs=btns().filter(b=>!b.disabled),i=bs.indexOf(document.activeElement);if(i<0)return;const d=e.key==="ArrowRight"||e.key==="ArrowDown"?1:e.key==="ArrowLeft"||e.key==="ArrowUp"?-1:0;if(d&&bs.length>1){e.preventDefault();bs[(i+d+bs.length)%bs.length].focus()}});
-  const narrow=()=>matchMedia("(max-width:700px)").matches;
-  function travel(b){const c=ctl.getBoundingClientRect(),r=b.getBoundingClientRect();b.style.setProperty("--tx",(c.left+c.width/2-(r.left+r.width/2)).toFixed(1)+"px");let ty;if(narrow()){const row=btns().indexOf(b)>=3?1:0;ty=(c.bottom-32)-(c.bottom-64+4+14+28*row)}else ty=c.bottom-36-(r.top+r.height/2);b.style.setProperty("--ty",ty.toFixed(1)+"px")}
+  const short=()=>matchMedia("(max-height:520px) and (orientation:landscape)").matches,narrow=()=>matchMedia("(max-width:700px)").matches&&!short();
+  function travel(b){const c=ctl.getBoundingClientRect(),r=b.getBoundingClientRect();b.style.setProperty("--tx",(c.left+c.width/2-(r.left+r.width/2)).toFixed(1)+"px");let ty;if(narrow()){const row=btns().indexOf(b)>=3?1:0;ty=(c.bottom-32)-(c.bottom-64+4+14+28*row)}else ty=c.bottom-(short()?28:36)-(r.top+r.height/2);b.style.setProperty("--ty",ty.toFixed(1)+"px")}
   function label(b,txt,aria){b.querySelector(".pk-t").textContent=txt;if(aria)b.setAttribute("aria-label",aria);else b.removeAttribute("aria-label")}
   function choose(btn){
     if(lock||scene!=="base"||!btn||btn.disabled)return;

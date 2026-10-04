@@ -176,3 +176,8 @@
   .mi-fig{aspect-ratio:4/5}
   .rm-i img,.cl-img img,.cl-f img,.mi-fig img{object-position:50% 6%}
 }
+
+/* fonte de pesquisa em fonte pequena */
+.fonte-ln{margin-top:var(--s3);font-size:.75rem;line-height:1.45;color:var(--ink-muted);max-width:70ch}
+.fonte-ln a{text-underline-offset:2px}
+.quem .fonte-ln{margin-top:6px}

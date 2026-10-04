@@ -34,19 +34,18 @@ summary{cursor:pointer}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:rgb(250 246 238 / .94)}.glass-dk{background:rgb(24 55 82 / .88)}}
 
 /* botões */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border:0;border-radius:var(--rp);background:var(--bg-alt);color:var(--ink);font:500 .95rem/1 var(--sans);text-decoration:none;white-space:nowrap;transition:transform var(--dur-1) var(--ease),background var(--dur-1),box-shadow var(--dur-1)}
-.btn:hover{background:var(--rule)}
-.btn:active{transform:scale(.97)}
-.btn.pri{background:var(--vermelho);color:var(--on-perfil,#fff)}.btn.pri:hover{background:var(--ink)}
-.btn.pri:hover{background:#d8b030}
-.btn.red{background:var(--vermelho);color:var(--hero-fg)}
-.btn.red:hover{background:#c01428}
-.btn.ink{background:var(--ink);color:var(--bg)}
-.btn.ink:hover{background:#2c2c31}
-.btn.sm{min-height:44px;padding:0 16px;font-size:.88rem}
-.btn.lg{min-height:56px;padding:0 28px;font-size:1.02rem}
-.btn.ghost{background:transparent;box-shadow:inset 0 0 0 1px var(--g3)}
-.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--ink);background:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border:0;border-radius:var(--rp);color:inherit;font:500 .9rem/1 var(--sans);text-decoration:none;white-space:nowrap;cursor:pointer;
+  background:color-mix(in srgb,currentColor 7%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 30%,transparent),inset 1px 1px 0 rgb(255 255 255 / .28);
+  -webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%);transition:transform var(--dur-1) var(--ease),box-shadow var(--dur-1)}
+/* VIDRO MINIMALISTA: todo botão é vidro (fundo translúcido + blur + contorno de 1px). Sem preenchimento colorido e sem troca de cor no hover: hover = elevação de 1px; a ação principal só ganha contorno mais firme e peso 600 */
+.btn:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 46%,transparent),inset 1px 1px 0 rgb(255 255 255 / .36),0 6px 16px rgb(0 0 0 / .08)}
+.btn:active{transform:none}
+.btn.pri,.btn.red,.btn.ink{font-weight:600;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,currentColor 62%,transparent),inset 1px 1px 0 rgb(255 255 255 / .28)}
+.btn.pri:hover,.btn.red:hover,.btn.ink:hover{box-shadow:inset 0 0 0 1.5px currentColor,inset 1px 1px 0 rgb(255 255 255 / .36),0 6px 16px rgb(0 0 0 / .08)}
+.btn.sm{min-height:40px;padding:0 16px;font-size:.86rem}
+.btn.lg{min-height:48px;padding:0 24px;font-size:.95rem}
+.btn.ghost{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.btn.ghost:hover{background:transparent}
 .btn.icon-only{width:44px;padding:0}
 .btn[disabled],.btn[aria-disabled="true"]{opacity:.35;cursor:not-allowed;transform:none}
 .btn svg{width:20px;height:20px;flex:none}

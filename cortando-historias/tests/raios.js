@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const URL=process.env.URL||'http://localhost:8766/lab.html';
 const ROTAS=['#/inicio','#/percurso','#/descobertas','#/guia','#/museu','#/museu/kuleshov','#/caderno','#/eu','#/livre','#/lab/EX_BROLL_001','#/lab/EX_JCUT_001','#/lab/EX_CORTE_004C','#/creditos','#/boas-vindas'];
 (async()=>{
-  const b=await chromium.launch();let total=0;const todos={};
+  const b=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM?{executablePath:process.env.PLAYWRIGHT_CHROMIUM}:{});let total=0;const todos={};
   for(const [w,h] of [[390,844],[1280,800]]){
     const c=await b.newContext({viewport:{width:w,height:h},isMobile:w<700,hasTouch:w<700});
     await c.addInitScript(()=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'Marina',persona:'ritmo',onboarded:true},seen:{tour:1}}))});

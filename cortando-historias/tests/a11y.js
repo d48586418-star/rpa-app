@@ -27,7 +27,7 @@ const AUDITORIA=()=>{
 const ROTAS_ANT=['#/inicio','#/percurso','#/descobertas','#/edicao','#/guia','#/museu','#/museu/kuleshov','#/caderno','#/eu','#/livre','#/lab/EX_BROLL_001','#/lab/EX_CORTE_004C','#/lab/EX_JCUT_001','#/creditos'];
 const ROTAS=['#/inicio','#/percurso','#/descobertas','#/edicao','#/guia','#/museu','#/museu/kuleshov','#/museu/murch','#/caderno','#/eu','#/livre','#/lab/EX_BROLL_001','#/lab/EX_CORTE_004C','#/lab/EX_JCUT_001','#/lab/EX_EXPERIMENTO_001','#/creditos','#/contraste','#/boas-vindas'];
 (async()=>{
-  const b=await chromium.launch();let bad=0;
+  const b=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM?{executablePath:process.env.PLAYWRIGHT_CHROMIUM}:{});let bad=0;
   for(const [tema,W,H] of [['light',390,844],['dark',390,844],['light',1280,800],['dark',1280,800],['light',360,740]]){
     const c=await b.newContext({viewport:{width:W,height:H},isMobile:W<700,hasTouch:W<700,reducedMotion:'reduce'});
     await c.addInitScript(t=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'Marina',persona:'ritmo',onboarded:true},seen:{tour:1}}));if(t==='dark')localStorage.setItem('ch:tema','dark')},tema);
@@ -54,6 +54,7 @@ const ROTAS=['#/inicio','#/percurso','#/descobertas','#/edicao','#/guia','#/muse
     await p.fill('#w-nm','Marina');await p.click('#w-name button[type=submit]');await p.waitForTimeout(700);
     await p.evaluate(id=>{const i=CH.PERSONAS?Object.keys(CH.PERSONAS).indexOf(id):0;const sw=document.getElementById('pk2-track');sw.scrollLeft=sw.clientWidth*i},pe);await p.waitForTimeout(700);
     await rep(`${tema} ${pe} boas-vindas (escolha)`);
+    await p.click(`.pk-b[data-id="${pe}"]`);await p.waitForTimeout(1200);await rep(`${tema} ${pe} boas-vindas (selecionado)`);
     await p.click('.pf.on [data-confirm]');await p.waitForTimeout(700);await rep(`${tema} ${pe} boas-vindas (final)`);
     await p.goto(URL+'#/eu');await p.waitForTimeout(800);await rep(`${tema} ${pe} Meu espaço (palco)`);
     rel.forEach(x=>console.log(x));await c.close();

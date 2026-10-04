@@ -176,7 +176,7 @@ CH.views.museuItem=function(root,id){
 <div class="page museu-i">
   <a class="back" href="#/museu">${icon("back")}Museu da Edição</a>
   <article class="mi">
-    <figure class="mi-fig">${img(e,true)}<figcaption class="glass-dk"><b>${esc(e.ano)}</b>${esc(c?c.t:"")}${(M().imgs||[]).includes(e.id)?`<small class="mu-foto">Foto: imagem da internet</small>`:""}</figcaption></figure>
+    <figure class="mi-fig">${img(e,true)}<figcaption class="glass-dk"><b>${esc(e.ano)}</b>${esc(c?c.t:"")}${(M().imgs||[]).includes(e.id)?`<small class="mu-foto">Foto: imagem da internet (fonte e licença não registradas)</small>`:""}</figcaption></figure>
     <div class="mi-tx">
       <header class="page-head"><span class="eyebrow">${esc(e.quem)}</span><h1 class="display mi-t" id="page-title" tabindex="-1">${esc(e.t)}</h1><p class="lead">${esc(e.n1)}</p></header>
       <section class="cblock"><h2 class="h4">Em um parágrafo</h2><p class="c-ent">${esc(e.n2)}</p></section>

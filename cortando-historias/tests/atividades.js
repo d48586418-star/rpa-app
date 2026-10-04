@@ -3,7 +3,7 @@
 const {chromium}=require('playwright');
 const URL=process.env.URL||'http://localhost:8766/lab.html';
 (async()=>{
-  const b=await chromium.launch();const p=await b.newPage({viewport:{width:1280,height:800}});
+  const b=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM?{executablePath:process.env.PLAYWRIGHT_CHROMIUM}:{});const p=await b.newPage({viewport:{width:1280,height:800}});
   await p.addInitScript(()=>{window.CH_NO_CEL=1;localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'T',persona:'olhar',onboarded:true,created:1},seen:{tour:1},prefs:{motion:'off'}}))});
   await p.goto(URL+'#/inicio');await p.waitForTimeout(800);
   const rep=await p.evaluate(async()=>{

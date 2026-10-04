@@ -56,7 +56,7 @@ CH.views.guia=function(root){
       <section id="g-ed" aria-labelledby="ge-h"><h2 class="h2" id="ge-h">O que é edição?</h2>
         <p class="lead">Um filme é feito de muitas imagens. Editar é decidir o que fazer com elas. Quatro ideias para começar.</p>
         <ol class="g-fund">${F.map((f,i)=>`<li><span class="g-n">${i+1}</span><div><h3 class="h3">${esc(f.t)}</h3><p class="g-idea">${esc(f.ideia)}</p><p>${esc(f.entenda)}</p></div></li>`).join("")}</ol>
-        <div class="wrap"><a class="btn ink lg" href="#/lab/${first}">Experimentar agora${icon("next")}</a><a class="btn ghost lg" href="#/descobertas">Ver descobertas</a><button class="btn ghost lg" type="button" data-tour>Rever o tutorial</button></div></section>
+        <div class="wrap"><a class="btn ink lg" href="#/lab/${first}">Experimentar agora${icon("next")}</a><a class="btn ghost lg" href="#/descobertas">Ver descobertas</a><button class="btn ghost lg" type="button" data-tour>Rever o tutorial</button></div>${CH.fonteLn?CH.fonteLn([],"texto do projeto, escrito para o laboratório"):""}</section>
     </div>
   </div>
 </div>`;

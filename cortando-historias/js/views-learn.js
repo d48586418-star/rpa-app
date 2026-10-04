@@ -38,10 +38,14 @@ CH.views.discoveries=function(root){
   return{title:"Descobertas",destroy(){}};
 };
 function D_ato(n){return CH.data.atos.atos.find(a=>a.n===n)}
+/* fonte visível, em fonte pequena: nome do site + link; o que não tem origem verificada é marcado como "texto do projeto" */
+function fonteLn(keys,txt){const f=(CH.data.museu&&CH.data.museu.fontes)||{};const li=(keys||[]).map(k=>f[k]).filter(Boolean).map(x=>`<a class="link" href="${x[1]}" target="_blank" rel="noopener">${esc(x[0])}</a>`);return `<p class="fonte-ln">Fonte: ${li.join("; ")}${li.length&&txt?" · ":""}${txt?esc(txt):""}</p>`}
+CH.fonteLn=fonteLn;
+const FQ={kuleshov:["klass","sstripe"],murch:["murch"]};
 function quemCard(k,q){
   const cc=CH.data.conceitos.conceitos.find(c=>c.quem===k),on=cc&&conceptOpen(cc),ini=q.nome.split(" ").map(x=>x[0]).join("").slice(0,2);
   return `<article class="quem"><div class="quem-plate" aria-hidden="true"><b class="display">${esc(ini)}</b><span class="mono">${esc(q.anos)}</span></div>
-    <div class="quem-tx"><b class="h4">${esc(q.nome)}</b><span class="eyebrow">${esc(q.papel)}</span><p>${esc(q.frase)}</p><p class="quem-rel"><b>E você?</b> ${esc(q.relacao)}</p>
+    <div class="quem-tx"><b class="h4">${esc(q.nome)}</b><span class="eyebrow">${esc(q.papel)}</span><p>${esc(q.frase)}</p><p class="quem-rel"><b>E você?</b> ${esc(q.relacao)}</p>${fonteLn(FQ[k],"resumo escrito pelo projeto")}
     ${cc?`<a class="btn sm" href="#/lab/${cc.exp[0]}">${on?"Experimentar de novo":"Experimentar"}${icon("next")}</a>`:""}</div></article>`;
 }
 
@@ -68,7 +72,7 @@ CH.views.concept=function(root,id){
   <section class="cblock"><span class="eyebrow">Veja</span>${veja(ex[0].pool,true)}</section>
   <section class="cblock"><span class="eyebrow">Entenda</span><p class="c-ent">${esc(c.entenda)}</p>
     ${c.criterios?`<ol class="crit">${c.criterios.map((k,i)=>`<li><span class="mono">${i+1}</span>${esc(k)}</li>`).join("")}</ol><p class="muted crit-n">Uma ordem de perguntas para decidir o corte. Não é uma regra para obedecer.</p>`:""}</section>
-  <section class="cblock"><span class="eyebrow">Experimente</span><div class="wrap">${ex.map(a=>`<a class="btn ink" href="#/lab/${a.id}">${esc(a.t)}${icon("next")}</a>`).join("")}</div></section>
+  ${fonteLn(c.quem?FQ[c.quem]:[],"texto do projeto, escrito para o laboratório")}<section class="cblock"><span class="eyebrow">Experimente</span><div class="wrap">${ex.map(a=>`<a class="btn ink" href="#/lab/${a.id}">${esc(a.t)}${icon("next")}</a>`).join("")}</div></section>
     ${CH.museuLink(CH.museuPorConceito(c.id))?`<section class="cblock">${CH.museuLink(CH.museuPorConceito(c.id))}</section>`:""}
   ${q?`<section class="cblock"><span class="eyebrow">Quem foi?</span>${quemCard(c.quem,q)}</section>`:""}
 </div>`;
@@ -88,6 +92,7 @@ CH.views.edicao=function(root){
   <div class="fund">${F.map((f,i)=>`<section class="fund-i" aria-labelledby="f-${f.id}"><span class="fund-n mono">0${i+1}</span>
     <div class="fund-tx"><h2 class="h3" id="f-${f.id}">${esc(f.t)}</h2><p class="fund-ideia display">${esc(f.ideia)}</p><p class="c-ent">${esc(f.entenda)}</p></div>${veja(f.veja,true)}</section>`).join("")}</div>
   <div class="wrap fund-cta"><a class="btn ink lg" href="#/lab/${first}">Experimentar agora${icon("next")}</a><a class="btn ghost lg" href="#/descobertas">Ver descobertas</a></div>
+  ${fonteLn([],"texto do projeto, escrito para o laboratório")}
 </div>`;
   CH.scroll.init(root);
   return{title:"O que é edição?",destroy(){CH.scroll.teardown()}};
