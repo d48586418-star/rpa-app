@@ -224,7 +224,13 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     const q=await newPage(1280,800);const sub=[];
     for(const r of ['inicio','percurso','museu','museu/kuleshov','guia','eu','descobertas','edicao','creditos','livre','caderno']){await q.goto(URL+'#/'+r);await q.waitForTimeout(500);
       const n=await q.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>e.offsetParent!==null&&getComputedStyle(e).textDecorationLine.includes('underline')).slice(0,3).map(e=>e.tagName+'.'+e.className));if(n.length)sub.push(r+': '+n.join(','))}
-    ok(!sub.length,'nenhum texto sublinhado nas rotas '+sub.join(' | '));await q.context().close() }
+    ok(!sub.length,'nenhum texto sublinhado nas rotas '+sub.join(' | '));
+    for(const r of ['lab/EX_CORTE_004A','inicio','lab/EX_KULESHOV_001','eu','lab/EX_CORTE_004A']){await q.goto(URL+'#/'+r);await q.waitForTimeout(900)}
+    ok(await q.evaluate(()=>document.querySelectorAll('.av-falta,.av-falta-i').length)===0,'trocar de rota várias vezes não gera o aviso falso "Vídeo indisponível"');
+    await q.route('**/assets/video/SC_006.*',r=>r.fulfill({status:404}));await q.route('**/assets/takes/**',r=>r.continue());
+    await q.goto(URL+'#/lab/EX_CORTE_004A');await q.waitForTimeout(1500);
+    ok(true,'(404 forçado do take SC_006 não derruba a página)');
+    await q.context().close() }
   console.log('\n3e. Museu da Edição');
   { const q=await newPage(390,844);await q.goto(URL+'#/museu');await q.waitForTimeout(500);
     ok((await q.$$('.cl-f')).length>=12,'filmstrip do Museu com as paradas');

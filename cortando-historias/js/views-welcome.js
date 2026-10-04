@@ -54,7 +54,7 @@ CH.views.welcome=function(root,mode){
           <ul class="chips">${p.valoriza.slice(0,4).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
           <details class="pd-more"><summary>Como esse perfil pensa</summary><ul>${p.pensa.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p>${esc(p.papel)}</p></details>
           <p class="pd-ia">Personagem gerado por inteligência artificial</p>
-          <button class="gb pf-go" type="button" data-confirm="${p.id}">Escolher${icon("next")}</button>
+          <button class="gb pf-go" type="button" data-confirm="${p.id}">Escolher</button>
         </div></article>`}).join("")}</div>
       <div class="pk-ctl" id="pk-ctl" role="group" aria-label="Perfis de editor" style="--n:${P.length};--pos:0">
         <span class="pk-track pk-gl" aria-hidden="true"></span><span class="pk-cap pk-gl" aria-hidden="true"></span>
@@ -136,6 +136,8 @@ CH.views.welcome=function(root,mode){
   wel.addEventListener("keydown",e=>{if(step!==3||(e.target.closest&&e.target.closest("input,textarea,summary,.pk-ctl")))return;if(e.key==="ArrowRight"){e.preventDefault();ir(cur+1,true)}else if(e.key==="ArrowLeft"){e.preventDefault();ir(cur-1,true)}});
   window.addEventListener("resize",()=>{if(step===3&&cur>=0)track.scrollLeft=cur*track.clientWidth});
   /* ---------- controlador de vidro: a cápsula acompanha o dedo; as bolinhas enchem; "Escolher" recolhe o trilho em cápsula ---------- */
+  const ws3=pk.parentElement,hex2=h=>{h=String(h||"#000").replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(k=>parseInt(h.slice(k,k+2),16))};
+  const cores=P.map(p=>hex2(FULLBG[p.id]||p.bg||p.cor)),FG=P.map(p=>p.bgfg||p.fg);
   const ctl=$("#pk-ctl",wel),dots=$$(".pk-dot",wel),dotsEl=$("#pk-dots",wel),sel=$("#pk-sel",wel),btnGo=()=>$$(".pf-go",wel);
   let lock=false,token=0,rafM=0;const timers=new Set();
   const after=(ms,fn)=>{const id=setTimeout(()=>{timers.delete(id);fn()},CH.motionOff()?1:ms);timers.add(id)};
@@ -144,9 +146,12 @@ CH.views.welcome=function(root,mode){
   function marca(){
     const w=track.clientWidth||1,x=cl(track.scrollLeft/w,0,P.length-1);
     ctl.style.setProperty("--pos",x.toFixed(3));
+    /* difusão: o fundo é um só e mistura a cor do perfil que sai com a do que entra, conforme o dedo */
+    const i=Math.min(P.length-2,Math.floor(x)),t=x-i,A=cores[i],B=cores[i+1]||cores[i];
+    if(A&&B){const m=A.map((u,k)=>Math.round(u+(B[k]-u)*t));ws3.style.setProperty("--cb",`rgb(${m[0]} ${m[1]} ${m[2]})`);ws3.style.setProperty("--cf",(t<.5?FG[i]:FG[i+1])||FG[i])}
     dots.forEach((d,k)=>d.style.setProperty("--f",Math.max(0,1-Math.abs(x-k)).toFixed(3)));
     if(CH.motionOff())return;
-    slides.forEach((sl,k)=>{const d=cl(x-k,-1,1);sl.style.setProperty("--d",d.toFixed(3));sl.style.setProperty("--a",Math.abs(d).toFixed(3))});
+    slides.forEach((sl,k)=>{const d=cl(x-k,-1,1);sl.style.setProperty("--d",d.toFixed(3));sl.style.setProperty("--a",Math.abs(d).toFixed(3));sl.classList.toggle("off",Math.abs(d)>=.97)});
   }
   track.addEventListener("scroll",()=>{if(rafM)return;rafM=requestAnimationFrame(()=>{rafM=0;marca()})},{passive:true});
   dots.forEach((d,k)=>d.addEventListener("click",()=>{if(!lock)ir(k,true)}));

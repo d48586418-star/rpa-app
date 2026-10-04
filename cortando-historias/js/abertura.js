@@ -113,14 +113,19 @@ function preparaLab(){
 }
 function entrar(){
   if(pillState.done)return;pillState.done=true;setPill(pillState.travel);
-  var r=knob.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,S=Math.max(W,H)*2.4/Math.max(1,r.width);
+  var r=knob.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,d=Math.max(1,r.width);
   var viaFrame=!!(labFrame&&labPronto);
-  base.style.transformOrigin=cx+"px "+cy+"px";base.classList.add("zoom");stage.classList.add("go");
-  if(viaFrame)stage.classList.add("go-frame");
-  requestAnimationFrame(function(){if(viaFrame)labFrame.classList.add("on");if(!reduzido)base.style.transform="scale("+S.toFixed(1)+")"});
-  var ms=reduzido?280:suave?(viaFrame?700:420):(viaFrame?950:600);
-  setTimeout(function(){try{sessionStorage.setItem("ch:cap",viaFrame?"2":"1");sessionStorage.setItem("ch:go3","1")}catch(e){}location.replace(LAB)},ms);
+  stage.classList.add("go");if(viaFrame)stage.classList.add("go-frame");
+  if(reduzido){requestAnimationFrame(function(){if(viaFrame)labFrame.classList.add("on")});setTimeout(function(){irLab(viaFrame)},280);return}
+  /* câmera entrando na bolinha: um círculo branco cresce a partir dela (GPU, só transform) enquanto o resto da cena dá um empurrão de câmera */
+  var portal=D.createElement("i");portal.className="portal";portal.style.cssText="left:"+(cx-d/2)+"px;top:"+(cy-d/2)+"px;width:"+d+"px;height:"+d+"px";stage.appendChild(portal);
+  var S=Math.hypot(W,H)*2/d;base.style.transformOrigin=cx+"px "+cy+"px";base.classList.add("zoom");
+  void portal.offsetWidth;
+  requestAnimationFrame(function(){portal.style.transform="scale("+S.toFixed(1)+")";base.style.transform="scale(2.6)"});
+  setTimeout(function(){if(viaFrame)labFrame.classList.add("on");portal.classList.add("fade")},420);
+  setTimeout(function(){irLab(viaFrame)},viaFrame?1150:900);
 }
+function irLab(viaFrame){try{sessionStorage.setItem("ch:cap",viaFrame?"2":"1");sessionStorage.setItem("ch:go3","1")}catch(e){}location.replace(LAB)}
 var px0=0;
 pill.addEventListener("pointerdown",function(e){if(pillState.done||!pill.classList.contains("show"))return;pillState.drag=true;px0=e.clientX-pillState.d;try{pill.setPointerCapture(e.pointerId)}catch(x){}knob.style.transition="none"});
 pill.addEventListener("pointermove",function(e){if(pillState.drag)setPill(e.clientX-px0)});

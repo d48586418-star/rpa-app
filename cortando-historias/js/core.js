@@ -173,16 +173,21 @@ CH.fx={blip(){try{if(!CH.store.prefs().fx)return;const A=window.AudioContext||wi
 /* O nome da persona é o nome do aluno; o tipo (Som, Ritmo...) vem da ficha */
 CH.personaNome=()=>CH.store.name()||"Editor";
 
-/* arquivo de take ausente (404): em vez de tela preta e ícone de imagem quebrada, quadro neutro com "Vídeo indisponível" (só apresentação) */
+/* arquivo de take ausente (404): em vez de tela preta e ícone de imagem quebrada, quadro neutro com "Vídeo indisponível" (só apresentação).
+   Só sinaliza depois de confirmar com HEAD que o arquivo realmente falta; "limpar" um <video> (removeAttribute("src")) também dispara error e NÃO conta. */
 (function(){
   var FALTA="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90"><rect width="160" height="90" fill="#26282b"/><g fill="none" stroke="#8b8f94" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="62" y="31" width="36" height="28" rx="4"/><path d="M98 41l10-6v20l-10-6"/></g></svg>');
-  var marca=function(el){var m=el.closest&&el.closest(".monitor,.veja-m,.pv-mon,.mh-media,.go-media,.pf-stage");if(m)m.classList.add("av-falta")};
+  var cache={},marca=function(el,on){var m=el.closest&&el.closest(".monitor,.veja-m,.pv-mon,.mh-media,.go-media,.pf-stage");if(m)m.classList.toggle("av-falta",on)};
+  var falta=function(url){if(!url)return Promise.resolve(false);if(cache[url]===undefined)cache[url]=fetch(url,{method:"HEAD",cache:"no-store"}).then(function(r){return !r.ok},function(){return false});return cache[url]};
   document.addEventListener("error",function(e){
     var t=e.target;if(!t||!t.tagName)return;
-    if(t.tagName==="IMG"&&!t.dataset.fb&&/\/(takes|img|video)\//.test(t.getAttribute("src")||"")){t.dataset.fb="1";t.src=FALTA;t.classList.add("av-falta-i");return}
+    if(t.tagName==="IMG"){var s=t.getAttribute("src")||"";if(t.dataset.fb||!/\/(takes|img|video)\//.test(s))return;falta(s).then(function(f){if(f&&t.naturalWidth===0){t.dataset.fb="1";t.src=FALTA;t.classList.add("av-falta-i")}});return}
     if(t.tagName==="SOURCE"||t.tagName==="VIDEO"){
-      var v=t.tagName==="VIDEO"?t:t.parentNode;if(!v||v.tagName!=="VIDEO"||v.dataset.fb)return;
+      var v=t.tagName==="VIDEO"?t:t.parentNode;if(!v||v.tagName!=="VIDEO"||v.dataset.fb||!v.isConnected)return;
       if(t.tagName==="SOURCE"&&t.nextElementSibling)return;   /* ainda há outra fonte (mp4) para tentar */
-      v.dataset.fb="1";v.poster=FALTA;marca(v)}
+      var u=v.currentSrc||v.getAttribute("src")||(t.tagName==="SOURCE"&&t.getAttribute("src"))||"";if(!u)return;
+      falta(u).then(function(f){if(f&&v.isConnected&&v.readyState<2){v.dataset.fb="1";v.poster=FALTA;marca(v,true)}})}
   },true);
+  /* se o vídeo chegou a tocar, o aviso sai */
+  ["loadeddata","playing"].forEach(function(n){document.addEventListener(n,function(e){var v=e.target;if(v&&v.tagName==="VIDEO"&&v.dataset.fb){delete v.dataset.fb;marca(v,false)}},true)});
 })();
