@@ -129,12 +129,12 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     await q.waitForTimeout(500);await q.fill('#w-nm','Marina');await q.click('#w-name button[type=submit]');await q.waitForTimeout(500);
     await q.evaluate(()=>{const w=document.getElementById('pk2-track');w.scrollLeft=w.clientWidth*3});await q.waitForTimeout(1000);
     ok(await q.evaluate(()=>/Som/.test(document.querySelector('.pf.on .pd-name').textContent)),'deslizar troca o perfil no celular');
-    ok(await q.evaluate(()=>getComputedStyle(document.querySelector('.pf.on .pf-go')).visibility==='hidden'),'"Esse sou eu" só aparece depois de escolher na barra');
-    await q.click('.pk-b[data-id="som"]');await q.waitForTimeout(1500);
-    ok(await q.evaluate(()=>document.getElementById('pick').dataset.state==='selected'&&/Reset/.test(document.querySelector('.pk-b.is-reset').textContent)&&document.getElementById('pk-ctl').classList.contains('collapsed')),'clicar no nome recolhe a barra e vira Reset');
-    await q.click('.pk-b.is-reset');await q.waitForTimeout(1500);
-    ok(await q.evaluate(()=>document.getElementById('pick').dataset.state==='base'&&!document.getElementById('pk-ctl').classList.contains('collapsed')&&document.querySelectorAll('.pk-b:not([disabled])').length===5),'Reset reabre a barra com os 5 perfis ativos');
-    await q.click('.pk-b[data-id="som"]');await q.waitForTimeout(1500);await q.click('.pf.on [data-confirm]');await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
+    ok(await q.evaluate(()=>document.querySelectorAll('.pk-dot').length===5&&document.querySelectorAll('.pk-ctl,.pk-b').length===0&&+document.querySelectorAll('.pk-dot')[3].style.getPropertyValue('--f')>.9),'bolinhas (uma por perfil) marcam o perfil atual; sem barra de nomes nem Reset');
+    ok(await q.evaluate(()=>/^Escolher/.test(document.querySelector('.pf.on .pf-go').textContent.trim())&&getComputedStyle(document.querySelector('.pf.on .pf-go')).visibility==='visible'),'botão "Escolher" visível na página ativa');
+    await q.click('.pk-dot:nth-child(2)');await q.waitForTimeout(900);
+    ok(await q.evaluate(()=>/Ritmo|Histórias|Olhar|Experimental|Som/.test(document.querySelector('.pf.on .pd-name').textContent)&&document.querySelector('.pf.on').dataset.id!=='som'),'clicar numa bolinha vai ao perfil');
+    await q.evaluate(()=>{const w=document.getElementById('pk2-track');w.scrollLeft=w.clientWidth*3});await q.waitForTimeout(900);
+    await q.click('.pf.on [data-confirm]');await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
     ok(/#\/lab\//.test(q.url()),'onboarding termina dentro da primeira atividade');
     ok(await q.evaluate(()=>CH.store.state.profile.onboarded===true&&!!CH.store.state.profile.persona),'onboarding completo grava nome e persona');
     ok(!q.errs.length,'sem erros '+q.errs);await q.context().close(); }
@@ -215,6 +215,14 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,reducedMotion:'reduce'});await c.addInitScript(()=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'M',persona:'som',onboarded:true},seen:{tour:1}}))});const q=await c.newPage();await q.goto(URL+'#/eu');await q.waitForTimeout(1000);
     ok(await q.evaluate(()=>document.querySelector('.mh-v').paused),'movimento reduzido: o vídeo do perfil não toca sozinho');await c.close() }
 
+  console.log('\n3d7. Todo take tem arquivo (tela preta / imagem quebrada nunca) e nenhum texto sublinhado');
+  { const D=(new Function('window',fs.readFileSync(path.join(ROOT,'data/data.js'),'utf8')+';return window.CH_DATA'))({});
+    const falta=[];D.takes.forEach(t=>{[t.th,t.vid,(t.vid||'').replace(/\.webm$/,'.mp4')].filter(Boolean).forEach(f=>{if(!fs.existsSync(path.join(ROOT,f)))falta.push(f)})});
+    ok(!falta.length,D.takes.length+' takes: jpg, webm e mp4 existem'+(falta.length?' (faltam '+falta.slice(0,6).join(', ')+')':''));
+    const q=await newPage(1280,800);const sub=[];
+    for(const r of ['inicio','percurso','museu','museu/kuleshov','guia','eu','descobertas','edicao','creditos','livre','caderno']){await q.goto(URL+'#/'+r);await q.waitForTimeout(500);
+      const n=await q.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>e.offsetParent!==null&&getComputedStyle(e).textDecorationLine.includes('underline')).slice(0,3).map(e=>e.tagName+'.'+e.className));if(n.length)sub.push(r+': '+n.join(','))}
+    ok(!sub.length,'nenhum texto sublinhado nas rotas '+sub.join(' | '));await q.context().close() }
   console.log('\n3e. Museu da Edição');
   { const q=await newPage(390,844);await q.goto(URL+'#/museu');await q.waitForTimeout(500);
     ok((await q.$$('.cl-f')).length>=12,'filmstrip do Museu com as paradas');

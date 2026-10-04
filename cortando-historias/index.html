@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#960000">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/abertura.css">
+<link rel="preload" as="image" href="assets/personas/full/historias.jpg">
 </head>
 <body>
 <main class="stage" id="stage">
@@ -15,11 +16,12 @@
   <!-- cena 3, por baixo das folhas: só aparece pelo corte -->
   <section class="base" id="base">
     <p class="sub" id="sub">O simulador de timeline</p>
-    <div class="ttl" id="ttl" aria-hidden="true"><span class="ln ln1" id="ln1"></span><span class="ln ln2" id="ln2"></span><i class="cutline" id="cutline"></i></div>
+    <div class="ttl" id="ttl" aria-hidden="true"><span class="ln ln1" id="ln1"></span><span class="ln ln2" id="ln2"></span></div>
     <div class="pill" id="pill" role="slider" tabindex="-1" aria-label="Arraste para iniciar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <span class="pill-t">Arraste para iniciar</span><i class="knob" id="knob"></i>
     </div>
   </section>
+  <div class="peek" id="peek" aria-hidden="true"></div>
   <!-- cena 1 e 2: o papel vermelho em duas folhas (cima/baixo), cada uma com a parte ainda inteira e a parte já aberta -->
   <div class="sheets" id="sheets" aria-hidden="true">
     <div class="sh p-tw"></div><div class="sh p-to"></div><div class="sh p-bw"></div><div class="sh p-bo"></div>

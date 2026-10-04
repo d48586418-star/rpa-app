@@ -552,3 +552,8 @@ html[data-motion="off"] .caraca-t,html[data-motion="off"] .caraca-s{animation:no
   .tools{grid-column:1 / -1}
 }
 @media (min-width:1700px){.lab{grid-template-columns:minmax(0,1.9fr) minmax(400px,1fr)}}
+
+/* take indisponível: quadro neutro com aviso, nunca tela preta com ícone quebrado */
+.av-falta{position:relative}
+.av-falta::after{content:"Vídeo indisponível";position:absolute;left:0;right:0;bottom:10px;text-align:center;font:500 .78rem/1 var(--sans);color:#c9ccd0;pointer-events:none}
+.av-falta-i{object-fit:cover;background:#26282b}

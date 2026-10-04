@@ -69,3 +69,5 @@ Contra o "aspecto de IA" (pesquisa em outubro de 2026): âncora em referência n
 **Navegação.** Tabbar e topnav usam os tokens `--nav-*` (vidro neutro bem transparente, blur 18px, borda branca a 55%; no escuro, vidro cinza a 40%), texto em tinta; o fundo aparece por trás. Raios 999 em controles.
 **Fora do padrão por decisão:** rótulos (`.tag`, `.act-nx`) seguem com tinta cheia por serem etiquetas e não botões; o aviso offline e o "pular para o conteúdo" também.
 **Fontes.** Todo conteúdo pesquisado mostra a fonte (nome do site + link) em fonte pequena; sem origem verificada, "texto do projeto".
+
+**Ajustes pós-entrega.** Escolha de perfil sem barra de nomes: um perfil por vez, bolinhas que seguem o dedo e botão "Escolher". Sem texto sublinhado em nenhuma rota (peso 600 + seta ↗ nos links externos). Abertura: título peso 800 sem linha de corte; a próxima tela aparece desfocada durante o zoom e ganha foco na chegada.

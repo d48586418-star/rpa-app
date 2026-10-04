@@ -54,7 +54,6 @@ const ROTAS=['#/inicio','#/percurso','#/descobertas','#/edicao','#/guia','#/muse
     await p.fill('#w-nm','Marina');await p.click('#w-name button[type=submit]');await p.waitForTimeout(700);
     await p.evaluate(id=>{const i=CH.PERSONAS?Object.keys(CH.PERSONAS).indexOf(id):0;const sw=document.getElementById('pk2-track');sw.scrollLeft=sw.clientWidth*i},pe);await p.waitForTimeout(700);
     await rep(`${tema} ${pe} boas-vindas (escolha)`);
-    await p.click(`.pk-b[data-id="${pe}"]`);await p.waitForTimeout(1200);await rep(`${tema} ${pe} boas-vindas (selecionado)`);
     await p.click('.pf.on [data-confirm]');await p.waitForTimeout(700);await rep(`${tema} ${pe} boas-vindas (final)`);
     await p.goto(URL+'#/eu');await p.waitForTimeout(800);await rep(`${tema} ${pe} Meu espaço (palco)`);
     rel.forEach(x=>console.log(x));await c.close();

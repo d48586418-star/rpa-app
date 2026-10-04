@@ -18,7 +18,7 @@ takes.forEach(t=>{if(t.vid&&!fs.existsSync(R(t.vid.replace(/\.webm$/,'.mp4'))))f
 const NV=J('novas.json'),NT=J('novos-takes.json'),NID=NV.atividades.map(a=>a.id);
 NT.takes.forEach(t=>{['th','vid'].forEach(k=>{if(!fs.existsSync(R(t[k])))fail('asset novo ausente '+t[k])});if(!fs.existsSync(R(t.vid.replace(/\.webm$/,'.mp4'))))fail('mp4 novo ausente '+t.id)});
 NT.audios.forEach(a=>['ogg','m4a'].forEach(k=>{if(!fs.existsSync(R(a[k])))fail('áudio ausente '+a[k])}));
-NV.atividades.forEach(a=>a.pool.forEach(i=>{if(!NT.takes.some(t=>t.id===i))fail(a.id+': take fora do pacote '+i)}));
+NV.atividades.forEach(a=>a.pool.forEach(i=>{if(!NT.takes.some(t=>t.id===i)&&!TK[i])fail(a.id+': take fora do pacote '+i)}));
 const DD=J('didatica.json').atividades,CO=J('conceitos.json'),CA=J('cartilha.json');
 ACT.concat(NV.atividades).forEach(a=>{const d=DD[a.id];if(!d)return fail('didática ausente '+a.id);['faca','observe','apos','continue'].forEach(k=>{if(!d[k])fail(a.id+': didática sem '+k)});if(a.id!=='EX_LAB_LIVRE'&&(!d.mudou||!d.descoberta))fail(a.id+': didática sem mudou/descoberta')});
 const aliases=CO.conceitos.flatMap(c=>c.aliases.map(x=>x.toLowerCase()));

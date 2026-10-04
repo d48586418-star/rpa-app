@@ -46,20 +46,17 @@ CH.views.welcome=function(root,mode){
         const src="assets/personas/full/"+p.id,w=p.nome.split(" "),l=w.pop();
         return `<article class="pf ${(p.bgfg||p.fg)==="#ffffff"||(p.bgfg||p.fg)==="#fff"?"pf-lt":"pf-dk"}" data-id="${p.id}" aria-roledescription="perfil" aria-label="${esc(p.nome)}, ${k+1} de ${P.length}" style="--pc:${FULLBG[p.id]||p.bg||p.cor};--pf:${p.bgfg||p.fg}">
         <div class="pf-stage" aria-hidden="true"><video class="pf-v" muted playsinline preload="none" poster="${src}.jpg">${CH.videoSources(src)}</video><video class="pf-v pf-v2" muted playsinline preload="none">${CH.videoSources(src)}</video></div>
+        <h2 class="pf-kick"${k===0?' id="w3-t" tabindex="-1"':''}>Escolha o seu perfil de editor</h2>
         <div class="pf-tx">
-          <h2 class="pf-kick"${k===0?' id="w3-t" tabindex="-1"':''}>Escolha o seu perfil de editor</h2>
           <h3 class="pd-name">${esc(w.join(" "))} <b>${esc(l)}</b></h3>
           <p class="pf-q">“${esc(p.pergunta)}”</p>
           <p class="pd-rep">${esc(p.representa)}</p>
           <ul class="chips">${p.valoriza.slice(0,4).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
           <details class="pd-more"><summary>Como esse perfil pensa</summary><ul>${p.pensa.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p>${esc(p.papel)}</p></details>
           <p class="pd-ia">Personagem gerado por inteligência artificial</p>
-          <button class="gb pf-go" type="button" data-confirm="${p.id}">Esse sou eu${icon("next")}</button>
+          <button class="gb pf-go" type="button" data-confirm="${p.id}">Escolher${icon("next")}</button>
         </div></article>`}).join("")}</div>
-      <div class="pk-ctl" id="pk-ctl" role="group" aria-label="Escolha de perfil de editor" style="--n:${P.length+1}">
-        <span class="pk-track pk-gl" aria-hidden="true"></span><span class="pk-cap pk-gl" aria-hidden="true"></span>
-        <div class="pk-cells" id="pk-cells"><div class="pk-cell pk-label">Escolha →</div>${P.map(p=>`<button type="button" class="pk-cell pk-b" data-id="${p.id}"><span class="pk-t">${esc(p.curto)}</span></button>`).join("")}</div>
-      </div>
+      <div class="pk-dots" id="pk-dots" role="group" aria-label="Perfis de editor">${P.map((p,k)=>`<button type="button" class="pk-dot" style="--f:${k?0:1}" aria-label="Perfil ${k+1} de ${P.length}: ${esc(p.curto)}"></button>`).join("")}</div>
     </div>
   </section>
 
@@ -103,7 +100,7 @@ CH.views.welcome=function(root,mode){
       v.innerHTML=CH.videoSources(p.video.replace(/\.webm$/,""));v.load()})}
   /* escolha do perfil: um palco de 100vw por personagem (corpo inteiro, vídeo animado) + barra de vidro "Escolha →" que recolhe em "Reset" */
   const person=()=>CH.PERSONAS[pick];
-  const pk=$("#pick",wel),track=$("#pk2-track",wel),slides=$$(".pf",track),ctl=$("#pk-ctl",wel),cells=$("#pk-cells",wel);
+  const pk=$("#pick",wel),track=$("#pk2-track",wel),slides=$$(".pf",track);
   let cur=-1,rafP=0,drag=null;
   const idxOf=()=>Math.max(0,Math.min(P.length-1,Math.round(track.scrollLeft/(track.clientWidth||1))));
   /* o laço de 10 s não tem emenda perfeita: dois vídeos se alternam com fusão de 0,8 s perto do fim */
@@ -128,73 +125,26 @@ CH.views.welcome=function(root,mode){
   function ir(i,suave){i=Math.max(0,Math.min(P.length-1,i));track.scrollTo({left:i*track.clientWidth,behavior:suave&&!CH.reduced()?"smooth":"auto"})}
   track.addEventListener("scroll",()=>{if(rafP)return;rafP=requestAnimationFrame(()=>{rafP=0;ativa(idxOf(),true)})},{passive:true});
   /* mouse: arrastar o palco (o toque já desliza nativamente); travado enquanto há perfil escolhido */
-  track.addEventListener("pointerdown",e=>{if(scene!=="base"||e.pointerType!=="mouse"||e.button!==0||(e.target.closest&&e.target.closest("button,a,summary,details,input")))return;drag={x:e.clientX,s:track.scrollLeft,m:false};try{track.setPointerCapture(e.pointerId)}catch(x){}});
+  track.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||(e.target.closest&&e.target.closest("button,a,summary,details,input")))return;drag={x:e.clientX,s:track.scrollLeft,m:false};try{track.setPointerCapture(e.pointerId)}catch(x){}});
   track.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x;if(!drag.m&&Math.abs(dx)>5){drag.m=true;track.classList.add("grab")}if(drag.m)track.scrollLeft=drag.s-dx});
   const solta=e=>{if(!drag)return;const d=drag,dx=e.clientX-d.x;drag=null;if(!d.m)return;track.classList.remove("grab");const w=track.clientWidth;let i=Math.round(track.scrollLeft/w);if(Math.abs(dx)>w*.12)i=Math.round(d.s/w)+(dx<0?1:-1);ir(i,true)};
   track.addEventListener("pointerup",solta);track.addEventListener("pointercancel",solta);
-  wel.addEventListener("keydown",e=>{if(step!==3||scene!=="base"||(e.target.closest&&e.target.closest("input,textarea,summary,.pk-ctl")))return;if(e.key==="ArrowRight"){e.preventDefault();ir(cur+1,true)}else if(e.key==="ArrowLeft"){e.preventDefault();ir(cur-1,true)}});
+  wel.addEventListener("keydown",e=>{if(step!==3||(e.target.closest&&e.target.closest("input,textarea,summary,.pk-dots")))return;if(e.key==="ArrowRight"){e.preventDefault();ir(cur+1,true)}else if(e.key==="ArrowLeft"){e.preventDefault();ir(cur-1,true)}});
   window.addEventListener("resize",()=>{if(step===3&&cur>=0)track.scrollLeft=cur*track.clientWidth});
-  /* ---------- barra de vidro: base → selecionado → base (um perfil por vez; Reset antes de trocar) ---------- */
-  let scene="base",lock=false,token=0,lastBtn=null;const timers=new Set();
-  const after=(ms,fn)=>{const id=setTimeout(()=>{timers.delete(id);fn()},CH.reduced()?1:ms);timers.add(id)};
-  const btns=()=>$$(".pk-b",cells),N=P.length+1;
-  function setIndex(i){
-    ctl.style.setProperty("--cap-left",i===0?"-5px":`calc(100% * ${i} / var(--n))`);
-    ctl.style.setProperty("--cap-width",i===0||i===N-1?"calc(100% / var(--n) + 5px)":"calc(100% / var(--n))");
-    ctl.classList.toggle("hl",i>0);
-  }
-  const idle=()=>scene==="base"&&!lock;
-  cells.addEventListener("pointerover",e=>{const b=e.target.closest(".pk-b");if(!b||b.disabled||!idle())return;setIndex(btns().indexOf(b)+1)});
-  ctl.addEventListener("pointerleave",()=>{const a=document.activeElement;if(a&&cells.contains(a)&&a.matches(":focus-visible"))return;if(idle())setIndex(0)});
-  ctl.addEventListener("pointermove",e=>{const r=ctl.getBoundingClientRect();if(!r.width)return;ctl.style.setProperty("--glass-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");ctl.style.setProperty("--glass-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")});
-  cells.addEventListener("focusin",e=>{const b=e.target.closest(".pk-b");if(b&&idle())setIndex(btns().indexOf(b)+1)});
-  cells.addEventListener("focusout",e=>{if(idle()&&!cells.contains(e.relatedTarget)&&!ctl.matches(":hover"))setIndex(0)});
-  cells.addEventListener("keydown",e=>{const bs=btns().filter(b=>!b.disabled),i=bs.indexOf(document.activeElement);if(i<0)return;const d=e.key==="ArrowRight"||e.key==="ArrowDown"?1:e.key==="ArrowLeft"||e.key==="ArrowUp"?-1:0;if(d&&bs.length>1){e.preventDefault();bs[(i+d+bs.length)%bs.length].focus()}});
-  const short=()=>matchMedia("(max-height:520px) and (orientation:landscape)").matches,narrow=()=>matchMedia("(max-width:700px)").matches&&!short();
-  function travel(b){const c=ctl.getBoundingClientRect(),r=b.getBoundingClientRect();b.style.setProperty("--tx",(c.left+c.width/2-(r.left+r.width/2)).toFixed(1)+"px");let ty;if(narrow()){const row=btns().indexOf(b)>=3?1:0;ty=(c.bottom-32)-(c.bottom-64+4+14+28*row)}else ty=c.bottom-(short()?28:36)-(r.top+r.height/2);b.style.setProperty("--ty",ty.toFixed(1)+"px")}
-  function label(b,txt,aria){b.querySelector(".pk-t").textContent=txt;if(aria)b.setAttribute("aria-label",aria);else b.removeAttribute("aria-label")}
-  function choose(btn){
-    if(lock||scene!=="base"||!btn||btn.disabled)return;
-    lock=true;const my=++token,id=btn.dataset.id,p=CH.PERSONAS[id],i=btns().indexOf(btn);
-    const had=document.activeElement===btn;   /* capturar o foco ANTES de desabilitar */
-    lastBtn=btn;btns().forEach(b=>{b.disabled=true});
-    ir(i,false);ativa(i,false);   /* troca atômica de personagem: sem fusão entre as duas cenas */
-    travel(btn);btn.classList.add("is-pick");ctl.classList.add("collapsed","rear-fade");   /* recolhe e agenda o fade do trilho na mesma recalc */
-    CH.say("Perfil "+p.curto+" selecionado.");
-    after(980,()=>{
-      if(my!==token)return;
-      scene="selected";pick=id;pk.dataset.state="selected";
-      label(btn,"Reset","Reset: voltar à escolha de perfis");btn.classList.add("is-reset");btn.disabled=false;
-      btns().forEach(b=>{if(b!==btn){b.disabled=true;b.setAttribute("aria-hidden","true");b.tabIndex=-1}});
-      if(had)btn.focus({preventScroll:true});
-      lock=false;CH.say("Use Esse sou eu para confirmar ou Reset para escolher outro.");
-    });
-  }
-  function reset(){
-    if(lock||scene!=="selected")return;
-    lock=true;const my=++token,btn=lastBtn,had=document.activeElement===btn,name=CH.PERSONAS[pick]?CH.PERSONAS[pick].curto:"";
-    btn.disabled=true;btn.classList.add("rst-out");pk.dataset.state="base";
-    ctl.classList.add("reversing");ctl.classList.remove("collapsed","rear-fade");setIndex(0);
-    btns().forEach(b=>{if(b!==btn)b.removeAttribute("aria-hidden")});pick=null;
-    CH.say("Voltando à escolha de perfis.");
-    after(420,()=>{if(my!==token)return;label(btn,name);btn.classList.remove("is-reset","is-pick","rst-out");if(had)btn.focus({preventScroll:true})});
-    after(980,()=>{
-      if(my!==token)return;
-      scene="base";ctl.classList.remove("reversing");btn.style.removeProperty("--tx");btn.style.removeProperty("--ty");
-      btns().forEach(b=>{b.disabled=false;b.removeAttribute("aria-hidden");b.removeAttribute("tabindex")});
-      if(had)btn.focus({preventScroll:true});lock=false;CH.say("Escolha um perfil de editor.");
-    });
-  }
-  cells.addEventListener("click",e=>{const b=e.target.closest(".pk-b");if(!b)return;if(scene==="selected"&&b===lastBtn)reset();else choose(b)});
+  /* ---------- bolinhas: uma por perfil, acompanham o dedo (a bolinha atual esvazia enquanto a próxima enche) ---------- */
+  const dots=$$(".pk-dot",wel),dotsEl=$("#pk-dots",wel);
+  function marca(){const w=track.clientWidth||1,x=track.scrollLeft/w;dots.forEach((d,k)=>d.style.setProperty("--f",Math.max(0,1-Math.abs(x-k)).toFixed(3)))}
+  track.addEventListener("scroll",marca,{passive:true});
+  dots.forEach((d,k)=>d.addEventListener("click",()=>ir(k,true)));
+  dotsEl.addEventListener("keydown",e=>{const k=dots.indexOf(document.activeElement);if(k<0)return;const d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(d){e.preventDefault();const n=Math.max(0,Math.min(P.length-1,k+d));dots[n].focus();ir(n,true)}});
   wel.addEventListener("click",e=>{
     const cf=e.target.closest("[data-confirm]");
-    if(cf&&scene==="selected"){pick=cf.dataset.confirm;CH.store.setPersona(pick);CH.who&&CH.who();if(!CH.store.name()&&!nameAsked){nameAsked=true;show(2)}else show(4)}
+    if(cf){pick=cf.dataset.confirm;CH.store.setPersona(pick);CH.who&&CH.who();if(!CH.store.name()&&!nameAsked){nameAsked=true;show(2)}else show(4)}
   });
   function enterPick(){
     cur=-1;slides.forEach(stopLoop);
-    if(scene!=="base"||lock){token++;timers.forEach(clearTimeout);timers.clear();lock=false;scene="base";pk.dataset.state="base";ctl.classList.remove("collapsed","rear-fade","reversing");btns().forEach(b=>{b.disabled=false;b.removeAttribute("aria-hidden");b.removeAttribute("tabindex");b.classList.remove("is-pick","is-reset","rst-out");const t=b.querySelector(".pk-t"),pp=CH.PERSONAS[b.dataset.id];if(pp)t.textContent=pp.curto});setIndex(0)}
     const i0=Math.max(0,P.findIndex(x=>x.id===pick));
-    requestAnimationFrame(()=>{track.scrollLeft=i0*track.clientWidth;ativa(i0,false)});
+    requestAnimationFrame(()=>{track.scrollLeft=i0*track.clientWidth;ativa(i0,false);marca()});
   }
 
   function renderGo(){
@@ -223,7 +173,7 @@ CH.views.welcome=function(root,mode){
   $("[data-skipname]",wel).onclick=()=>{CH.store.setName("");CH.who&&CH.who();show(person()?4:3)};
   show(step);
   if(troca&&pick){/* na troca, abre já no editor atual */}
-  return{title:"Boas-vindas",destroy(){document.body.classList.remove("immersive");token++;timers.forEach(clearTimeout);timers.clear();stopVideos()}};
+  return{title:"Boas-vindas",destroy(){document.body.classList.remove("immersive");stopVideos()}};
 };
 CH.views.editor=function(root,m){return CH.views.welcome(root,"troca")};
 })();
