@@ -1,60 +1,53 @@
-/* abertura.css — a entrada é um corte de edição. Uma camada de vidro cobre o laboratório; o título está nela.
-   Arrastar a lâmina (Razor) através do título divide a camada; no vão aparece o laboratório de verdade. */
+/* abertura.css — três cenas, nesta ordem: (1) a navalha na borda direita; (2) ela corta a tela da direita para a esquerda e a cunha se abre;
+   (3) o título nasce do corte e a pílula "Arraste para iniciar" leva ao laboratório. Cores e proporções medidas das imagens de referência. */
 @font-face{font-family:"DM Sans";src:url(../fonts/dm-sans-latin-wght-normal.woff2) format("woff2");font-weight:100 1000;font-style:normal;font-display:swap}
-:root{--hero-bg:#a81020;--hero-fg:#fff4ee;--display:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;--sans:var(--display);
-  --ease:cubic-bezier(.22,1,.36,1);--cx:50vw;--dxl:0px;--dxr:0px;--rdy:0px;--dur:0ms}
+:root{--red:#960000;--wedge:#6e0000;--fg:#fff;--display:"Helvetica Neue",Helvetica,"DM Sans",Arial,sans-serif;--ease:cubic-bezier(.22,1,.36,1);
+  --ax:0px;--yc:50vh;--tht:0deg;--thb:0deg;--oy:0px;--ev:0}
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;background:var(--hero-bg);overscroll-behavior:none}
-body{margin:0;background:var(--hero-bg);color:var(--hero-fg);font:400 1rem/1.4 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
+html{-webkit-text-size-adjust:100%;background:var(--red);overscroll-behavior:none}
+body{margin:0;background:var(--red);color:var(--fg);font:300 1rem/1.4 var(--display);-webkit-font-smoothing:antialiased;overflow:hidden;overscroll-behavior:none}
 h1,p{margin:0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:var(--hero-bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-.stage.aim{cursor:none}
-.lab{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fbfbfc;pointer-events:none;opacity:0;transition:opacity .4s linear}
-.stage.lab-on .lab{opacity:1}
-/* camada de vidro, em duas metades pelo x do corte (1px de sobreposição para não aparecer emenda) */
-.pane{position:absolute;inset:0;background:rgb(168 16 32 / .93);-webkit-backdrop-filter:blur(34px) saturate(110%);backdrop-filter:blur(34px) saturate(110%);pointer-events:none;transition:transform var(--dur) var(--ease)}
-.pl{clip-path:inset(0 calc(100% - var(--cx) + 1px) 0 0);transform:translateX(var(--dxl))}
-.pr{clip-path:inset(0 0 0 var(--cx));transform:translateX(var(--dxr))}
-/* letras de vidro: o próprio backdrop-filter recortado pelo desenho do texto (clipPath SVG) */
-.gl{position:absolute;inset:0;background:rgb(255 244 238 / .2);-webkit-backdrop-filter:blur(6px) brightness(1.1) saturate(85%);backdrop-filter:blur(6px) brightness(1.1) saturate(85%);pointer-events:none;transition:transform var(--dur) var(--ease)}
-.gl-a{clip-path:url(#c-a)}
-.gl-l{clip-path:url(#c-l);transform:translateX(var(--dxl))}
-.gl-r{clip-path:url(#c-r);transform:translateX(var(--dxr))}
-/* antes do corte: uma camada só (sem emenda); no corte, trocam-se pelas duas metades no mesmo quadro */
-.pl,.pr,.gl-l,.gl-r,#eg-l,#eg-r{display:none}
-.cut .pl,.cut .pr,.cut .gl-l,.cut .gl-r{display:block}
-.cut #eg-l,.cut #eg-r{display:inline}
-.cut .pa,.cut .gla,.cut .gl-a,.cut #eg-a{display:none}
-.edge{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.edge text{fill:none;stroke:rgb(255 255 255 / .42);stroke-width:1.2;stroke-linejoin:round;font-family:var(--display);font-weight:700}
-.edge line{stroke:rgb(255 255 255 / .55);stroke-width:1;opacity:0;transition:opacity .25s linear .1s}
-.cut .edge line{opacity:1}
-#eg-l{transform:translateX(var(--dxl));transition:transform var(--dur) var(--ease)}
-#eg-r{transform:translateX(var(--dxr));transition:transform var(--dur) var(--ease)}
-/* lâmina: linha de corte e ícone de navalha, só quando a pessoa explora */
-.blade{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .16s linear}
-.blade.on{opacity:1}
-.blade .guide{stroke:rgb(255 244 238 / .5);stroke-width:1}
-.blade .solid{stroke:#fff4ee;stroke-width:1.5}
-.blade .cap{stroke:rgb(255 244 238 / .75);stroke-width:1.5;fill:none}
-.blade .rz{stroke:#fff4ee;stroke-width:1.4;fill:rgb(168 16 32 / .6);stroke-linejoin:round;stroke-linecap:round}
-.cut .blade{opacity:0}
-.band{position:absolute;left:0;width:100%;pointer-events:none;border-radius:6px}
-.band:focus-visible{outline:2px solid #fff4ee;outline-offset:4px}
-.hint{position:absolute;font:400 .8rem/1 var(--sans);letter-spacing:.01em;color:rgb(255 244 238 / .72);transition:opacity .25s linear;pointer-events:none}
-.stage.touched .hint,.cut .hint{opacity:0}
-/* depois do corte: micro-ação de vidro, bem menor que o título */
-.go{position:absolute;display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 16px 0 20px;border-radius:999px;color:var(--hero-fg);text-decoration:none;font:500 .95rem/1 var(--sans);letter-spacing:-.005em;
-  background:rgb(255 255 255 / .12);border:1px solid rgb(255 255 255 / .34);-webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%);
-  box-shadow:inset 1px 1px 0 rgb(255 255 255 / .28);opacity:0;transform:translateY(6px);transition:opacity .35s linear,transform .45s var(--ease),background-color .25s linear}
-.go.show{opacity:1;transform:none}
-.go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ease)}
-.go:hover,.go:focus-visible{background:rgb(255 255 255 / .2)}
-.go:hover svg,.go:focus-visible svg{transform:translateX(3px)}
-.go:active{transform:scale(.98)}
-.go:focus-visible{outline:2px solid #fff4ee;outline-offset:3px}
-.leave .pane,.leave .gl,.leave #eg-l,.leave #eg-r{transition-timing-function:cubic-bezier(.65,0,.35,1)}
-.leave .go{opacity:0;transition-duration:.15s}
-/* Reduzir Movimento: sem deslocamento gradual, só troca de estado */
-@media (prefers-reduced-motion:reduce){:root{--dur:1ms!important}.go,.go svg,.blade,.hint,.lab{transition-duration:.15s}}
+.stage{position:relative;height:100vh;height:100dvh;overflow:hidden;background:var(--red);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+/* cena 3 (base): escura como a cunha, clareia para o vermelho quando o título nasce */
+.base{position:absolute;inset:0;background:var(--wedge);visibility:hidden}
+.base.on{visibility:visible}
+.base.lit{background:var(--red);transition:background-color .8s var(--ease)}
+.sub{position:absolute;left:0;right:0;top:11.4%;transform:translateY(-50%);text-align:center;font-weight:300;font-size:clamp(1rem,1.5vw,1.9rem);letter-spacing:-.005em;opacity:0;transition:opacity .7s linear}
+.base.lit .sub{opacity:1}
+.ttl{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ttl text{fill:var(--fg);font-family:var(--display);font-weight:700;text-anchor:middle}
+.pill{position:absolute;left:50%;top:66.4%;width:clamp(250px,18.4vw,430px);height:clamp(52px,3.25vw,72px);transform:translate(-50%,-50%) translateY(14px);border-radius:999px;background:var(--wedge);display:flex;align-items:center;--ph:clamp(52px,3.25vw,72px);padding:0 0 0 calc(var(--ph) * .36);opacity:0;transition:opacity .6s linear,transform .7s var(--ease);touch-action:none;cursor:grab}
+.pill.show{opacity:1;transform:translate(-50%,-50%)}
+.pill:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.pill-t{font-weight:400;font-size:clamp(.95rem,1.58vw,1.7rem);letter-spacing:.005em;white-space:nowrap;transition:opacity .15s linear}
+.knob{position:absolute;top:50%;right:calc(clamp(52px,3.25vw,72px) * .1);width:calc(clamp(52px,3.25vw,72px) * .8);height:calc(clamp(52px,3.25vw,72px) * .8);margin-top:calc(clamp(52px,3.25vw,72px) * -.4);border-radius:50%;background:#fff;will-change:transform}
+/* folhas vermelhas: duas metades (cima/baixo) cortadas em y = --yc; cada uma tem a parte inteira (esq. do ápice) e a aberta (dir.), que gira em torno do ápice */
+.sheets{position:absolute;inset:0;pointer-events:none}
+/* as folhas são 3× maiores que a tela (para que, ao girarem, nunca mostrem a base nas bordas); os recortes usam --W e --H em px */
+.sh{position:absolute;left:calc(var(--W,100vw) * -1);top:calc(var(--H,100vh) * -1);width:calc(var(--W,100vw) * 3);height:calc(var(--H,100vh) * 3);background:var(--red);will-change:transform}
+.p-tw{clip-path:inset(0 calc(var(--W,100vw) * 2 - var(--ax) - 1px) calc(var(--H,100vh) * 2 - var(--yc) - 1px) 0)}
+.p-bw{clip-path:inset(calc(var(--H,100vh) + var(--yc)) calc(var(--W,100vw) * 2 - var(--ax) - 1px) 0 0)}
+.p-to{clip-path:inset(0 0 calc(var(--H,100vh) * 2 - var(--yc) - 1px) calc(var(--W,100vw) + var(--ax) - 1px));transform-origin:calc(var(--W,100vw) + var(--ax)) calc(var(--H,100vh) + var(--yc));transform:translate3d(0,var(--oy),0) rotate(var(--tht))}
+.p-bo{clip-path:inset(calc(var(--H,100vh) + var(--yc)) 0 0 calc(var(--W,100vw) + var(--ax) - 1px));transform-origin:calc(var(--W,100vw) + var(--ax)) calc(var(--H,100vh) + var(--yc));transform:translate3d(0,calc(var(--oy) * -1),0) rotate(var(--thb))}
+.exit .p-tw{transform:translate3d(0,var(--oy),0)}
+.exit .p-bw{transform:translate3d(0,calc(var(--oy) * -1),0)}
+.hint{position:absolute;left:0;right:0;top:85.4%;transform:translateY(-50%);text-align:center;font-weight:300;font-size:clamp(1.05rem,1.72vw,2.2rem);letter-spacing:-.005em;opacity:0;pointer-events:none;transition:opacity .5s linear}
+.hint.show{opacity:1}
+.hint.off{opacity:0;transition-duration:.25s}
+/* navalha: SVG branco de furo vazado; área de toque de 96 px */
+.blade{position:absolute;left:0;top:0;width:var(--bw,60px);height:var(--bh,126px);margin:calc(var(--bh,126px) / -2) 0 0 calc(var(--bw,60px) / -2);color:#fff;cursor:grab;will-change:transform;touch-action:none;opacity:0}
+.blade::before{content:"";position:absolute;inset:-18px -26px}
+.blade svg{display:block;width:100%;height:100%;fill:currentColor;pointer-events:none}
+.blade:focus-visible{outline:2px solid #fff;outline-offset:8px;border-radius:4px}
+.stage.drag .blade{cursor:grabbing}
+/* Reduzir Movimento: sem giros; as folhas só esmaecem */
+.redmo .p-to,.redmo .p-bo{transform:none}
+.redmo .sheets{transition:opacity .25s linear}
+.redmo.exit .sheets{opacity:0}
+.redmo .pill,.redmo .base.lit{transition-duration:.2s}
+/* título: cada linha sobe da própria máscara; o tracking fecha de +0,02em até −0,07em (as letras nascem encostando) */
+.ttl .l{transform-box:fill-box;transform:translateY(112%);letter-spacing:var(--ls0);transition:transform .95s var(--ease),letter-spacing .95s var(--ease)}
+.ttl .l2{transition-delay:.16s}
+.title .ttl .l{transform:none;letter-spacing:var(--ls)}
+.redmo .ttl .l{transition:none}

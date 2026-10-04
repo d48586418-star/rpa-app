@@ -15,15 +15,16 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     if(!fresh)await p.addInitScript(()=>{try{if(!localStorage.getItem('ch:v1'))localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'Marina',persona:'som',onboarded:true},seen:{tour:1}}))}catch(e){}});
     p.on('pageerror',e=>p.errs.push(e.message));p.on('console',m=>{if(m.type()==='error')p.errs.push(m.text())});p.on('response',r=>{if(r.status()>=400)p.errs.push('HTTP '+r.status()+' '+r.url())});return p};
 
-  console.log('\n0. Abertura (index.html): o primeiro corte divide o título; só depois aparece "Iniciar jornada"');
+  console.log('\n0. Abertura (index.html): navalha → corte → título → pílula');
   for(const w of [390,1280]){
-    const q=await newPage(w,800);await q.goto(LAND);await q.waitForTimeout(1400);
-    ok(await q.evaluate(()=>/Cortando Histórias/.test(document.querySelector('h1').textContent)&&document.getElementById('entrar').hidden&&!/Desenvolvido/.test(document.body.innerText)),w+'px: título e nenhum botão antes do corte');
-    const g=await q.evaluate(()=>{const r=document.getElementById('band').getBoundingClientRect();return {t:r.top,b:r.bottom}});
-    await q.mouse.move(w*.5,(g.t+g.b)/2,{steps:3});await q.mouse.down();await q.mouse.move(w*.5+6,g.t-20,{steps:6});await q.mouse.move(w*.5+6,g.b+20,{steps:12});await q.mouse.up();await q.waitForTimeout(1100);
-    ok(await q.evaluate(()=>document.getElementById('stage').classList.contains('cut')&&!document.getElementById('entrar').hidden),w+'px: arrastar a lâmina pelo título corta e mostra o botão');
-    await q.click('#entrar');await q.waitForTimeout(1500);
-    ok(/lab\.html/.test(q.url())&&/boas-vindas/.test(q.url()),w+'px: "Iniciar jornada" chega às boas-vindas');
+    const q=await newPage(w,800);await q.goto(LAND);await q.waitForTimeout(1800);
+    ok(await q.evaluate(()=>/Cortando Histórias/.test(document.querySelector('h1').textContent)&&!!document.getElementById('blade')&&!/Desenvolvido/.test(document.body.innerText)),w+'px: navalha e título presentes, sem crédito');
+    const g=await q.evaluate(()=>{const r=document.getElementById('blade').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}});
+    await q.mouse.move(g.x,g.y);await q.mouse.down();await q.mouse.move(w*.1,g.y,{steps:20});await q.mouse.up();await q.waitForTimeout(3200);
+    ok(await q.evaluate(()=>document.getElementById('stage').classList.contains('title')&&document.getElementById('pill').classList.contains('show')),w+'px: arrastar a navalha corta e mostra título e pílula');
+    const pr=await q.evaluate(()=>{const p=document.getElementById('pill').getBoundingClientRect(),k=document.getElementById('knob').getBoundingClientRect();return {px:p.x,y:k.y+k.height/2,kx:k.x+k.width/2}});
+    await q.mouse.move(pr.kx,pr.y);await q.mouse.down();await q.mouse.move(pr.px+8,pr.y,{steps:12});await q.mouse.up();await q.waitForTimeout(1500);
+    ok(/lab\.html/.test(q.url())&&/boas-vindas/.test(q.url()),w+'px: pílula leva às boas-vindas');
     ok(!q.errs.length,w+'px: abertura sem erros '+q.errs);await q.context().close();
   }
   console.log('\n1. Rotas × viewports (sem erro, sem overflow horizontal)');
@@ -125,8 +126,8 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
   }
   { const q=await newPage(390,844,true);await q.goto(URL+'#/boas-vindas');await q.waitForTimeout(800);
     await q.waitForTimeout(500);await q.fill('#w-nm','Marina');await q.click('#w-name button[type=submit]');await q.waitForTimeout(500);
-    await q.evaluate(()=>{const w=document.querySelector('#pk-swipe');w.children[3].scrollIntoView({inline:'center',behavior:'instant'})});await q.waitForTimeout(1000);
-    ok(await q.evaluate(()=>/Som/.test(document.querySelector('.pd-name').textContent)),'deslizar troca o perfil no celular');await q.click('[data-confirm]');await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
+    await q.evaluate(()=>{const w=document.getElementById('pk2-track');w.scrollLeft=w.clientWidth*3});await q.waitForTimeout(1000);
+    ok(await q.evaluate(()=>/Som/.test(document.querySelector('.pf.on .pd-name').textContent)),'deslizar troca o perfil no celular');await q.click('.pf.on [data-confirm]');await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
     ok(/#\/lab\//.test(q.url()),'onboarding termina dentro da primeira atividade');
     ok(await q.evaluate(()=>CH.store.state.profile.onboarded===true&&!!CH.store.state.profile.persona),'onboarding completo grava nome e persona');
     ok(!q.errs.length,'sem erros '+q.errs);await q.context().close(); }

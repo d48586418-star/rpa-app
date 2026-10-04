@@ -4,36 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cortando Histórias</title>
-<meta name="description" content="Simulador de timeline: laboratório de montagem audiovisual.">
-<meta name="theme-color" content="#a81020">
+<meta name="description" content="O simulador de timeline: laboratório de montagem audiovisual.">
+<meta name="theme-color" content="#960000">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/abertura.css">
 </head>
 <body>
 <main class="stage" id="stage">
-  <!-- o laboratório de verdade, por trás do vidro: só aparece no vão do corte -->
-  <iframe class="lab" id="lab" title="" tabindex="-1" aria-hidden="true" inert></iframe>
   <h1 class="sr">Cortando Histórias</h1>
-  <!-- duas metades da camada de vidro e das letras; tudo irmão direto do palco para o blur enxergar o laboratório -->
-  <div class="pane pa" aria-hidden="true"></div>
-  <div class="pane pl" aria-hidden="true"></div>
-  <div class="pane pr" aria-hidden="true"></div>
-  <div class="gl gl-a" aria-hidden="true"></div>
-  <div class="gl gl-l" aria-hidden="true"></div>
-  <div class="gl gl-r" aria-hidden="true"></div>
-  <svg class="edge" id="edge" aria-hidden="true" focusable="false"><defs id="defs"></defs>
-    <g id="eg-a"></g><g id="eg-l"></g><g id="eg-r"></g>
-  </svg>
-  <div class="band" id="band" role="slider" tabindex="0" aria-label="Linha de corte: use as setas para mover e Enter para cortar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></div>
-  <svg class="blade" id="blade" aria-hidden="true" focusable="false">
-    <line id="bf" class="guide"/><line id="bs" class="solid"/>
-    <path id="bt" class="cap"/><path id="bb" class="cap"/>
-    <g id="razor"><path class="rz" d="M-7 -11H7V5L0 12L-7 5Z"/><path class="rz" d="M-3 -6H3"/><path class="rz" d="M0 -11V-17"/></g>
-  </svg>
-  <p class="hint" id="hint">arraste para cortar</p>
-  <a class="go" id="entrar" href="lab.html#/boas-vindas" hidden><span>Iniciar jornada</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
+  <!-- cena 3, por baixo das folhas: só aparece pelo corte -->
+  <section class="base" id="base">
+    <p class="sub" id="sub">O simulador de timeline</p>
+    <svg class="ttl" id="ttl" aria-hidden="true" focusable="false"><defs id="ttl-defs"></defs><g id="ttl-g"></g></svg>
+    <div class="pill" id="pill" role="slider" tabindex="-1" aria-label="Arraste para iniciar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="pill-t">Arraste para iniciar</span><i class="knob" id="knob"></i>
+    </div>
+  </section>
+  <!-- cena 1 e 2: o papel vermelho em duas folhas (cima/baixo), cada uma com a parte ainda inteira e a parte já aberta -->
+  <div class="sheets" id="sheets" aria-hidden="true">
+    <div class="sh p-tw"></div><div class="sh p-to"></div><div class="sh p-bw"></div><div class="sh p-bo"></div>
+  </div>
+  <p class="hint" id="hint">Arraste para cortar e abrir</p>
+  <div class="blade" id="blade" role="slider" tabindex="0" aria-label="Navalha: arraste para a esquerda para cortar e abrir (ou use as setas e Enter)" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <svg viewBox="0 0 50 105" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M7 6H17V3H33V6H43Q46 6 46 9V96Q46 99 43 99H33V102H17V99H7Q4 99 4 96V9Q4 6 7 6Z
+      M18 13H32V17H27V22Q30 24 30 28Q30 31.5 27.5 33V38Q29 40 29 42H21Q21 40 22.5 38V33Q20 31.5 20 28Q20 24 23 22V17H18Z
+      M23 46H27Q29 47.5 29 52.5Q29 57.5 27 59H23Q21 57.5 21 52.5Q21 47.5 23 46Z
+      M21 63H29Q29 65 27.5 67V72Q30 74 30 77.5Q30 81 27 83V88H32V92H18V88H23V83Q20 81 20 77.5Q20 74 22.5 72V67Q21 65 21 63Z"/></svg>
+  </div>
 </main>
-<noscript><style>.pane,.gl,.edge,.band,.hint,.blade,.lab{display:none}.stage{display:grid;place-content:center;gap:24px;padding:24px}.sr{position:static;width:auto;height:auto;clip:auto;font:700 clamp(3rem,16vw,9rem)/.88 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.06em;color:#fff4ee}.ns{color:#fff4ee;font:500 1rem/1 Helvetica,Arial,sans-serif}</style><a class="ns" href="lab.html#/boas-vindas">Entrar no laboratório</a></noscript>
+<noscript><style>.sheets,.hint,.blade{display:none}.base{opacity:1!important;visibility:visible!important;background:#960000}.sub,.pill{display:none}.stage{display:grid;place-content:center;gap:28px}.sr{position:static;width:auto;height:auto;clip:auto;font:700 clamp(3rem,16vw,9rem)/.9 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.07em;color:#fff;text-align:center}.ns{color:#fff;font:400 1.1rem Helvetica,Arial,sans-serif;text-align:center}</style><a class="ns" href="lab.html#/boas-vindas">Entrar no laboratório</a></noscript>
 <script src="js/abertura.js"></script>
 </body>
 </html>

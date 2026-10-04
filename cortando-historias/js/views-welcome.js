@@ -11,6 +11,8 @@ CH.views.welcome=function(root,mode){
   document.body.classList.add("immersive");
   const first=CH.allActs()[0];
   const P=CH.data.personas.personas;
+  /* cor de fundo = cor medida no próprio vídeo de corpo inteiro (para o palco se fundir ao vídeo) */
+  const FULLBG={ritmo:"#2b3e58",som:"#4e3145",historias:"#9b5745",olhar:"#91a493",experimental:"#b1833e"};
   root.innerHTML=`
 <div class="wel" id="wel">
   <section class="ws ws1" data-step="1" aria-labelledby="w1-t">
@@ -39,22 +41,22 @@ CH.views.welcome=function(root,mode){
 
   <section class="ws ws3" data-step="3" aria-labelledby="w3-t" hidden>
     <button class="w-back" type="button" data-go="${troca?"back":"2"}">${icon("back")}${troca?"Meu espaço":"Voltar"}</button>
-    <div class="pk" id="pick" data-state="base">
-      <div class="pk-left">
-        <header class="w-head"><h2 class="w-h" id="w3-t" tabindex="-1">Qual <b>perfil de editor</b> é o seu?</h2>
-          <p class="w-hint">Passe o dedo ou o mouse pelos perfis para ver como cada um olha a montagem. Não existe melhor nem pior.</p></header>
-        <div class="pk-dock">
-          <div class="pk-ctl glass" role="radiogroup" aria-label="Perfis de editor">
-            <span class="pk-cap" aria-hidden="true"></span>
-            <ul class="pk-ul" id="pk-ul">${P.map(p=>`<li><button type="button" role="radio" class="pk-b" data-id="${p.id}" aria-checked="false" style="--pc:${p.cor}"><img src="${p.busto}" alt="" width="40" height="40" loading="lazy"><span>${esc(p.curto)}</span></button></li>`).join("")}</ul>
-            <button type="button" class="pk-reset" id="pk-reset" tabindex="-1" aria-hidden="true">Trocar</button>
-          </div>
-        </div>
-        <article class="p-det" id="p-det" aria-live="polite"></article>
-      </div>
-      <div class="pk-swipe" id="pk-swipe" aria-label="Deslize para escolher o perfil" role="group">${P.map(p=>`<figure class="sw" data-id="${p.id}" data-name="${esc(p.curto)}" style="--pc:${p.bg||p.cor};--pf:${p.bgfg||p.fg}"><img src="${p.poster}" alt="" width="640" height="640" loading="lazy"><video class="sw-v" muted loop playsinline preload="metadata" poster="${p.poster}" aria-hidden="true">${CH.videoSources(p.video.replace(/\.webm$/,""))}</video></figure>`).join("")}</div>
-      <div class="sw-ui" aria-hidden="true"><span class="sw-hint glass">${icon("back")}Deslize para escolher${icon("next")}</span><span class="sw-dots">${P.map((p,k)=>`<i data-i="${k}"></i>`).join("")}</span></div>
-      <div class="pk-stage" id="pk-stage" aria-hidden="true"><div class="pk-idle"><span>Escolha um perfil para ver como ele olha o corte.</span></div></div>
+    <div class="pk2" id="pick" data-state="base">
+      <header class="pk2-head"><h2 class="w-h" id="w3-t" tabindex="-1">Qual <b>perfil de editor</b> é o seu?</h2><p class="pk2-hint">Deslize para o lado para conhecer cada perfil.</p></header>
+      <div class="pk2-track" id="pk2-track" role="group" aria-roledescription="carrossel" aria-label="Perfis de editor" tabindex="0">${P.map((p,k)=>{
+        const src="assets/personas/full/"+p.id,w=p.nome.split(" "),l=w.pop();
+        return `<article class="pf" data-id="${p.id}" aria-roledescription="perfil" aria-label="${esc(p.nome)}, ${k+1} de ${P.length}" style="--pc:${FULLBG[p.id]||p.bg||p.cor};--pf:${p.bgfg||p.fg}">
+        <div class="pf-stage" aria-hidden="true"><video class="pf-v" muted playsinline preload="none" poster="${src}.jpg">${CH.videoSources(src)}</video><video class="pf-v pf-v2" muted playsinline preload="none">${CH.videoSources(src)}</video></div>
+        <div class="pf-tx">
+          <h3 class="pd-name">${esc(w.join(" "))} <b>${esc(l)}</b></h3>
+          <p class="pf-q">“${esc(p.pergunta)}”</p>
+          <p class="pd-rep">${esc(p.representa)}</p>
+          <ul class="chips">${p.valoriza.slice(0,4).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+          <details class="pd-more"><summary>Como esse perfil pensa</summary><ul>${p.pensa.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p>${esc(p.papel)}</p></details>
+          <p class="pd-ia">Personagem gerado por inteligência artificial</p>
+          <button class="btn red lg" type="button" data-confirm="${p.id}">Esse sou eu${icon("next")}</button>
+        </div></article>`}).join("")}</div>
+      <nav class="pk2-nav" aria-label="Trocar de perfil"><button type="button" class="pk2-ar" data-dir="-1" aria-label="Perfil anterior">${icon("back")}</button><span class="pk2-dots" id="pk2-dots">${P.map((p,k)=>`<button type="button" class="pk2-dot" data-i="${k}" aria-label="${esc(p.curto)}"></button>`).join("")}</span><button type="button" class="pk2-ar" data-dir="1" aria-label="Próximo perfil">${icon("next")}</button></nav>
     </div>
   </section>
 
@@ -68,7 +70,7 @@ CH.views.welcome=function(root,mode){
   function show(n){
     step=n;$$(".ws",wel).forEach(s=>{const on=+s.dataset.step===n;s.hidden=!on;if(on){s.classList.remove("in");void s.offsetWidth;s.classList.add("in")}});
     const t=$(`.ws[data-step="${n}"] [tabindex="-1"]`,wel);t&&t.focus({preventScroll:true});window.scrollTo(0,0);
-    if(n===3){if(mob()&&!pick)hov=P[0].id;renderPick();requestAnimationFrame(moveCap);if(mob()&&pick){const i=P.findIndex(x=>x.id===pick);requestAnimationFrame(()=>{swipe.scrollLeft=i*slideW();tocaSw(i);marcaDot(i)})}}if(n===4)renderGo();
+    if(n===3){enterPick()}if(n===4)renderGo();
     if(n!==3&&n!==4)stopVideos();
   }
   function stopVideos(){$$("video",wel).forEach(v=>{v.pause()})}
@@ -96,87 +98,51 @@ CH.views.welcome=function(root,mode){
       v.addEventListener("seeked",()=>fin(()=>{try{const m=medianEdge(v,96,54);if(lum(m[0],m[1],m[2])<.04||v.readyState<2)return viaPoster();return Promise.resolve(paint(p,m))}catch(e){return viaPoster()}}));
       v.addEventListener("error",()=>fin(viaPoster));setTimeout(()=>fin(viaPoster),2500);
       v.innerHTML=CH.videoSources(p.video.replace(/\.webm$/,""));v.load()})}
-  const swipe=$("#pk-swipe",wel);let swT=0;
-  const slideW=()=>{const f=swipe.children[0],g=swipe.children[1];return f&&g?g.offsetLeft-f.offsetLeft:swipe.clientWidth};
-  const dots=()=>[...wel.querySelectorAll(".sw-dots i")];
-  /* só o perfil à vista se move (os vizinhos pausam) */
-  function tocaSw(i){[...swipe.children].forEach((f,k)=>{const v=f.querySelector(".sw-v");if(!v)return;if(k===i&&!CH.reduced()){v.preload="auto";v.play().catch(()=>{})}else v.pause()})}
-  function marcaDot(i){tocaSw(i);dots().forEach((d,k)=>d.classList.toggle("on",k===i))}
-  /* profundidade: cada cartão recebe sua distância ao centro (--d); o central é grande, os vizinhos inclinam e esmaecem */
-  let depthRaf=0;
-  function profundidade(){depthRaf=0;const w=slideW()||1,c=swipe.scrollLeft;[...swipe.children].forEach((f,k)=>{f.style.setProperty("--d",Math.max(-2,Math.min(2,(k*w-c)/w)).toFixed(3))})}
-  const agendaProf=()=>{if(!depthRaf)depthRaf=requestAnimationFrame(profundidade)};
-  swipe.addEventListener("scroll",()=>{agendaProf();if(!mob())return;const i=Math.max(0,Math.min(P.length-1,Math.round(swipe.scrollLeft/slideW())));marcaDot(i);[...swipe.children].forEach((f,k)=>f.classList.toggle('on',k===i));wel.classList.add("swiped");
-    clearTimeout(swT);swT=setTimeout(()=>{const f=swipe.children[i];if(!f)return;const id=f.dataset.id;if(pick){if(pick!==id){pick=id;renderPick()}}else if(hov!==id){hov=id;renderPick()}},80)},{passive:true});
-  wel.addEventListener("click",e=>{const d=e.target.closest(".sw-dots i");if(d)swipe.children[+d.dataset.i].scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"})});
-  setTimeout(()=>{marcaDot(0);profundidade()},50);swipe.children[0]&&swipe.children[0].classList.add('on');
+  /* escolha do perfil: um palco de 100vw por personagem (corpo inteiro, vídeo animado); deslizar com o dedo, arrastar com o mouse, setas ou pontos */
   const person=()=>CH.PERSONAS[pick];
-  const shownP=()=>person()||(hov&&CH.PERSONAS[hov]);
-
-  const stage=$("#pk-stage",wel),pk=$("#pick",wel),ul=$("#pk-ul",wel),cap=$(".pk-cap",wel),rst=$("#pk-reset",wel),ctl=$(".pk-ctl",wel);
-  const layers={};let shown=null,lastBtn=null;
-  /* a cápsula desliza até o item escolhido; medida a partir da própria posição dos itens */
-  function moveCap(){
-    const b=$(`.pk-b[aria-checked="true"]`,ul)||(hov&&$(`.pk-b[data-id="${hov}"]`,ul));
-    if(!b){cap.style.opacity=0;return}
-    const c=ctl.getBoundingClientRect(),r=b.getBoundingClientRect();
-    cap.style.opacity=1;cap.style.width=r.width+"px";cap.style.height=r.height+"px";cap.style.transform=`translate(${r.left-c.left}px,${r.top-c.top}px)`;
+  const pk=$("#pick",wel),track=$("#pk2-track",wel),slides=$$(".pf",track),dotsEl=$$(".pk2-dot",wel);
+  let cur=-1,rafP=0,drag=null;
+  const idxOf=()=>Math.max(0,Math.min(P.length-1,Math.round(track.scrollLeft/(track.clientWidth||1))));
+  /* o laço de 10 s não tem emenda perfeita: dois vídeos se alternam com fusão de 0,7 s perto do fim */
+  const loops=new WeakMap();
+  function startLoop(sl){
+    const [a,b]=$$(".pf-v",sl);if(!a||!b||loops.has(sl))return;
+    const st={cur:a,oth:b,on:true,fade:false};loops.set(sl,st);
+    a.style.opacity=1;b.style.opacity=0;
+    const tick=()=>{if(!st.on)return;const v=st.cur,d=v.duration;
+      if(d&&!st.fade&&v.currentTime>d-.9){st.fade=true;const o=st.oth;try{o.currentTime=0}catch(e){}o.play().catch(()=>{});o.style.transition="opacity .8s linear";v.style.transition="opacity .8s linear";o.style.opacity=1;v.style.opacity=0;
+        setTimeout(()=>{if(!st.on)return;v.pause();try{v.currentTime=0}catch(e){}st.cur=o;st.oth=v;st.fade=false},850)}
+      requestAnimationFrame(tick)};
+    a.play().catch(()=>{});requestAnimationFrame(tick);
   }
-  /* troca de vídeo sem costura: o novo só aparece quando o primeiro quadro já pode ser mostrado; o antigo sai no mesmo quadro (sem fusão) */
-  function swap(p){
-    if(!layers[p.id]){
-      const v=document.createElement("video");v.className="pk-v";v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.poster=p.poster;
-      v.setAttribute("aria-hidden","true");v.innerHTML=CH.videoSources(p.video.replace(/\.webm$/,""));layers[p.id]=v;stage.append(v);
-    }
-    const nv=layers[p.id],old=shown&&layers[shown];shown=p.id;
-    stage.style.setProperty("--pc",p.bg||p.cor);
-    const go=()=>requestAnimationFrame(()=>{if(shown!==p.id)return;Object.values(layers).forEach(x=>{x.classList.toggle("on",x===nv);if(x!==nv)x.pause()});stage.classList.add("has");if(!CH.reduced())nv.play().catch(()=>{})});
-    if(nv.readyState>=2)go();else{nv.addEventListener("loadeddata",go,{once:true});nv.load()}
+  function stopLoop(sl){const st=loops.get(sl);if(!st)return;st.on=false;loops.delete(sl);$$(".pf-v",sl).forEach(v=>{v.pause();v.style.transition="none"});}
+  function ativa(i,anuncia){
+    if(i===cur)return;cur=i;
+    slides.forEach((sl,k)=>{sl.classList.toggle("on",k===i);if(k!==i)stopLoop(sl);else if(!CH.reduced())startLoop(sl)});
+    [i-1,i+1].forEach(k=>{const sl=slides[k];if(sl)$$(".pf-v",sl)[0].preload="metadata"});
+    dotsEl.forEach((d,k)=>{d.classList.toggle("on",k===i);d.setAttribute("aria-current",k===i?"true":"false")});
+    const p=P[i];const r3=pk.parentElement;r3.style.setProperty("--cf",p.bgfg||p.fg);r3.style.setProperty("--cb",FULLBG[p.id]||p.bg||p.cor);
+    if(anuncia)CH.say("Perfil "+p.curto+", "+(i+1)+" de "+P.length+".");
   }
-  function renderPick(){
-    const p=shownP(),sel=!!person();
-    $$(".pk-b",ul).forEach(b=>{const on=b.dataset.id===pick;b.setAttribute("aria-checked",on);b.tabIndex=on||(!pick&&b===ul.querySelector(".pk-b"))?0:-1});
-    pk.dataset.state=sel?"selected":"base";
-    rst.tabIndex=sel?0:-1;rst.setAttribute("aria-hidden",sel?"false":"true");
-    const d=$("#p-det",wel),sec=$(".ws3",wel);
-    sec.classList.toggle("colored",!!p);
-    if(p){const k=edge[p.id]||{bg:p.cor,fg:p.fg};sec.style.setProperty("--pc",k.bg);sec.style.setProperty("--pf",k.fg);if(!edge[p.id])edgeColor(p).then(()=>{if(shownP()&&shownP().id===p.id)renderPick()})}
-    if(!p){d.innerHTML="";stage.classList.remove("has");Object.values(layers).forEach(x=>{x.classList.remove("on");x.pause()});shown=null;requestAnimationFrame(moveCap);return}
-    if(!mob())swap(p);
-    d.style.setProperty("--pc",p.cor);d.style.setProperty("--pf",p.fg);
-    d.innerHTML=`
-      <h3 class="pd-name">${(()=>{const w=p.nome.split(" "),l=w.pop();return esc(w.join(" "))+" <b>"+esc(l)+"</b>"})()}</h3>
-      <p class="pd-rep">${esc(p.representa)}</p>
-      <ul class="chips">${p.valoriza.slice(0,4).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
-      <p class="pd-ia">Personagem gerado por inteligência artificial</p><details class="pd-more"><summary>Como esse perfil pensa</summary><ul>${p.pensa.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p>${esc(p.papel)}</p></details>
-      ${sel||mob()?`<button class="btn red lg" type="button" data-confirm>Esse sou eu${icon("next")}</button>`:""}`;
-    const cf=$("[data-confirm]",d);if(cf)cf.onclick=()=>{pick=pick||p.id;CH.store.setPersona(pick);CH.who&&CH.who();show(4)};
-    /* o item colapsa só depois do layout assentar, então medimos no quadro seguinte e de novo ao fim da transição */
-    requestAnimationFrame(()=>{moveCap();setTimeout(moveCap,520)});
-  }
-  /* deslizar no computador: arrastar o palco (ou setas ←/→ nele) passa para o perfil vizinho, com o mesmo efeito de troca do toque */
-  function passo(d){
-    const ids=P.map(x=>x.id),cur=person()?pick:(hov||ids[0]),n=ids[(ids.indexOf(cur)+d+ids.length)%ids.length];
-    if(person())pick=n;else hov=n;renderPick();
-  }
-  let dx0=null,dy0=0;
-  stage.style.touchAction="pan-y";stage.style.cursor="grab";
-  stage.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")return;dx0=e.clientX;dy0=e.clientY;stage.style.cursor="grabbing";try{stage.setPointerCapture(e.pointerId)}catch(x){}});
-  const fimArrasto=e=>{if(dx0===null)return;const dx=e.clientX-dx0;dx0=null;stage.style.cursor="grab";if(Math.abs(dx)>50)passo(dx<0?1:-1)};
-  stage.addEventListener("pointerup",fimArrasto);stage.addEventListener("pointercancel",()=>{dx0=null;stage.style.cursor="grab"});
-  pk.addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea"))return;if(e.key==="ArrowRight"&&e.target===stage){e.preventDefault();passo(1)}else if(e.key==="ArrowLeft"&&e.target===stage){e.preventDefault();passo(-1)}});
-  ul.addEventListener("click",e=>{const b=e.target.closest(".pk-b");if(!b||pk.dataset.state==="selected")return;lastBtn=b;pick=b.dataset.id;hov=null;renderPick();rst.focus({preventScroll:true})});
-  ul.addEventListener("keydown",e=>{
-    const bs=$$(".pk-b",ul),i=bs.indexOf(document.activeElement);if(i<0)return;
-    const d=e.key==="ArrowRight"||e.key==="ArrowDown"?1:e.key==="ArrowLeft"||e.key==="ArrowUp"?-1:0;
-    if(d){e.preventDefault();const n=bs[(i+d+bs.length)%bs.length];bs.forEach(x=>x.tabIndex=x===n?0:-1);n.focus()}
+  function ir(i,suave){i=Math.max(0,Math.min(P.length-1,i));track.scrollTo({left:i*track.clientWidth,behavior:suave&&!CH.reduced()?"smooth":"auto"})}
+  track.addEventListener("scroll",()=>{if(rafP)return;rafP=requestAnimationFrame(()=>{rafP=0;ativa(idxOf(),true);pk.classList.add("swiped")})},{passive:true});
+  /* mouse: arrastar o palco (o toque já desliza nativamente) */
+  track.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||(e.target.closest&&e.target.closest("button,a,summary,details,input")))return;drag={x:e.clientX,s:track.scrollLeft,m:false};try{track.setPointerCapture(e.pointerId)}catch(x){}});
+  track.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x;if(!drag.m&&Math.abs(dx)>5){drag.m=true;track.classList.add("grab")}if(drag.m)track.scrollLeft=drag.s-dx});
+  const solta=e=>{if(!drag)return;const d=drag,dx=e.clientX-d.x;drag=null;if(!d.m)return;track.classList.remove("grab");const w=track.clientWidth;let i=Math.round(track.scrollLeft/w);if(Math.abs(dx)>w*.12)i=Math.round(d.s/w)+(dx<0?1:-1);ir(i,true)};
+  track.addEventListener("pointerup",solta);track.addEventListener("pointercancel",solta);
+  wel.addEventListener("click",e=>{
+    const ar=e.target.closest(".pk2-ar");if(ar){ir(cur+ +ar.dataset.dir,true);return}
+    const dt=e.target.closest(".pk2-dot");if(dt){ir(+dt.dataset.i,true);return}
+    const cf=e.target.closest("[data-confirm]");if(cf){pick=cf.dataset.confirm;CH.store.setPersona(pick);CH.who&&CH.who();show(4)}
   });
-  if(matchMedia("(hover:hover)").matches){
-    ul.addEventListener("pointerover",e=>{const b=e.target.closest(".pk-b");if(!b||person())return;if(hov!==b.dataset.id){hov=b.dataset.id;renderPick()}});
-    ctl.addEventListener("pointerleave",()=>{if(person()||!hov)return;hov=null;renderPick()});
+  wel.addEventListener("keydown",e=>{if(step!==3||(e.target.closest&&e.target.closest("input,textarea,summary")))return;if(e.key==="ArrowRight"){e.preventDefault();ir(cur+1,true)}else if(e.key==="ArrowLeft"){e.preventDefault();ir(cur-1,true)}});
+  window.addEventListener("resize",()=>{if(step===3&&cur>=0)track.scrollLeft=cur*track.clientWidth});
+  function enterPick(){
+    cur=-1;slides.forEach(stopLoop);
+    const i0=Math.max(0,P.findIndex(x=>x.id===pick));
+    requestAnimationFrame(()=>{track.scrollLeft=i0*track.clientWidth;ativa(i0,false)});
   }
-  rst.addEventListener("click",()=>{const back=lastBtn||$(`.pk-b[data-id="${pick}"]`,ul);pick=null;renderPick();setTimeout(()=>{moveCap();back&&back.focus({preventScroll:true})},60)});
-  window.addEventListener("resize",moveCap);
 
   function renderGo(){
     const p=person(),n=CH.store.name();

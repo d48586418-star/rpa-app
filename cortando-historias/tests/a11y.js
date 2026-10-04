@@ -52,9 +52,9 @@ const ROTAS=['#/inicio','#/percurso','#/descobertas','#/edicao','#/guia','#/muse
     const rep=async(nome)=>{const out=await p.evaluate(AUDITORIA);const ruins=out.pobre.length+out.sem.length+out.alt.length;if(ruins)bad++;rel.push((ruins?'✗':'·')+' '+nome+' sem-nome:'+out.sem.length+' contraste<AA:'+out.pobre.length+(out.pobre.length?' → '+out.pobre.slice(0,4).join(' | '):''))};
     await p.goto(URL+'#/boas-vindas');await p.waitForTimeout(700);
     await p.fill('#w-nm','Marina');await p.click('#w-name button[type=submit]');await p.waitForTimeout(700);
-    await p.evaluate(id=>{const i=CH.PERSONAS?Object.keys(CH.PERSONAS).indexOf(id):0;const sw=document.querySelector('#pk-swipe');sw.children[i].scrollIntoView({inline:'center',behavior:'instant'})},pe);await p.waitForTimeout(700);
+    await p.evaluate(id=>{const i=CH.PERSONAS?Object.keys(CH.PERSONAS).indexOf(id):0;const sw=document.getElementById('pk2-track');sw.scrollLeft=sw.clientWidth*i},pe);await p.waitForTimeout(700);
     await rep(`${tema} ${pe} boas-vindas (escolha)`);
-    await p.click('[data-confirm]');await p.waitForTimeout(700);await rep(`${tema} ${pe} boas-vindas (final)`);
+    await p.click('.pf.on [data-confirm]');await p.waitForTimeout(700);await rep(`${tema} ${pe} boas-vindas (final)`);
     await p.goto(URL+'#/eu');await p.waitForTimeout(800);await rep(`${tema} ${pe} Meu espaço (palco)`);
     rel.forEach(x=>console.log(x));await c.close();
   }
