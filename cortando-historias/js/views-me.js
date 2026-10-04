@@ -80,7 +80,7 @@ CH.views.me=function(root){
   ${CH.store.volatile?`<p class="warn" role="alert">Seu navegador não deixa salvar dados. O progresso será perdido ao fechar a página.</p>`:""}
 
   ${(()=>{const pe=CH.persona();return pe?`<section class="me-hero" style="--pc:${pe.bg||pe.cor};--pf:${pe.bgfg||pe.fg}" aria-labelledby="me-e">
-    <div class="mh-media"><video class="mh-v" ${CH.reduced()?"":"autoplay"} muted loop playsinline poster="${pe.poster}" aria-label="Animação do seu perfil, ${esc(pe.curto)}">${CH.videoSources(pe.video.replace(/\.webm$/,""))}</video></div>
+    <div class="mh-media"><video class="mh-v" ${CH.motionOff()?"":"autoplay"} muted loop playsinline poster="${pe.poster}" aria-label="Animação do seu perfil, ${esc(pe.curto)}">${CH.videoSources(pe.video.replace(/\.webm$/,""))}</video></div>
     <div class="mh-tx"><p class="eyebrow">Seu perfil</p><h2 class="display" id="me-e">${esc(CH.personaNome())}</h2><p class="mh-q">${esc(pe.pergunta||"")}</p><a class="btn" href="#/editor">Trocar de perfil</a><p class="mh-cr">Personagem gerado por inteligência artificial</p></div></section>`:""})()}
 
   <section class="me-blk" aria-labelledby="me-n">
@@ -137,7 +137,7 @@ CH.views.me=function(root){
   $("#b-pdf",root).onclick=async e=>{const b=e.currentTarget;b.disabled=true;try{await CH.passaporte();CH.toast("Sua jornada foi salva.")}catch(err){CH.toast("Não foi possível gerar o PDF agora.")}b.disabled=false};
   $("#b-rst",root).onclick=()=>{if(confirm("Apagar TUDO (nome, versões, anotações, descobertas)? Isso não pode ser desfeito.")){CH.store.reset();CH.applyPrefs();CH.toast("Tudo apagado.");location.hash="#/inicio";setTimeout(()=>location.reload(),200)}};
   /* o vídeo do perfil só toca enquanto está na tela */
-  const mv=root.querySelector(".mh-v");let io=null;if(mv&&"IntersectionObserver" in window&&!CH.reduced()){io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)mv.play().catch(()=>{});else mv.pause()}),{threshold:.1});io.observe(mv)}
+  const mv=root.querySelector(".mh-v");let io=null;if(mv&&"IntersectionObserver" in window&&!CH.motionOff()){io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)mv.play().catch(()=>{});else mv.pause()}),{threshold:.1});io.observe(mv)}
   return{title:"Meu espaço",destroy(){io&&io.disconnect();mv&&mv.pause()}};
 };
 

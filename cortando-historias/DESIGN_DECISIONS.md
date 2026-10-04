@@ -71,3 +71,5 @@ Contra o "aspecto de IA" (pesquisa em outubro de 2026): âncora em referência n
 **Fontes.** Todo conteúdo pesquisado mostra a fonte (nome do site + link) em fonte pequena; sem origem verificada, "texto do projeto".
 
 **Ajustes pós-entrega.** Escolha de perfil sem barra de nomes: um perfil por vez, bolinhas que seguem o dedo e botão "Escolher". Sem texto sublinhado em nenhuma rota (peso 600 + seta ↗ nos links externos). Abertura: título peso 800 sem linha de corte; a próxima tela aparece desfocada durante o zoom e ganha foco na chegada.
+
+**Movimento e acessibilidade (rodada 8).** A abertura e os vídeos de personagem são o conteúdo principal e são acionados pelo próprio aluno; por isso o "reduzir movimento" do sistema só os suaviza (sem giros, zoom curto). Quem quiser desligar tudo usa Meu espaço → Movimento → Reduzido, que é respeitado por completo.

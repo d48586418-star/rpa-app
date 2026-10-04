@@ -250,4 +250,7 @@ textarea{border-radius:var(--r3)}
 .from-cap{background:#9b5745}
 .from-cap body{animation:chegada .8s cubic-bezier(.2,.715,.205,.99) both}
 @keyframes chegada{from{opacity:.6;transform:scale(1.08);filter:blur(18px)}to{opacity:1;transform:none;filter:blur(0)}}
+/* chegada "2": a escolha de perfil já estava na tela (iframe da abertura), então a troca de documento não anima nada */
+.from-cap2{background:#9b5745}
+.from-cap2 body,.from-cap2 .ws.in{animation:none!important}
 @media (prefers-reduced-motion:reduce){.from-cap body{animation:chegada-r .4s linear both}@keyframes chegada-r{from{opacity:0}to{opacity:1}}}

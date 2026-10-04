@@ -97,6 +97,8 @@ let tt;
 CH.toast=(msg,ms=2600)=>{const t=CH.$("#toast");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),ms);CH.say(msg)};
 CH.carregar=src=>new Promise((ok,no)=>{if(document.querySelector(`script[data-lz="${src}"]`))return ok();const s=document.createElement("script");s.src=src;s.dataset.lz=src;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.append(s)});
 CH.reduced=()=>{const r=document.documentElement.dataset.motion;if(r==="off")return true;if(r==="on")return false;return matchMedia("(prefers-reduced-motion: reduce)").matches};
+/* só a preferência explícita do site desliga os vídeos de personagem e a coreografia da escolha; o "reduzir movimento" do aparelho não esconde o conteúdo principal */
+CH.motionOff=()=>document.documentElement.dataset.motion==="off";
 
 /* ---------- ícones (traço 2px, 24px) ---------- */
 const P={

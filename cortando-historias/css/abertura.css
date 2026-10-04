@@ -13,12 +13,15 @@ h1,p{margin:0}
 .base{position:absolute;inset:0;background:var(--wedge);visibility:hidden}
 .base.on{visibility:visible}
 .base.lit{background:var(--red);transition:background-color .8s var(--ease)}
-.sub{position:absolute;left:0;right:0;top:11.4%;transform:translateY(-50%);text-align:center;font-weight:300;font-size:clamp(1rem,1.5vw,1.9rem);letter-spacing:-.005em;opacity:0;transition:opacity .7s linear}
+.sub{position:absolute;left:0;right:0;top:11.4%;transform:translateY(-50%);text-align:center;font-weight:500;font-size:clamp(1.05rem,1.8vw,2.1rem);letter-spacing:.01em;opacity:0;transition:opacity .7s linear}
+.sub .w{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .8s var(--ease),transform .9s var(--ease),letter-spacing 1.2s var(--ease);letter-spacing:.05em;transition-delay:calc(var(--i) * 80ms + 1000ms)}
+.title .sub .w{opacity:1;transform:none;letter-spacing:-.005em}
+.redmo .sub .w,.suave .sub .w{transition-delay:calc(var(--i) * 40ms + 200ms)}
 .base.lit .sub{opacity:1}
-.pill{position:absolute;left:50%;top:66.4%;width:clamp(284px,22vw,500px);height:clamp(52px,3.25vw,72px);transform:translate(-50%,-50%) translateY(14px);border-radius:999px;background:var(--wedge);display:flex;align-items:center;justify-content:center;--ph:clamp(52px,3.25vw,72px);padding:0;opacity:0;transition:opacity .6s linear,transform .7s var(--ease);touch-action:none;cursor:grab}
+.pill{position:absolute;left:50%;top:66.4%;width:clamp(228px,15vw,310px);height:clamp(52px,3.25vw,72px);transform:translate(-50%,-50%) translateY(14px);border-radius:999px;background:var(--wedge);display:flex;align-items:center;justify-content:center;--ph:clamp(52px,3.25vw,72px);padding:0 14px 0 calc(var(--ph) + 4px);opacity:0;transition:opacity .6s linear,transform .7s var(--ease);touch-action:none;cursor:grab}
 .pill.show{opacity:1;transform:translate(-50%,-50%)}
 .pill:focus-visible{outline:2px solid #fff;outline-offset:4px}
-.pill-t{font-weight:400;font-size:clamp(.92rem,1.36vw,1.5rem);letter-spacing:.005em;white-space:nowrap;transition:opacity .15s linear}
+.pill-t{font-weight:400;font-size:clamp(.9rem,1.25vw,1.4rem);letter-spacing:.005em;white-space:nowrap;transition:opacity .15s linear}
 .knob{position:absolute;top:50%;left:calc(clamp(52px,3.25vw,72px) * .1);width:calc(clamp(52px,3.25vw,72px) * .8);height:calc(clamp(52px,3.25vw,72px) * .8);margin-top:calc(clamp(52px,3.25vw,72px) * -.4);border-radius:50%;background:#fff;will-change:transform}
 /* folhas vermelhas: duas metades (cima/baixo) cortadas em y = --yc; cada uma tem a parte inteira (esq. do ápice) e a aberta (dir.), que gira em torno do ápice */
 .sheets{position:absolute;inset:0;pointer-events:none;transform:scaleX(-1)}
@@ -56,10 +59,24 @@ h1,p{margin:0}
 .redmo .c,.redmo .ln,.redmo .ttl{transition:none}
 .cred{position:absolute;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));margin:0;padding:0 16px;text-align:center;font-size:11px;line-height:1.3;letter-spacing:.01em;color:#fff;opacity:.62;z-index:5;pointer-events:none}
 /* zoom pela bolinha: a câmera entra no botão */
-.base.zoom{transition:transform .62s cubic-bezier(.7,0,.95,.35);will-change:transform}
+.base.zoom{transition:transform .62s cubic-bezier(.7,0,.95,.35),background-color .35s linear;will-change:transform}
 .redmo .base.zoom{transition:opacity .25s linear;opacity:0}
 
 /* próxima tela (escolha de perfil) desfocada, aparece enquanto a câmera entra na bolinha */
 .peek{position:fixed;inset:0;z-index:4;pointer-events:none;background:#9b5745 url(../assets/personas/full/historias.jpg) 60% 50%/cover no-repeat;filter:blur(22px);transform:scale(1.12);opacity:0;transition:opacity .55s linear .08s}
 .go .peek{opacity:.94}
 .redmo .peek{transition-duration:.25s;transition-delay:0s}
+
+/* aparelho com "reduzir movimento" ligado: os efeitos continuam, sem giros e com zoom curto */
+.suave .c{transform:translateY(120%);transition-duration:.8s}
+.suave .base.zoom{transition-duration:.35s}
+/* câmera entrando na bolinha com a escolha de perfil real (iframe) aparecendo desfocada atrás e ganhando foco */
+.lab-frame{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;filter:blur(24px);transform:scale(1.14);pointer-events:none;background:#9b5745;transition:opacity .55s linear .12s,filter .85s var(--ease) .1s,transform .85s var(--ease) .1s}
+.lab-frame.on{opacity:1;filter:blur(0);transform:none}
+.go-frame .base{background:transparent!important;transition:background-color .35s linear}
+.go-frame .sub,.go-frame .ttl,.go-frame .pill-t{opacity:0;transition:opacity .25s linear}
+.go-frame .pill{background:transparent;box-shadow:none;border-color:transparent}
+.go-frame .knob{transition:opacity .35s linear .55s;opacity:0}
+.go-frame .peek{display:none}
+.redmo .lab-frame{display:none}
+.go .cred{opacity:0;transition:opacity .25s linear}

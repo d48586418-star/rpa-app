@@ -129,12 +129,12 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     await q.waitForTimeout(500);await q.fill('#w-nm','Marina');await q.click('#w-name button[type=submit]');await q.waitForTimeout(500);
     await q.evaluate(()=>{const w=document.getElementById('pk2-track');w.scrollLeft=w.clientWidth*3});await q.waitForTimeout(1000);
     ok(await q.evaluate(()=>/Som/.test(document.querySelector('.pf.on .pd-name').textContent)),'deslizar troca o perfil no celular');
-    ok(await q.evaluate(()=>document.querySelectorAll('.pk-dot').length===5&&document.querySelectorAll('.pk-ctl,.pk-b').length===0&&+document.querySelectorAll('.pk-dot')[3].style.getPropertyValue('--f')>.9),'bolinhas (uma por perfil) marcam o perfil atual; sem barra de nomes nem Reset');
+    ok(await q.evaluate(()=>document.querySelectorAll('.pk-dot').length===5&&!!document.getElementById('pk-ctl')&&+document.querySelectorAll('.pk-dot')[3].style.getPropertyValue('--f')>.9&&+getComputedStyle(document.getElementById('pk-ctl')).getPropertyValue('--pos')>2.9),'controlador de vidro: 5 bolinhas e a cápsula acompanham o perfil atual');
     ok(await q.evaluate(()=>/^Escolher/.test(document.querySelector('.pf.on .pf-go').textContent.trim())&&getComputedStyle(document.querySelector('.pf.on .pf-go')).visibility==='visible'),'botão "Escolher" visível na página ativa');
     await q.click('.pk-dot:nth-child(2)');await q.waitForTimeout(900);
     ok(await q.evaluate(()=>/Ritmo|Histórias|Olhar|Experimental|Som/.test(document.querySelector('.pf.on .pd-name').textContent)&&document.querySelector('.pf.on').dataset.id!=='som'),'clicar numa bolinha vai ao perfil');
     await q.evaluate(()=>{const w=document.getElementById('pk2-track');w.scrollLeft=w.clientWidth*3});await q.waitForTimeout(900);
-    await q.click('.pf.on [data-confirm]');await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
+    await q.click('.pf.on [data-confirm]');await q.waitForTimeout(400);ok(await q.evaluate(()=>document.getElementById('pk-ctl').classList.contains('collapsed')&&document.querySelectorAll('.pf-go:not([disabled])').length===0),'Escolher recolhe o controlador e trava o resto');await q.waitForTimeout(900);await q.waitForTimeout(900);await q.click('[data-end]:first-child');await q.waitForTimeout(600);
     ok(/#\/lab\//.test(q.url()),'onboarding termina dentro da primeira atividade');
     ok(await q.evaluate(()=>CH.store.state.profile.onboarded===true&&!!CH.store.state.profile.persona),'onboarding completo grava nome e persona');
     ok(!q.errs.length,'sem erros '+q.errs);await q.context().close(); }
@@ -213,7 +213,9 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     await q.goto(URL+'#/inicio');await q.waitForTimeout(600);ok(await q.evaluate(()=>/Débora Augusta Alves Santos e Claude/.test(document.querySelector('.ini-cr').textContent)),'Início traz o crédito de desenvolvimento');
     await c.close() }
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,reducedMotion:'reduce'});await c.addInitScript(()=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'M',persona:'som',onboarded:true},seen:{tour:1}}))});const q=await c.newPage();await q.goto(URL+'#/eu');await q.waitForTimeout(1000);
-    ok(await q.evaluate(()=>document.querySelector('.mh-v').paused),'movimento reduzido: o vídeo do perfil não toca sozinho');await c.close() }
+    await q.waitForTimeout(900);ok(await q.evaluate(()=>!document.querySelector('.mh-v').paused),'aparelho em "reduzir movimento": o vídeo do personagem continua tocando (conteúdo principal)');await c.close() }
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true});await c.addInitScript(()=>{localStorage.setItem('ch:v1',JSON.stringify({v:1,profile:{name:'M',persona:'som',onboarded:true},prefs:{motion:'off'},seen:{tour:1}}))});const q=await c.newPage();await q.goto(URL+'#/eu');await q.waitForTimeout(1200);
+    ok(await q.evaluate(()=>document.querySelector('.mh-v').paused),'Meu espaço → Movimento "Reduzido" (preferência do site): o vídeo do personagem não toca sozinho');await c.close() }
 
   console.log('\n3d7. Todo take tem arquivo (tela preta / imagem quebrada nunca) e nenhum texto sublinhado');
   { const D=(new Function('window',fs.readFileSync(path.join(ROOT,'data/data.js'),'utf8')+';return window.CH_DATA'))({});

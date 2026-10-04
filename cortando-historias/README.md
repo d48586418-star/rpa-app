@@ -108,3 +108,9 @@ As fotos em `assets/museu/` (Méliès, Porter, Griffith, Kuleshov, Eisenstein, P
 - **Design "vidro minimalista"** (definição em `DESIGN_DECISIONS.md`): botões e navegação são vidro, sem preenchimento colorido e sem troca de cor no hover.
 - **Fontes de pesquisa na tela:** Museu (nome do site + link por parada), "Quem foi?", conceitos, "O que é edição?" e Guia mostram "Fonte: …" em fonte pequena; o que não tem origem verificada aparece como "texto do projeto". Fotos do Museu: "imagem da internet (fonte e licença não registradas)".
 - **Limites honestos:** takes `CD_BH_01–08` ainda não estão no pacote (aguardando os arquivos da autora); o validador também aponta o pacote `NZ_*`; não testado em Safari/iOS reais nem com leitor de tela real.
+
+## Rodada 8: celular e continuidade
+- **Movimento:** só a preferência do site (Meu espaço → Movimento → Reduzido) desliga a abertura, os vídeos dos personagens e a coreografia da escolha. Se apenas o aparelho está em "reduzir movimento" (comum em celulares e no app), os efeitos continuam em versão suave (sem giros, zoom curto) e os vídeos tocam. `CH.motionOff()` em `js/core.js`.
+- **Abertura:** pílula mais curta (texto centralizado ao lado da bolinha, conclui com 70% do curso); "O simulador de timeline" maior e entrando palavra por palavra; a escolha de perfil real carrega num iframe invisível e aparece desfocada atrás da bolinha enquanto a câmera entra, ganhando foco, sem trocar de tela no meio do movimento (`from-cap2`).
+- **Escolha de perfil:** controlador de vidro no rodapé (cápsula acompanha o dedo, bolinhas enchem), vizinhos desfocam/esmaecem ao deslizar, "Escolher" recolhe o controlador em cápsula com o nome do perfil e segue. Margens de safe-area no alto e embaixo.
+- Tela final: só "Começar a jornada".
