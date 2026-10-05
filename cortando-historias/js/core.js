@@ -69,7 +69,7 @@ CH.naCartilha=(kind,id)=>{
 CH.desc=t=>String((t&&t.s)||"").replace(/\s+de\s+[A-Z]{2}_[A-Za-z0-9]+/g,"");
 CH.PERSONAS={};D.personas.personas.forEach(x=>CH.PERSONAS[x.id]=x);
 CH.persona=()=>CH.PERSONAS[CH.store.persona()]||null;
-CH.videoSources=(base)=>`<source src="${base}.webm" type='video/webm; codecs="vp9, opus"'><source src="${base}.mp4" type="video/mp4">`;
+CH.videoSources=(base)=>{const w=`<source src="${base}.webm" type='video/webm; codecs="vp9, opus"'>`,m=`<source src="${base}.mp4" type="video/mp4">`;return CH.preferMp4?m+w:w+m};
 CH.linkDaAtividade=id=>location.href.split("#")[0]+"#/"+(id===CH.LIVRE?"livre":"lab/"+id);
 /* primeiro plano da atividade = imagem que a representa */
 CH.capaDe=id=>{const a=CH.ACT[id];const t=a&&CH.TK[a.pool[0]];return t?t.th:""};

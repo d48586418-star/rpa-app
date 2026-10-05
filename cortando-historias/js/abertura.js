@@ -126,7 +126,7 @@ function entrar(){
   var portal=D.createElement("i");portal.className="portal";portal.style.cssText="left:"+(cx-d/2)+"px;top:"+(cy-d/2)+"px;width:"+d+"px;height:"+d+"px";stage.appendChild(portal);
   var S=Math.hypot(W,H)*2/d;base.style.transformOrigin=cx+"px "+cy+"px";base.classList.add("zoom");
   void portal.offsetWidth;
-  requestAnimationFrame(function(){portal.style.transform="scale("+S.toFixed(1)+")";base.style.transform="scale(2.6)"});
+  requestAnimationFrame(function(){portal.style.transform="scale("+S.toFixed(1)+")";base.style.transform="scale(2.2)"});
   setTimeout(function(){if(viaFrame)labFrame.classList.add("on");portal.classList.add("fade")},420);
   setTimeout(function(){seguir(viaFrame)},viaFrame?1150:900);
 }

@@ -63,8 +63,8 @@ h1,p{margin:0}
 .redmo .base.zoom{transition:opacity .25s linear;opacity:0}
 
 /* próxima tela (escolha de perfil) desfocada, aparece enquanto a câmera entra na bolinha */
-.peek{position:fixed;inset:0;z-index:4;pointer-events:none;background:#9b5745 url(../assets/personas/full/historias.jpg) 60% 50%/cover no-repeat;filter:blur(22px);transform:scale(1.12);opacity:0;transition:opacity .55s linear .08s}
-.go .peek{opacity:.94}
+.peek{position:fixed;inset:0;z-index:4;pointer-events:none;background:#9b5745 url(../assets/personas/full/historias.jpg) 60% 50%/cover no-repeat;filter:blur(10px);transform:scale(1.04);opacity:0;transition:opacity .55s linear .08s}
+.go .peek{opacity:1}
 .redmo .peek{transition-duration:.25s;transition-delay:0s}
 
 /* aparelho com "reduzir movimento" ligado: os efeitos continuam, sem giros e com zoom curto */

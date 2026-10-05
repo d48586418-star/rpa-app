@@ -246,11 +246,8 @@ textarea{border-radius:var(--r3)}
 .ws3.colored .w-hint,.ws3.colored .w-back,.ws3.colored .pd-rep,.ws3.colored .pd-more summary,.ws3.colored .pd-more p,.ws3.colored .pd-more li,.ws3.colored .pd-ia,.ws3.colored .eyebrow,.ws4 .go-q,.ws4 .go-q b,.ws4 .eyebrow,.ws4 .pd-ia,.ws4 .w-link,.me-hero .eyebrow,.me-hero .mh-q,.me-hero .mh-cr{opacity:1!important;color:var(--pf)!important}
 .mh-tx .btn:hover{background:transparent}
 .ws3.colored .chips li{background:transparent!important;color:var(--pf)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pf) 60%,transparent)}
-/* chegada vinda da abertura: a câmera entrou na bolinha e a escolha de perfil já aparecia desfocada; aqui ela ganha foco (blur 18px → 0) e a câmera recua (1,08 → 1) */
+/* chegada vinda da abertura: só a cor de fundo (sem blur/escala no body, que travavam o vídeo no celular) */
 .from-cap{background:#9b5745}
-.from-cap body{animation:chegada .8s cubic-bezier(.2,.715,.205,.99) both}
-@keyframes chegada{from{opacity:.6;transform:scale(1.08);filter:blur(18px)}to{opacity:1;transform:none;filter:blur(0)}}
 /* chegada "2": a escolha de perfil já estava na tela (iframe da abertura), então a troca de documento não anima nada */
 .from-cap2{background:#9b5745}
 .from-cap2 body,.from-cap2 .ws.in{animation:none!important}
-@media (prefers-reduced-motion:reduce){.from-cap body{animation:chegada-r .4s linear both}@keyframes chegada-r{from{opacity:0}to{opacity:1}}}
