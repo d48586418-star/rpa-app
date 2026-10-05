@@ -25,7 +25,7 @@ const URL='http://localhost:'+PORT+'/lab.html',LAND='http://localhost:'+PORT+'/i
     ok(await q.evaluate(()=>document.getElementById('stage').classList.contains('title')&&document.getElementById('pill').classList.contains('show')),w+'px: arrastar a navalha corta e mostra título e pílula');
     const pr=await q.evaluate(()=>{const p=document.getElementById('pill').getBoundingClientRect(),k=document.getElementById('knob').getBoundingClientRect();return {px:p.x,pw:p.width,y:k.y+k.height/2,kx:k.x+k.width/2}});
     await q.mouse.move(pr.kx,pr.y);await q.mouse.down();await q.mouse.move(pr.px+pr.pw-8,pr.y,{steps:12});await q.mouse.up();await q.waitForTimeout(1500);
-    ok(/lab\.html/.test(q.url())&&/boas-vindas/.test(q.url()),w+'px: pílula leva às boas-vindas');
+    ok(/lab\.html/.test(q.url())&&/escolher/.test(q.url()),w+'px: pílula leva às boas-vindas');
     ok(!q.errs.length,w+'px: abertura sem erros '+q.errs);await q.context().close();
   }
   console.log('\n1. Rotas × viewports (sem erro, sem overflow horizontal)');

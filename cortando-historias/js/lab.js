@@ -148,14 +148,14 @@ class Lab{
       const tabs=$$("[data-tab]",this.el).filter(x=>!x.hidden&&x.offsetParent!==null),i=tabs.indexOf(b);
       if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=tabs[(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length];n.focus();this.setTab(n.dataset.tab)}}});
     this.bindTimeline();
-    this._ro=new ResizeObserver(()=>{if(!this.destroyed&&this._lastW!==this.$("#tl-scroll").clientWidth)this.renderTL()});
-    this._ro.observe(this.$("#tl-scroll"));
+    if(typeof ResizeObserver!=="undefined"){this._ro=new ResizeObserver(()=>{if(!this.destroyed&&this._lastW!==this.$("#tl-scroll").clientWidth)this.renderTL()});
+    this._ro.observe(this.$("#tl-scroll"))}
     this._key=e=>{
       if(e.target.closest("input,textarea,select,dialog"))return;
       if(e.key===" "&&e.target===document.body){e.preventDefault();this.togglePlay()}};
     document.addEventListener("keydown",this._key);
   }
-  destroy(){document.documentElement.style.removeProperty("--dock-pad");this.destroyed=true;this.saveDraftNow();this.mix&&this.mix.destroy();this.player.destroy();this._ro&&this._ro.disconnect();document.removeEventListener("keydown",this._key);this.closeOverlays&&this.closeOverlays()}
+  destroy(){document.documentElement.style.removeProperty("--dock-pad");this.destroyed=true;this.saveDraftNow();this.mix&&this.mix.destroy();this.player.destroy();this._ro&&this._ro&&this._ro.disconnect();document.removeEventListener("keydown",this._key);this.closeOverlays&&this.closeOverlays()}
   saveDraftNow(){clearTimeout(this._sd);CH.store.setDraft(this.exId,this.seq.length?{seq:this.seq,aud:this.aud,watched:this.watched,from:this.fromVersion}:null)}
 
   dockPad(){

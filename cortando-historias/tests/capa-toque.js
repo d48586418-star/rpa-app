@@ -23,10 +23,38 @@ const URL=process.env.CAPA||'http://localhost:8766/index.html';
     ok(await p.evaluate(()=>{const e=document.getElementById('pill'),r=e.getBoundingClientRect();return e.classList.contains('show')&&r.height>=52&&r.left>=0&&r.right<=innerWidth}),`${rot}: pílula "Arraste para iniciar" (≥ 52 px) dentro da tela`);
     const pl=await centro(p,'pill'),kn=await centro(p,'knob');
     await toque(cd,kn.x,kn.y,pl.x+pl.w/2-10,kn.y);await p.waitForTimeout(1500);
-    ok(/lab\.html/.test(p.url())&&/boas-vindas/.test(p.url()),`${rot}: arrastar a bolinha (esq→dir) leva às boas-vindas`);
+    ok(/lab\.html/.test(p.url())&&/escolher/.test(p.url()),`${rot}: arrastar a bolinha (esq→dir) leva às boas-vindas`);
     ok(await p.evaluate(()=>!!document.querySelector('#pick')&&!document.querySelector('.ws3').hidden&&/Escolha o seu perfil/.test(document.querySelector('.pf-kick').textContent)),`${rot}: chega direto na escolha de perfil (sem capa nem nome)`);
     ok(!errs.length,`${rot}: sem erros ${errs}`);await c.close();
   }
+  { /* armazenamento bloqueado (visualizadores restritos): arrastar a bolinha ainda leva à escolha de perfil */
+    const c=await b.newContext({viewport:{width:390,height:700},hasTouch:true,isMobile:true,reducedMotion:'reduce'});
+    await c.addInitScript(()=>{const t=()=>{throw new DOMException('blocked','SecurityError')};try{Object.defineProperty(window,'localStorage',{get:t});Object.defineProperty(window,'sessionStorage',{get:t})}catch(e){}});
+    const p=await c.newPage();const cd=await c.newCDPSession(p);const errs=[];p.on('pageerror',e=>errs.push(e.message));
+    await p.goto(URL);await p.waitForTimeout(1800);
+    let bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(3800);
+    const pl=await centro(p,'pill'),kn=await centro(p,'knob');await toque(cd,kn.x,kn.y,pl.x+pl.w/2-8,kn.y);await p.waitForTimeout(3600);
+    ok(/lab\.html#\/escolher/.test(p.url()),'sem armazenamento: a bolinha leva a lab.html#/escolher');
+    ok(await p.evaluate(()=>!!document.querySelector('.pf-kick')&&!document.querySelector('.ws3').hidden),'sem armazenamento: aparece a escolha de perfil (não a capa)');
+    ok(!errs.length,'sem armazenamento: sem erros de script '+errs.slice(0,2));await c.close() }
+  { /* voltar para a abertura (bfcache/retorno ao app) não deixa a tela congelada no zoom */
+    const c=await b.newContext({viewport:{width:390,height:700},hasTouch:true,isMobile:true});const p=await c.newPage();const cd=await c.newCDPSession(p);
+    await p.goto(URL);await p.waitForTimeout(1800);let bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(3800);
+    const pl=await centro(p,'pill'),kn=await centro(p,'knob');await toque(cd,kn.x,kn.y,pl.x+pl.w/2-8,kn.y);await p.waitForTimeout(3600);
+    ok(await p.evaluate(()=>!document.querySelector('.lab-frame')),'toque: sem iframe invisível (leve)');
+    await p.click('.ws3 .w-back');await p.waitForTimeout(1500);
+    ok(await p.evaluate(()=>!!document.getElementById('pill')&&!document.querySelector('.portal')),'Voltar leva à abertura nova (sem círculo branco preso)');
+    /* retorno por bfcache/app em segundo plano: simula pageshow persistido logo após o zoom */
+    bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(3800);
+    const pl2=await centro(p,'pill'),kn2=await centro(p,'knob');await p.route('**/lab.html**',async r=>{await new Promise(x=>setTimeout(x,9000));r.continue().catch(()=>{})});await toque(cd,kn2.x,kn2.y,pl2.x+pl2.w/2-8,kn2.y);await p.waitForTimeout(500);
+    await p.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await p.waitForTimeout(300);
+    ok(await p.evaluate(()=>!document.querySelector('.portal')&&!document.getElementById('stage').classList.contains('go')&&document.getElementById('base').style.transform===''),'pageshow persistido limpa o zoom congelado');await c.close() }
+  { /* se a troca de página falhar, o link manual aparece e a navegação é tentada de novo */
+    const c=await b.newContext({viewport:{width:390,height:700},hasTouch:true,isMobile:true});const p=await c.newPage();const cd=await c.newCDPSession(p);
+    await p.route('**/lab.html**',async r=>{await new Promise(x=>setTimeout(x,9000));r.continue().catch(()=>{})});
+    await p.goto(URL);await p.waitForTimeout(1800);let bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(3800);
+    const pl=await centro(p,'pill'),kn=await centro(p,'knob');await toque(cd,kn.x,kn.y,pl.x+pl.w/2-8,kn.y);await p.waitForTimeout(3700);
+    ok(await p.evaluate(()=>{const l=document.getElementById('entrar-link');return !!l&&!l.hidden}),'navegação falhou: o link "Entrar" aparece como saída manual');await c.close() }
   { /* mouse em tela larga + soltar no meio volta */
     const c=await b.newContext({viewport:{width:1920,height:1080}});const p=await c.newPage();await p.goto(URL);await p.waitForTimeout(1800);
     const bl=await centro(p,'blade');
@@ -44,6 +72,6 @@ const URL=process.env.CAPA||'http://localhost:8766/index.html';
     await p.keyboard.press('Enter');await p.waitForTimeout(1200);
     ok(/lab\.html/.test(p.url()),'teclado: Enter na pílula entra no laboratório');await c.close() }
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,javaScriptEnabled:false});const p=await c.newPage();await p.goto(URL);await p.waitForTimeout(400);
-    ok(await p.evaluate(()=>{const a=document.querySelector('.ns');return !!a&&a.getBoundingClientRect().height>0&&/boas-vindas/.test(a.href)}),'sem JS: título e link de texto para o laboratório');await c.close() }
+    ok(await p.evaluate(()=>{const a=document.querySelector('.ns');return !!a&&a.getBoundingClientRect().height>0&&/escolher/.test(a.href)}),'sem JS: título e link de texto para o laboratório');await c.close() }
   await b.close();console.log(bad?`\nFALHOU ${bad}`:'\nTUDO OK');process.exit(bad?1:0);
 })();

@@ -86,3 +86,7 @@ h1,p{margin:0}
 .lab-frame{z-index:3}
 .go-frame .peek{display:none}
 .go .peek{z-index:5}
+
+/* saída de emergência (aparece só se algo falhar ou demorar) */
+.entrar-link{position:absolute;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 34px);transform:translateX(-50%);z-index:9;display:inline-flex;align-items:center;min-height:44px;padding:0 22px;border-radius:999px;color:#fff;font:500 .95rem/1 var(--display,Helvetica,Arial,sans-serif);text-decoration:none;border:1px solid rgb(255 255 255 / .6);background:rgb(255 255 255 / .14)}
+.entrar-link[hidden]{display:none}

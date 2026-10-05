@@ -114,3 +114,9 @@ As fotos em `assets/museu/` (Méliès, Porter, Griffith, Kuleshov, Eisenstein, P
 - **Abertura:** pílula mais curta (texto centralizado ao lado da bolinha, conclui com 70% do curso); "O simulador de timeline" maior e entrando palavra por palavra; a escolha de perfil real carrega num iframe invisível e aparece desfocada atrás da bolinha enquanto a câmera entra, ganhando foco, sem trocar de tela no meio do movimento (`from-cap2`).
 - **Escolha de perfil:** controlador de vidro no rodapé (cápsula acompanha o dedo, bolinhas enchem), vizinhos desfocam/esmaecem ao deslizar, "Escolher" recolhe o controlador em cápsula com o nome do perfil e segue. Margens de safe-area no alto e embaixo.
 - Tela final: só "Começar a jornada".
+
+## Rodada 9: robustez no celular
+- **`lab.html#/escolher`** abre direto na escolha de perfil e não depende de `sessionStorage` (alguns visualizadores bloqueiam o armazenamento). A abertura navega para ela.
+- Se a troca de página falhar ou demorar, aparece o link "Entrar" (e a navegação é tentada de novo); ao voltar ou retornar ao app (`pageshow`/`visibilitychange`) o zoom congelado é desfeito.
+- A cópia invisível da escolha (iframe) só é usada em computador; no toque o zoom usa o círculo branco e a imagem desfocada (leve).
+- `css/compat.css`: alternativas sem `color-mix()` para navegadores antigos. `lab.html` mostra "Não foi possível carregar" com botão se o app não montar.

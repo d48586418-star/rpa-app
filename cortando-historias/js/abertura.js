@@ -4,7 +4,7 @@
    Toda a geometria das folhas/navalha é calculada num espaço espelhado (u = W − x). Só transform/opacity/clip-path. */
 (function(){
 "use strict";
-var D=document,R=D.documentElement,LAB="lab.html#/boas-vindas";
+var D=document,R=D.documentElement,LAB="lab.html#/escolher",LINK=D.getElementById("entrar-link");
 var stage=D.getElementById("stage"),sheets=D.getElementById("sheets"),blade=D.getElementById("blade"),hint=D.getElementById("hint"),base=D.getElementById("base"),
     ttl=D.getElementById("ttl"),ln1=D.getElementById("ln1"),ln2=D.getElementById("ln2"),pill=D.getElementById("pill"),knob=D.getElementById("knob"),pillT=D.querySelector(".pill-t");
 if(!stage||!blade||!sheets)return;
@@ -102,9 +102,9 @@ blade.addEventListener("keydown",function(e){
 function setPill(d){pillState.d=clamp(d,0,pillState.travel);knob.style.transform="translate3d("+pillState.d.toFixed(1)+"px,0,0)";pillT.style.opacity=String(1-clamp(pillState.d/(pillState.travel*.5),0,1));pill.setAttribute("aria-valuenow",Math.round(pillState.d/pillState.travel*100))}
 /* a escolha de perfil real é carregada em segundo plano (invisível) para a câmera "entrar" nela sem trocar de documento no meio do movimento */
 var labFrame=null,labPronto=false;
+var fino=false;try{fino=matchMedia("(hover:hover) and (pointer:fine)").matches&&!(navigator.connection&&navigator.connection.saveData)}catch(e){}
 function preparaLab(){
-  if(labFrame||reduzido)return;
-  try{sessionStorage.setItem("ch:go3","1")}catch(e){}
+  if(labFrame||reduzido||!fino)return;   /* a cópia invisível da escolha só em computador; no toque é pesada e frágil */
   try{
     labFrame=D.createElement("iframe");labFrame.className="lab-frame";labFrame.name="ch-peek";labFrame.src=LAB;labFrame.setAttribute("aria-hidden","true");labFrame.setAttribute("tabindex","-1");labFrame.setAttribute("title","");labFrame.setAttribute("inert","");labFrame.setAttribute("scrolling","no");
     labFrame.addEventListener("load",function(){setTimeout(function(){labPronto=true},500)});
@@ -125,7 +125,27 @@ function entrar(){
   setTimeout(function(){if(viaFrame)labFrame.classList.add("on");portal.classList.add("fade")},420);
   setTimeout(function(){irLab(viaFrame)},viaFrame?1150:900);
 }
-function irLab(viaFrame){try{sessionStorage.setItem("ch:cap",viaFrame?"2":"1");sessionStorage.setItem("ch:go3","1")}catch(e){}location.replace(LAB)}
+var indo=false;
+function mostraLink(){try{LINK&&(LINK.hidden=false)}catch(e){}}
+function irLab(viaFrame){
+  if(indo)return;indo=true;
+  try{sessionStorage.setItem("ch:cap",viaFrame?"2":"1");sessionStorage.setItem("ch:go3","1")}catch(e){}
+  try{location.replace(LAB)}catch(e){try{location.assign(LAB)}catch(x){location.href=LAB}}
+  /* se a troca de página não acontecer (visualizador, rede, suspensão), tenta de novo por outro caminho e mostra a saída manual */
+  setTimeout(function(){mostraLink();setTimeout(function(){try{location.href=LAB}catch(e){}},1500)},2200);
+}
+/* volta (bfcache) ou retorno ao app: nunca deixar a tela congelada no zoom branco */
+function reinicia(){
+  indo=false;pillState.done=false;pillState.drag=false;
+  var p=D.querySelector(".portal");if(p&&p.parentNode)p.parentNode.removeChild(p);
+  if(labFrame&&labFrame.parentNode){labFrame.parentNode.removeChild(labFrame)}labFrame=null;labPronto=false;
+  stage.classList.remove("go","go-frame");base.classList.remove("zoom");base.style.transform="";base.style.transformOrigin="";
+  knob.style.transition="none";setPill(0);knob.style.opacity="";if(LINK)LINK.hidden=true;
+}
+addEventListener("pageshow",function(e){if(e.persisted||pillState.done)reinicia()});
+D.addEventListener("visibilitychange",function(){if(!D.hidden&&pillState.done&&!indo)reinicia()});
+/* qualquer erro de script na abertura: oferece a saída manual em vez de uma tela parada */
+addEventListener("error",function(){mostraLink()});addEventListener("unhandledrejection",function(){mostraLink()});
 var px0=0;
 pill.addEventListener("pointerdown",function(e){if(pillState.done||!pill.classList.contains("show"))return;pillState.drag=true;px0=e.clientX-pillState.d;try{pill.setPointerCapture(e.pointerId)}catch(x){}knob.style.transition="none"});
 pill.addEventListener("pointermove",function(e){if(pillState.drag)setPill(e.clientX-px0)});

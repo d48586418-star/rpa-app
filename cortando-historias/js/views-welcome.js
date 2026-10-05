@@ -7,7 +7,8 @@ CH.views=CH.views||{};
 
 CH.views.welcome=function(root,mode){
   const troca=mode==="troca";
-  const fromCap=(()=>{try{const v=sessionStorage.getItem('ch:go3');sessionStorage.removeItem('ch:go3');return v==='1'}catch(e){return false}})();let step=(troca||fromCap)?3:(CH.store.name()?3:2),nameAsked=false,pick=CH.store.persona()||(()=>{try{const h=localStorage.getItem('ch:persona-hint');return CH.PERSONAS[h]?h:null}catch(e){return null}})(),nome=CH.store.name();
+  /* "#/escolher" abre direto na escolha de perfil; não depende de armazenamento (alguns visualizadores o bloqueiam) */
+  const fromCap=mode==="escolher"||(()=>{try{const v=sessionStorage.getItem('ch:go3');sessionStorage.removeItem('ch:go3');return v==='1'}catch(e){return false}})();let step=(troca||fromCap)?3:(CH.store.name()?3:2),nameAsked=false,pick=CH.store.persona()||(()=>{try{const h=localStorage.getItem('ch:persona-hint');return CH.PERSONAS[h]?h:null}catch(e){return null}})(),nome=CH.store.name();
   document.body.classList.add("immersive");
   const first=CH.allActs()[0];
   const P=CH.data.personas.personas;

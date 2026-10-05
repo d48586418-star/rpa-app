@@ -21,6 +21,7 @@ const ROUTES=[
   [/^\/edicao$/,"guia",(c,m)=>{location.replace("#/guia");return {}}],
   [/^\/guia$/,"guia",(c,m)=>CH.views.guia(c,m)],
   [/^\/boas-vindas$/,"inicio",(c,m)=>CH.views.welcome(c)],
+  [/^\/escolher$/,"inicio",(c,m)=>CH.views.welcome(c,"escolher")],
   [/^\/editor$/,"eu",(c,m)=>CH.views.editor(c)],
   [/^\/contraste$/,"percurso",(c,m)=>CH.views.contraste(c,m)],
   [/^\/caderno$/,"caderno",(c,m)=>CH.views.notebook(c,m)],
