@@ -34,7 +34,7 @@ body.immersive #app{padding-bottom:0;margin-top:0}
 
 /* ===== 3: escolha do perfil — corpo inteiro, um palco de 100vw por personagem, barra de vidro "Escolha →" que recolhe em "Reset" ===== */
 :root{--retake-ease:cubic-bezier(.22,1,.36,1);--retake-slow-ease:cubic-bezier(.65,0,.35,1)}
-.ws3{padding:0!important;background:var(--cb,var(--bg));color:var(--cf,var(--ink))}
+.ws3{--cb:#9b5745;--cf:#fff;padding:0!important;background:#9b5745;background:var(--cb);color:#fff;color:var(--cf)}
 .ws3 .w-back{color:var(--cf,var(--ink));z-index:7;min-height:40px;border-radius:999px}
 .ws3 .w-back:hover{background:rgb(255 255 255 / .16);color:var(--cf,var(--ink))}
 .pk2{position:relative;height:100vh;height:100dvh;overflow:hidden;color:var(--cf,var(--ink))}

@@ -40,7 +40,7 @@ CH.views.welcome=function(root,mode){
     </form>
   </section>
 
-  <section class="ws ws3" data-step="3" aria-labelledby="w3-t" hidden>
+  <section class="ws ws3" data-step="3" aria-labelledby="w3-t" style="--cb:#9b5745;--cf:#fff" hidden>
     ${fromCap&&!troca?`<a class="w-back" href="index.html">${icon("back")}Voltar</a>`:`<button class="w-back" type="button" data-go="${troca?"back":"2"}">${icon("back")}${troca?"Meu espaço":"Voltar"}</button>`}
     <div class="pk2" id="pick" data-state="base">
       <div class="pk2-track" id="pk2-track" role="group" aria-roledescription="carrossel" aria-label="Perfis de editor" tabindex="0">${P.map((p,k)=>{
@@ -201,6 +201,7 @@ CH.views.welcome=function(root,mode){
   $("#w-name",wel).addEventListener("submit",e=>{e.preventDefault();const v=$("#w-nm",wel).value.trim();CH.store.setName(v);nome=v;CH.who&&CH.who();show(person()?4:3)});
   $("[data-skipname]",wel).onclick=()=>{CH.store.setName("");CH.who&&CH.who();show(person()?4:3)};
   show(step);
+  if(window.name==="ch-peek"&&window.parent!==window){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{window.parent.postMessage("ch-peek-ok","*")}catch(e){}}))}
   if(troca&&pick){/* na troca, abre já no editor atual */}
   return{title:"Boas-vindas",destroy(){document.body.classList.remove("immersive");token++;timers.forEach(clearTimeout);timers.clear();stopVideos()}};
 };

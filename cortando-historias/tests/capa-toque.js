@@ -1,7 +1,7 @@
 /* Abertura em 3 cenas: (1) navalha na borda esquerda; (2) o aluno a arrasta para a direita e corta; (3) título nasce e a bolinha da pílula (à esquerda) arrastada para a direita faz o zoom e leva direto à escolha de perfil.
    360/390/430 (toque) × (normal, Reduzir Movimento), mouse 1920, teclado e sem JS. */
 const {chromium}=require('playwright');
-const URL=process.env.CAPA||'http://localhost:8766/index.html';
+const URL=process.env.CAPA||'http://localhost:8766/index.html';const LAB_URL=URL.replace('index.html','lab.html')+'#/escolher';
 (async()=>{
   const b=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM?{executablePath:process.env.PLAYWRIGHT_CHROMIUM}:{});let bad=0;const ok=(c,m)=>{console.log((c?'  ✓ ':'  ✗ ')+m);if(!c)bad++};
   const centro=(p,id)=>p.evaluate(i=>{const r=document.getElementById(i).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,w:r.width,h:r.height}},id);
@@ -55,6 +55,19 @@ const URL=process.env.CAPA||'http://localhost:8766/index.html';
     await p.goto(URL);await p.waitForTimeout(1800);let bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(3800);
     const pl=await centro(p,'pill'),kn=await centro(p,'knob');await toque(cd,kn.x,kn.y,pl.x+pl.w/2-8,kn.y);await p.waitForTimeout(3700);
     ok(await p.evaluate(()=>{const l=document.getElementById('entrar-link');return !!l&&!l.hidden}),'navegação falhou: o link "Entrar" aparece como saída manual');await c.close() }
+  { /* título estável depois do corte (sem "pulo") e fonte atrasada em 1,5 s */
+    const c=await b.newContext({viewport:{width:390,height:700},hasTouch:true,isMobile:true});const p=await c.newPage();const cd=await c.newCDPSession(p);
+    await p.route('**/*.woff2',async r=>{await new Promise(x=>setTimeout(x,1500));r.continue().catch(()=>{})});
+    await p.goto(URL);await p.waitForTimeout(2200);let bl=await centro(p,'blade');await toque(cd,bl.x,bl.y,390*.88,bl.y);await p.waitForTimeout(2200);
+    const amostras=[];for(let i=0;i<14;i++){await p.waitForTimeout(150);amostras.push(await p.evaluate(()=>{const r=document.getElementById('ln2').getBoundingClientRect();return [r.x,r.y,r.width]}))}
+    const d=k=>Math.max(...amostras.map(a=>a[k]))-Math.min(...amostras.map(a=>a[k]));
+    ok(d(0)<=2&&d(1)<=2&&d(2)<=8,'título não pula depois do corte (Δx '+d(0).toFixed(1)+', Δy '+d(1).toFixed(1)+', Δlargura '+d(2).toFixed(1)+')');await c.close() }
+  { /* abrir a escolha direto, com rede lenta e sem cache: nunca branco (cor de chegada + "Carregando…") */
+    const c=await b.newContext({viewport:{width:390,height:700},hasTouch:true,isMobile:true});const p=await c.newPage();const cd=await c.newCDPSession(p);
+    await cd.send('Network.enable');await cd.send('Network.setCacheDisabled',{cacheDisabled:true});await cd.send('Network.emulateNetworkConditions',{offline:false,latency:200,downloadThroughput:150*1024,uploadThroughput:100*1024});
+    p.goto(LAB_URL).catch(()=>{});await p.waitForTimeout(500);
+    const cor=await p.evaluate(()=>getComputedStyle(document.documentElement).backgroundColor+'|'+!!document.getElementById('boot-splash'));
+    ok(/rgb\(155, 87, 69\)\|true/.test(cor),'escolha aberta a frio: fundo terracota e "Carregando…" desde o primeiro instante ('+cor+')');await c.close() }
   { /* mouse em tela larga + soltar no meio volta */
     const c=await b.newContext({viewport:{width:1920,height:1080}});const p=await c.newPage();await p.goto(URL);await p.waitForTimeout(1800);
     const bl=await centro(p,'blade');

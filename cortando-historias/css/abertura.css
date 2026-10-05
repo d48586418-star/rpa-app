@@ -48,9 +48,9 @@ h1,p{margin:0}
 .redmo.exit .sheets{opacity:0}
 .redmo .pill,.redmo .base.lit{transition-duration:.2s}
 /* título: HTML, cada letra numa máscara; sobem em cascata, o tracking fecha e uma linha fina de corte percorre o título */
-.ttl{position:absolute;left:50%;top:var(--ty,45%);transform:translate(-50%,-50%) scale(1.14);width:max-content;text-align:center;font-family:var(--display);font-weight:800;color:var(--fg);line-height:.86;white-space:nowrap;transition:transform 1.9s var(--ease)}
+.ttl{position:absolute;left:50%;top:var(--ty,45%);transform:translate(-50%,-50%);width:max-content;text-align:center;font-family:var(--display);font-weight:800;color:var(--fg);line-height:.86;white-space:nowrap;transition:transform 1.9s var(--ease)}
 .title .ttl{transform:translate(-50%,-50%)}
-.ln{display:block;letter-spacing:.06em;transition:letter-spacing 1.35s var(--ease)}
+.ln{display:block;letter-spacing:.02em;transition:letter-spacing 1.35s var(--ease)}
 .ln1{font-size:calc(var(--fsH,120px) * .62)}.ln2{font-size:var(--fsH,120px)}
 .title .ln{letter-spacing:-.07em}
 .m{display:inline-block;overflow:hidden;vertical-align:top;padding:.3em .01em .14em;margin:-.3em 0 -.14em}
@@ -90,3 +90,5 @@ h1,p{margin:0}
 /* saída de emergência (aparece só se algo falhar ou demorar) */
 .entrar-link{position:absolute;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 34px);transform:translateX(-50%);z-index:9;display:inline-flex;align-items:center;min-height:44px;padding:0 22px;border-radius:999px;color:#fff;font:500 .95rem/1 var(--display,Helvetica,Arial,sans-serif);text-decoration:none;border:1px solid rgb(255 255 255 / .6);background:rgb(255 255 255 / .14)}
 .entrar-link[hidden]{display:none}
+
+.ttl{visibility:hidden}.medido .ttl{visibility:visible}

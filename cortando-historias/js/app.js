@@ -73,6 +73,7 @@ function route(){
   window.scrollTo(0,0);
   try{cur=hit[0][2](holder,hit[1])||{}}catch(err){console.error(err);holder.innerHTML=`<div class="page"><h1 class="h2">Algo não abriu</h1><p class="lead">Volte ao <a class="link" href="#/inicio">início</a> e tente de novo.</p></div>`;cur={}}
   setCurrent(hit[0][1]);who();
+  {const sp=document.getElementById("boot-splash");if(sp)sp.remove();document.documentElement.classList.remove("from-url")}
   document.title=(cur.title?cur.title+", ":"")+"Cortando Histórias";
   const hd=$("#page-title",holder)||$("h1",holder);
   if(hd){hd.setAttribute("tabindex","-1");hd.focus({preventScroll:true})}
