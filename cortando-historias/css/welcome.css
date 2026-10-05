@@ -85,7 +85,7 @@ body.immersive #app{padding-bottom:0;margin-top:0}
 :root{--retake-ease:cubic-bezier(.22,1,.36,1);--retake-slow-ease:cubic-bezier(.65,0,.35,1)}
 .pk-ctl{position:absolute;left:50%;bottom:calc(var(--sab) + 18px);z-index:6;transform:translateX(-50%);height:44px;color:var(--cf,var(--ink));transition:opacity 300ms var(--retake-ease)}
 .pk-cells{display:flex;align-items:center;justify-content:center;height:100%}
-.pk-dot{width:34px;height:44px;display:grid;place-items:center;background:none;border:0;padding:0;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pk-dot{width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:none;border:0;padding:0;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .pk-dot::before{content:"";height:5px;width:calc(5px + 9px * var(--f,0));border-radius:5px;background:currentColor;opacity:calc(.35 + .65 * var(--f,0))}
 .pk-dot:focus-visible{outline:2px solid currentColor;outline-offset:-6px;border-radius:999px}
 .pk-dot:disabled{cursor:default}
