@@ -7,3 +7,4 @@ beautifulsoup4==4.12.3
 python-multipart==0.0.9
 google-auth-oauthlib==1.2.1
 google-api-python-client==2.149.0
+python-dotenv==1.0.1

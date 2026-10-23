@@ -12,6 +12,13 @@ from contextlib import contextmanager
 import feedparser, requests
 from bs4 import BeautifulSoup
 
+# Load .env if present (local dev)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent / ".env")
+except ImportError:
+    pass
+
 try:
     from google_auth_oauthlib.flow import Flow
     from googleapiclient.discovery import build
