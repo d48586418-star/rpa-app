@@ -131,6 +131,69 @@ def init_db():
             content TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS checklist_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question TEXT NOT NULL,
+            answer TEXT,
+            period TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS references_library (
+            id TEXT PRIMARY KEY,
+            type TEXT NOT NULL,
+            url TEXT NOT NULL,
+            title TEXT,
+            channel TEXT,
+            thumbnail TEXT,
+            notes TEXT,
+            tags TEXT DEFAULT '[]',
+            project_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS financial_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,
+            amount REAL NOT NULL,
+            description TEXT NOT NULL,
+            category TEXT,
+            date TEXT NOT NULL,
+            project_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS ideas (
+            id TEXT PRIMARY KEY,
+            content TEXT NOT NULL,
+            type TEXT DEFAULT 'ideia',
+            tags TEXT DEFAULT '[]',
+            project_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS opportunities (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            organization TEXT,
+            category TEXT,
+            url TEXT,
+            deadline TEXT,
+            country TEXT,
+            language TEXT,
+            notes TEXT,
+            status TEXT DEFAULT 'identificada',
+            source TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS learning_goals (
+            id TEXT PRIMARY KEY,
+            competency TEXT NOT NULL,
+            current_level INTEGER DEFAULT 1,
+            target_level INTEGER DEFAULT 3,
+            resources TEXT DEFAULT '[]',
+            evidence TEXT,
+            status TEXT DEFAULT 'ativa',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
         INSERT OR IGNORE INTO profile (id, data) VALUES (1, '{}');
         INSERT OR IGNORE INTO financial_data (id, data) VALUES (1, '{}');
         """)
@@ -552,6 +615,17 @@ async def add_event(request: Request):
         )
     return {"id": cur.lastrowid, "ok": True}
 
+@app.put("/api/events/{eid}")
+async def update_event(eid: int, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE events SET title=?,date=?,type=?,project_id=?,notes=? WHERE id=?",
+            (body.get("title",""), body.get("date",""),
+             body.get("type","manual"), body.get("project_id"), body.get("notes",""), eid)
+        )
+    return {"ok": True}
+
 @app.delete("/api/events/{eid}")
 async def delete_event(eid: int):
     with db() as c:
@@ -576,10 +650,267 @@ async def add_result(request: Request):
         )
     return {"id": cur.lastrowid, "ok": True}
 
+@app.put("/api/results/{rid}")
+async def update_result(rid: int, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE results_log SET description=?,date=?,category=? WHERE id=?",
+            (body.get("description",""), body.get("date",""), body.get("category",""), rid)
+        )
+    return {"ok": True}
+
 @app.delete("/api/results/{rid}")
 async def delete_result(rid: int):
     with db() as c:
         c.execute("DELETE FROM results_log WHERE id=?", (rid,))
+    return {"ok": True}
+
+
+# ── CHECKLIST ─────────────────────────────────────────────────────
+@app.get("/api/checklist")
+async def get_checklist(period: str = ""):
+    with db() as c:
+        if period:
+            rows = c.execute("SELECT * FROM checklist_items WHERE period=? ORDER BY id", (period,)).fetchall()
+        else:
+            rows = c.execute("SELECT * FROM checklist_items ORDER BY period DESC, id").fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/checklist")
+async def save_checklist(request: Request):
+    body = await request.json()
+    period = body.get("period", "")
+    items = body.get("items", [])
+    with db() as c:
+        if period:
+            c.execute("DELETE FROM checklist_items WHERE period=?", (period,))
+        for item in items:
+            c.execute(
+                "INSERT INTO checklist_items (question, answer, period) VALUES (?,?,?)",
+                (item.get("question",""), item.get("answer",""), period)
+            )
+    return {"ok": True}
+
+
+# ── REFERENCES LIBRARY ────────────────────────────────────────────
+@app.get("/api/references")
+async def get_references(type: str = "", tags: str = ""):
+    with db() as c:
+        q = "SELECT * FROM references_library"
+        params: list = []
+        if type:
+            q += " WHERE type=?"; params.append(type)
+        q += " ORDER BY created_at DESC"
+        rows = c.execute(q, params).fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/references")
+async def add_reference(request: Request):
+    body = await request.json()
+    import uuid
+    rid = body.get("id") or str(uuid.uuid4())[:8]
+    with db() as c:
+        c.execute(
+            "INSERT OR REPLACE INTO references_library (id,type,url,title,channel,thumbnail,notes,tags,project_id) VALUES (?,?,?,?,?,?,?,?,?)",
+            (rid, body.get("type","web"), body.get("url",""), body.get("title",""),
+             body.get("channel",""), body.get("thumbnail",""), body.get("notes",""),
+             json.dumps(body.get("tags",[])), body.get("project_id"))
+        )
+    return {"id": rid, "ok": True}
+
+@app.put("/api/references/{rid}")
+async def update_reference(rid: str, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE references_library SET notes=?,tags=?,title=? WHERE id=?",
+            (body.get("notes",""), json.dumps(body.get("tags",[])), body.get("title",""), rid)
+        )
+    return {"ok": True}
+
+@app.delete("/api/references/{rid}")
+async def delete_reference(rid: str):
+    with db() as c:
+        c.execute("DELETE FROM references_library WHERE id=?", (rid,))
+    return {"ok": True}
+
+
+# ── FINANCIAL ENTRIES ────────────────────────────────────────────
+@app.get("/api/finances/entries")
+async def get_financial_entries(type: str = "", month: str = ""):
+    with db() as c:
+        q = "SELECT * FROM financial_entries WHERE 1=1"
+        params: list = []
+        if type:
+            q += " AND type=?"; params.append(type)
+        if month:
+            q += " AND date LIKE ?"; params.append(f"{month}%")
+        q += " ORDER BY date DESC, id DESC"
+        rows = c.execute(q, params).fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/finances/entries")
+async def add_financial_entry(request: Request):
+    body = await request.json()
+    with db() as c:
+        cur = c.execute(
+            "INSERT INTO financial_entries (type,amount,description,category,date,project_id) VALUES (?,?,?,?,?,?)",
+            (body.get("type","receita"), float(body.get("amount",0)),
+             body.get("description",""), body.get("category",""),
+             body.get("date",""), body.get("project_id"))
+        )
+    return {"id": cur.lastrowid, "ok": True}
+
+@app.put("/api/finances/entries/{eid}")
+async def update_financial_entry(eid: int, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE financial_entries SET type=?,amount=?,description=?,category=?,date=?,project_id=? WHERE id=?",
+            (body.get("type","receita"), float(body.get("amount",0)),
+             body.get("description",""), body.get("category",""),
+             body.get("date",""), body.get("project_id"), eid)
+        )
+    return {"ok": True}
+
+@app.delete("/api/finances/entries/{eid}")
+async def delete_financial_entry(eid: int):
+    with db() as c:
+        c.execute("DELETE FROM financial_entries WHERE id=?", (eid,))
+    return {"ok": True}
+
+@app.get("/api/finances/summary")
+async def financial_summary(month: str = ""):
+    with db() as c:
+        q = "SELECT type, SUM(amount) as total FROM financial_entries"
+        params: list = []
+        if month:
+            q += " WHERE date LIKE ?"; params.append(f"{month}%")
+        q += " GROUP BY type"
+        rows = c.execute(q, params).fetchall()
+        return {r["type"]: r["total"] for r in rows}
+
+
+# ── IDEAS ────────────────────────────────────────────────────────
+@app.get("/api/ideas")
+async def get_ideas():
+    with db() as c:
+        rows = c.execute("SELECT * FROM ideas ORDER BY created_at DESC").fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/ideas")
+async def add_idea(request: Request):
+    body = await request.json()
+    import uuid
+    iid = str(uuid.uuid4())[:8]
+    with db() as c:
+        c.execute(
+            "INSERT INTO ideas (id,content,type,tags,project_id) VALUES (?,?,?,?,?)",
+            (iid, body.get("content",""), body.get("type","ideia"),
+             json.dumps(body.get("tags",[])), body.get("project_id"))
+        )
+    return {"id": iid, "ok": True}
+
+@app.put("/api/ideas/{iid}")
+async def update_idea(iid: str, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE ideas SET content=?,type=?,tags=?,project_id=? WHERE id=?",
+            (body.get("content",""), body.get("type","ideia"),
+             json.dumps(body.get("tags",[])), body.get("project_id"), iid)
+        )
+    return {"ok": True}
+
+@app.delete("/api/ideas/{iid}")
+async def delete_idea(iid: str):
+    with db() as c:
+        c.execute("DELETE FROM ideas WHERE id=?", (iid,))
+    return {"ok": True}
+
+
+# ── OPPORTUNITIES ────────────────────────────────────────────────
+@app.get("/api/opportunities")
+async def get_opportunities():
+    with db() as c:
+        rows = c.execute("SELECT * FROM opportunities ORDER BY created_at DESC").fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/opportunities")
+async def add_opportunity(request: Request):
+    body = await request.json()
+    import uuid
+    oid = str(uuid.uuid4())[:8]
+    with db() as c:
+        c.execute(
+            "INSERT INTO opportunities (id,title,organization,category,url,deadline,country,language,notes,status,source) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (oid, body.get("title",""), body.get("organization",""), body.get("category",""),
+             body.get("url",""), body.get("deadline",""), body.get("country",""),
+             body.get("language",""), body.get("notes",""),
+             body.get("status","identificada"), body.get("source",""))
+        )
+    return {"id": oid, "ok": True}
+
+@app.put("/api/opportunities/{oid}")
+async def update_opportunity(oid: str, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE opportunities SET title=?,organization=?,category=?,url=?,deadline=?,country=?,language=?,notes=?,status=?,source=? WHERE id=?",
+            (body.get("title",""), body.get("organization",""), body.get("category",""),
+             body.get("url",""), body.get("deadline",""), body.get("country",""),
+             body.get("language",""), body.get("notes",""),
+             body.get("status","identificada"), body.get("source",""), oid)
+        )
+    return {"ok": True}
+
+@app.delete("/api/opportunities/{oid}")
+async def delete_opportunity(oid: str):
+    with db() as c:
+        c.execute("DELETE FROM opportunities WHERE id=?", (oid,))
+    return {"ok": True}
+
+
+# ── LEARNING GOALS ────────────────────────────────────────────────
+@app.get("/api/learning")
+async def get_learning():
+    with db() as c:
+        rows = c.execute("SELECT * FROM learning_goals ORDER BY created_at DESC").fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/learning")
+async def add_learning(request: Request):
+    body = await request.json()
+    import uuid
+    lid = str(uuid.uuid4())[:8]
+    with db() as c:
+        c.execute(
+            "INSERT INTO learning_goals (id,competency,current_level,target_level,resources,evidence,status,notes) VALUES (?,?,?,?,?,?,?,?)",
+            (lid, body.get("competency",""),
+             int(body.get("current_level",1)), int(body.get("target_level",3)),
+             json.dumps(body.get("resources",[])), body.get("evidence",""),
+             body.get("status","ativa"), body.get("notes",""))
+        )
+    return {"id": lid, "ok": True}
+
+@app.put("/api/learning/{lid}")
+async def update_learning(lid: str, request: Request):
+    body = await request.json()
+    with db() as c:
+        c.execute(
+            "UPDATE learning_goals SET competency=?,current_level=?,target_level=?,resources=?,evidence=?,status=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?",
+            (body.get("competency",""),
+             int(body.get("current_level",1)), int(body.get("target_level",3)),
+             json.dumps(body.get("resources",[])), body.get("evidence",""),
+             body.get("status","ativa"), body.get("notes",""), lid)
+        )
+    return {"ok": True}
+
+@app.delete("/api/learning/{lid}")
+async def delete_learning(lid: str):
+    with db() as c:
+        c.execute("DELETE FROM learning_goals WHERE id=?", (lid,))
     return {"ok": True}
 
 
@@ -595,9 +926,14 @@ async def export_data():
         decisions = [dict(r) for r in c.execute("SELECT * FROM decisions ORDER BY id").fetchall()]
         events = [dict(r) for r in c.execute("SELECT * FROM events ORDER BY date").fetchall()]
         results = [dict(r) for r in c.execute("SELECT * FROM results_log ORDER BY id").fetchall()]
+        ideas = [dict(r) for r in c.execute("SELECT * FROM ideas ORDER BY created_at").fetchall()]
+        opportunities = [dict(r) for r in c.execute("SELECT * FROM opportunities ORDER BY created_at").fetchall()]
+        learning = [dict(r) for r in c.execute("SELECT * FROM learning_goals ORDER BY created_at").fetchall()]
+        references = [dict(r) for r in c.execute("SELECT * FROM references_library ORDER BY created_at").fetchall()]
+        fin_entries = [dict(r) for r in c.execute("SELECT * FROM financial_entries ORDER BY date").fetchall()]
     return {
         "exported_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "version": "3",
+        "version": "4",
         "profile": profile,
         "diagnostic": diagnostic,
         "projects": projects,
@@ -605,6 +941,11 @@ async def export_data():
         "decisions": decisions,
         "events": events,
         "results": results,
+        "ideas": ideas,
+        "opportunities": opportunities,
+        "learning": learning,
+        "references": references,
+        "financial_entries": fin_entries,
     }
 
 @app.post("/api/import")
@@ -965,6 +1306,28 @@ def build_ai_context(c) -> str:
         if f.get("price_per_project"):
             parts.append(f"\nFINANCEIRO: preço por projecto R$ {f.get('price_per_project')}, "
                          f"horas/mês {f.get('hours_per_month')}, custos fixos R$ {f.get('fixed_costs',0)}")
+
+    # Ideas (last 5)
+    ideas = c.execute("SELECT content, type FROM ideas ORDER BY created_at DESC LIMIT 5").fetchall()
+    if ideas:
+        parts.append("\nIDEIAS RECENTES:")
+        for content, itype in ideas:
+            parts.append(f"- [{itype}] {content[:100]}")
+
+    # Opportunities (active, next 5 by deadline)
+    opps = c.execute("SELECT title, category, deadline, status FROM opportunities WHERE status NOT IN ('rejeitada','expirada') ORDER BY deadline ASC LIMIT 5").fetchall()
+    if opps:
+        parts.append("\nOPORTUNIDADES ACTIVAS:")
+        for title, cat, deadline, status in opps:
+            d = f" (prazo: {deadline})" if deadline else ""
+            parts.append(f"- {title} [{cat or 'geral'}]{d} — {status}")
+
+    # Learning goals (active)
+    goals = c.execute("SELECT competency, current_level, target_level FROM learning_goals WHERE status='ativa' LIMIT 5").fetchall()
+    if goals:
+        parts.append("\nOBJECTIVOS DE APRENDIZADO:")
+        for comp, cur, tgt in goals:
+            parts.append(f"- {comp}: nível {cur}/5 → meta {tgt}/5")
 
     return "\n".join(parts) if parts else "Ainda sem dados registados — peça à utilizadora para preencher o perfil e o diagnóstico."
 

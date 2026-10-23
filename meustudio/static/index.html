@@ -700,11 +700,17 @@ function cfgHeaders(){
   const gc = ls('ms_cfg_google_cx'); if(gc) h['X-Google-Cx']=gc;
   return h;
 }
-async function api(path,opts={}){
+async function api(path,methodOrOpts={},body){
+  let opts=methodOrOpts;
+  if(typeof methodOrOpts==='string'){
+    opts={method:methodOrOpts};
+    if(body!==undefined) opts.body=JSON.stringify(body);
+  }
   const r = await fetch(API+path,{headers:{'Content-Type':'application/json',...cfgHeaders()},...opts});
   if(!r.ok) throw new Error('HTTP '+r.status);
   return r.json();
 }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function ls(k,v){
   try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){return null;}
 }
@@ -1238,21 +1244,35 @@ function renderCalendar(){
   const el=document.getElementById('events-list');
   el.innerHTML=upcoming.length?upcoming.slice(0,10).map(e=>`<div class="card" style="padding:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
     <div><div style="font-size:13px;font-weight:500;">${e.title}</div><div style="font-size:12px;color:var(--text-3);">${fmtDate(e.date)}</div></div>
-    <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">×</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="editEvent(${e.id},'${escHtml(e.title)}','${e.date}','${escHtml(e.notes||'')}')">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">×</button>
+    </div>
   </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum evento próximo.</div>';
 }
 function openEventForm(){ document.getElementById('ef-date').value=new Date().toISOString().slice(0,10); document.getElementById('event-form').style.display='block'; }
+async function deleteEvent(id){ if(!confirm('Remover este evento?')) return; try{ await api('/api/events/'+id,'DELETE'); await loadEvents(); }catch(e){} }
+function editEvent(id,title,date,notes){
+  document.getElementById('ef-title').value=title;
+  document.getElementById('ef-date').value=date;
+  document.getElementById('ef-notes').value=notes;
+  document.getElementById('event-form').style.display='block';
+  document.getElementById('event-form').dataset.editId=id;
+}
 async function saveEvent(){
   const title=document.getElementById('ef-title').value.trim(); if(!title) return;
+  const form=document.getElementById('event-form');
+  const eid=form.dataset.editId;
+  const payload={title,date:document.getElementById('ef-date').value,notes:document.getElementById('ef-notes').value};
   try{
-    await api('/api/events',{method:'POST',body:JSON.stringify({title,date:document.getElementById('ef-date').value,notes:document.getElementById('ef-notes').value})});
-    document.getElementById('event-form').style.display='none';
+    if(eid){ await api('/api/events/'+eid,'PUT',payload); delete form.dataset.editId; }
+    else { await api('/api/events','POST',payload); }
+    form.style.display='none';
     document.getElementById('ef-title').value='';
     document.getElementById('ef-notes').value='';
     await loadEvents();
   }catch(e){}
 }
-async function deleteEvent(id){ if(!confirm('Remover este evento?')) return; try{ await api('/api/events/'+id,{method:'DELETE'}); await loadEvents(); }catch(e){} }
 
 // ── FINANCEIRO ───────────────────────────────────────────────────
 function updateFinSlider(f){
@@ -1429,6 +1449,7 @@ async function loadResults(){
         <div style="font-size:13px;flex:1;">${r.description}</div>
         <div style="display:flex;gap:6px;align-items:center;margin-left:8px;">
           <span class="badge ${catBadge[r.category]||'badge-gray'}">${catLabel[r.category]||r.category}</span>
+          <button class="btn btn-ghost btn-sm" onclick="editResult(${r.id},'${escHtml(r.description)}','${r.category}','${r.date}')">Editar</button>
           <button class="btn btn-danger btn-sm" onclick="deleteResult(${r.id})">×</button>
         </div>
       </div>
@@ -1436,24 +1457,45 @@ async function loadResults(){
     </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum resultado registado ainda.</div>';
   }catch(e){}
 }
+let editingResultId=null;
+function editResult(id,desc,cat,date){
+  editingResultId=id;
+  document.getElementById('rf-desc').value=desc;
+  document.getElementById('rf-cat').value=cat;
+  document.getElementById('rf-date').value=date;
+  document.getElementById('result-form').style.display='block';
+}
 async function saveResult(){
   const data={description:document.getElementById('rf-desc').value,category:document.getElementById('rf-cat').value,date:document.getElementById('rf-date').value};
   if(!data.description) return;
   try{
-    await api('/api/results',{method:'POST',body:JSON.stringify(data)});
+    if(editingResultId){ await api('/api/results/'+editingResultId,'PUT',data); editingResultId=null; }
+    else { await api('/api/results','POST',data); }
     document.getElementById('rf-desc').value='';
     document.getElementById('result-form').style.display='none';
     await loadResults();
   }catch(e){}
 }
-async function deleteResult(id){ if(!confirm('Remover?')) return; try{ await api('/api/results/'+id,{method:'DELETE'}); await loadResults(); }catch(e){} }
+async function deleteResult(id){ if(!confirm('Remover?')) return; try{ await api('/api/results/'+id,'DELETE'); await loadResults(); }catch(e){} }
 
 // ── CHECKLIST ────────────────────────────────────────────────────
-function saveChecklist(){
-  for(let i=1;i<=5;i++) ls(`ms_checklist_${i}`,document.getElementById('cl-'+i).value);
+const CL_QUESTIONS=['O caminho principal ainda faz sentido?','A meta mensal ainda é válida?','Quais projetos precisam de atenção?','O que aprendi nos últimos 30 dias?','O que devo parar de fazer?'];
+async function saveChecklist(){
+  const period=new Date().toISOString().slice(0,7);
+  const items=CL_QUESTIONS.map((q,i)=>({question:q,answer:document.getElementById('cl-'+(i+1)).value}));
+  await api('/api/checklist','POST',{period,items});
   const el=document.getElementById('cl-saved'); el.style.display='inline'; setTimeout(()=>el.style.display='none',2000);
 }
-function loadChecklist(){ for(let i=1;i<=5;i++){ const v=ls(`ms_checklist_${i}`); if(v) document.getElementById('cl-'+i).value=v; } }
+async function loadChecklist(){
+  const period=new Date().toISOString().slice(0,7);
+  try{
+    const items=await api(`/api/checklist?period=${period}`);
+    items.forEach((item,i)=>{ const el=document.getElementById('cl-'+(i+1)); if(el) el.value=item.answer||''; });
+  }catch(e){
+    // fallback to localStorage for migration
+    for(let i=1;i<=5;i++){const v=ls(`ms_checklist_${i}`);if(v)document.getElementById('cl-'+i).value=v;}
+  }
+}
 
 // ── CONFIGURAÇÕES ────────────────────────────────────────────────
 function loadConnectorStatus(){
