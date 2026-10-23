@@ -7,3 +7,6 @@ web-build/
 !.env.example
 *.log
 .DS_Store
+__pycache__/
+*.pyc
+*.pyo
