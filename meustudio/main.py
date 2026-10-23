@@ -269,6 +269,30 @@ CAREER_PATHS = {
         "risk": "alto",
         "investment": "R$ 1.000–5.000",
     },
+    "editora_conteudo_digital": {
+        "name": "Editora de Conteúdo Digital",
+        "desc": "Edição especializada para criadores de conteúdo no YouTube e redes sociais.",
+        "time_to_revenue": "1–2 meses",
+        "monthly_potential": "R$ 3.000–10.000",
+        "risk": "baixo",
+        "investment": "R$ 0–200",
+    },
+    "freelancer_internacional": {
+        "name": "Freelancer Internacional",
+        "desc": "Clientes estrangeiros com tarifas em moeda forte via plataformas como Upwork e Toptal.",
+        "time_to_revenue": "2–4 meses",
+        "monthly_potential": "R$ 6.000–20.000",
+        "risk": "médio",
+        "investment": "R$ 0–500",
+    },
+    "criadora_produtos_educativos": {
+        "name": "Criadora de Produtos Educativos",
+        "desc": "E-books, cartilhas, templates e materiais formativos vendidos online.",
+        "time_to_revenue": "2–3 meses",
+        "monthly_potential": "R$ 2.000–10.000",
+        "risk": "médio",
+        "investment": "R$ 200–1.000",
+    },
 }
 
 def score_career_paths(answers: dict) -> list:
@@ -284,9 +308,12 @@ def score_career_paths(answers: dict) -> list:
             "educador_digital": ["ensinar"],
             "criador_conteudo": ["criar"],
             "empreendedor_audiovisual": ["estrategia"],
+            "editora_conteudo_digital": ["executar"],
+            "freelancer_internacional": ["executar"],
+            "criadora_produtos_educativos": ["ensinar"],
         }
         if a2 in signal_map.get(path_id, []):
-            score += 25
+            score += 20
             reasons.append(f"Perfil energético alinhado com {path['name']}")
 
         # Risk alignment
@@ -305,7 +332,7 @@ def score_career_paths(answers: dict) -> list:
             if path_id == "criador_conteudo":
                 score -= 30
                 gaps.append("Canal leva 6–12 meses para monetizar")
-            elif path_id == "freelancer_premium":
+            elif path_id in ("freelancer_premium", "editora_conteudo_digital"):
                 score += 15
                 reasons.append("Retorno rápido — ideal para urgência de 3 meses")
 
@@ -316,13 +343,58 @@ def score_career_paths(answers: dict) -> list:
             gaps.append("Investimento inicial necessário")
 
         # English for international market
-        if path_id == "freelancer_premium":
-            if answers.get("b4") == "fluente":
+        eng = answers.get("b4") or answers.get("idiomas_fluentes", "")
+        fluent_en = eng in ("fluente", "ingles_fluente")
+        if path_id in ("freelancer_premium", "freelancer_internacional"):
+            if fluent_en:
                 score += 15
                 reasons.append("Inglês fluente — mercado internacional")
+            elif path_id == "freelancer_internacional":
+                score -= 20
+                gaps.append("Inglês fluente necessário para clientes estrangeiros")
             elif answers.get("b4") in ("basico", "nao"):
                 score -= 10
                 gaps.append("Desenvolver inglês para mercado internacional")
+
+        # New path scoring — editora_conteudo_digital
+        if path_id == "editora_conteudo_digital":
+            if answers.get("d3") not in (None, "nao"):
+                score += 10
+                reasons.append("Conhece o universo dos criadores de conteúdo")
+            if answers.get("exposicao_publica") == "nao_quero":
+                score += 10
+                reasons.append("Trabalha nos bastidores — sem exposição de imagem")
+
+        # New path scoring — freelancer_internacional
+        if path_id == "freelancer_internacional":
+            if answers.get("idioma_conteudo") == "ingles":
+                score += 10
+                reasons.append("Orientação internacional alinhada")
+            if answers.get("equipamentos") == "nao":
+                score -= 10
+                gaps.append("Equipamento profissional necessário")
+
+        # New path scoring — criadora_produtos_educativos
+        if path_id == "criadora_produtos_educativos":
+            if answers.get("formato_preferido") in ("texto", "visual"):
+                score += 15
+                reasons.append("Formato preferido alinhado com produtos digitais")
+            if answers.get("d2") == "muito":
+                score += 15
+                reasons.append("Alto interesse em ensinar")
+            elif answers.get("d2") == "nao":
+                score -= 20
+                gaps.append("Interesse em ensinar ausente")
+
+        # Exposure preference
+        if answers.get("exposicao_publica") == "nao_quero":
+            if path_id in ("criador_conteudo", "empreendedor_audiovisual"):
+                score -= 20
+                gaps.append("Requer exposição pública de imagem")
+        elif answers.get("exposicao_publica") == "amo":
+            if path_id in ("criador_conteudo", "educador_digital"):
+                score += 15
+                reasons.append("Exposição pública — fator de crescimento")
 
         # Teaching interest
         if path_id == "educador_digital":
@@ -365,7 +437,7 @@ def score_career_paths(answers: dict) -> list:
 
         # Portfolio strength
         portfolio = answers.get("portfolio_status", "")
-        if portfolio == "sim_forte" and path_id in ["freelancer_premium", "empreendedor_audiovisual"]:
+        if portfolio == "sim_forte" and path_id in ["freelancer_premium", "empreendedor_audiovisual", "freelancer_internacional", "editora_conteudo_digital"]:
             score += 10
             reasons.append("Portfólio sólido disponível")
         elif portfolio == "nao" and path_id == "freelancer_premium":

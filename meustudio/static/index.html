@@ -256,41 +256,59 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 
   <!-- ═══ HOME ═══════════════════════════════════════════════════ -->
   <section id="s-home" class="section active">
-    <div class="home-grid">
-      <div>
-        <p class="page-sub" id="home-greeting">Carregando…</p>
-        <h1 class="page-title" style="margin-bottom:24px;">Sistema de Carreira</h1>
+    <p class="page-sub" id="home-greeting" style="margin-bottom:4px;">Carregando…</p>
+    <h1 class="page-title" style="margin-bottom:24px;">Meu Studio</h1>
 
-        <div class="section-label">Diagnóstico</div>
-        <div class="card" style="margin-bottom:20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <!-- Q1: O que é importante agora? -->
+    <div class="section-label">O que é importante agora</div>
+    <div class="home-grid" style="margin-bottom:24px;">
+      <div>
+        <div class="card" style="padding:16px;margin-bottom:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Projetos Ativos</div>
+          <div id="home-projects">—</div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:16px;margin-bottom:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Oportunidades com Prazo</div>
+          <div id="home-opps">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2: O que fazer a seguir? -->
+    <div class="section-label">O que fazer a seguir</div>
+    <div class="card" style="padding:16px;margin-bottom:24px;">
+      <div id="home-actions">—</div>
+    </div>
+
+    <!-- Q3: Como estão meus objectivos? -->
+    <div class="section-label">Como estão meus objetivos</div>
+    <div class="home-grid" style="margin-bottom:24px;">
+      <div>
+        <div class="card" style="padding:16px;margin-bottom:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Diagnóstico</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <span style="font-size:13px;font-weight:600;" id="home-diag-label">Não iniciado</span>
             <span style="font-size:12px;color:var(--text-3);" id="home-diag-pct">0%</span>
           </div>
-          <div class="progress"><div class="progress-fill" id="home-diag-bar" style="width:0%"></div></div>
-          <div style="margin-top:12px;">
-            <button class="btn btn-primary btn-sm" onclick="nav(null,'s-perfil')">Continuar Diagnóstico →</button>
-          </div>
+          <div class="progress" style="margin-bottom:10px;"><div class="progress-fill" id="home-diag-bar" style="width:0%"></div></div>
+          <div id="home-path-content" style="font-size:12px;color:var(--text-2);">Complete o diagnóstico para ver sua recomendação.</div>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="nav(null,'s-perfil')">Continuar →</button>
         </div>
-
-        <div class="section-label">Caminho Recomendado</div>
-        <div class="card accent-border" id="home-path-card" style="border-left:3px solid var(--accent);">
-          <div id="home-path-content" style="color:var(--text-2);font-size:13px;">Complete o diagnóstico para ver sua recomendação.</div>
-        </div>
-
-        <div class="section-label" style="margin-top:20px;">Projetos Ativos</div>
-        <div id="home-projects" style="color:var(--text-2);font-size:13px;">Nenhum projeto ainda.</div>
       </div>
       <div>
-        <div class="section-label">Meta Financeira</div>
-        <div class="card" style="margin-bottom:12px;">
+        <div class="card" style="padding:16px;margin-bottom:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Meta Financeira</div>
           <div id="home-finance-content" style="font-size:13px;color:var(--text-2);">Configure sua meta em Financeiro.</div>
         </div>
-        <div class="section-label">Próximos 7 dias</div>
-        <div id="home-upcoming" class="card" style="font-size:13px;color:var(--text-2);">Nenhum evento.</div>
-        <div class="section-label" style="margin-top:12px;">Ações Pendentes</div>
-        <div id="home-pending" class="card" style="font-size:13px;color:var(--text-2);">—</div>
       </div>
+    </div>
+
+    <!-- Q4: Há algo que exige atenção? -->
+    <div class="section-label">Atenção necessária</div>
+    <div class="card" style="padding:16px;margin-bottom:0;">
+      <div id="home-alerts">—</div>
     </div>
   </section>
 
@@ -1053,6 +1071,72 @@ const QUESTIONS = {
   e3:{stage:"estrategia",text:"Quanto você pode investir no negócio agora?",options:[
     {val:"nada",label:"Nada — zero capital"},{val:"ate_500",label:"Até R$ 500"},
     {val:"ate_2000",label:"Até R$ 2.000"},{val:"mais_2000",label:"Mais de R$ 2.000"}
+  ],next:"val_autonomia"},
+
+  // Módulo Valores
+  val_autonomia:{stage:"valores",text:"Como você se sente em relação à autonomia no trabalho?",options:[
+    {val:"essencial",label:"Essencial — preciso ser minha própria chefe"},{val:"importante",label:"Importante, mas aceito estrutura"},
+    {val:"indiferente",label:"Indiferente — o que importa é o resultado"},{val:"prefiro_guia",label:"Prefiro ter orientação"}
+  ],next:"val_estabilidade"},
+  val_estabilidade:{stage:"valores",text:"O que é mais importante para você agora?",options:[
+    {val:"estabilidade",label:"Estabilidade financeira antes de tudo"},{val:"crescimento",label:"Crescimento acelerado mesmo com instabilidade"},
+    {val:"equilibrio",label:"Equilíbrio entre segurança e crescimento"},{val:"impacto",label:"Impacto e propósito acima de tudo"}
+  ],next:"val_reconhecimento"},
+  val_reconhecimento:{stage:"valores",text:"De que forma o reconhecimento importa para você?",options:[
+    {val:"dinheiro",label:"Reconhecimento financeiro — pago pelo valor que entrego"},{val:"autoridade",label:"Autoridade — ser referência na área"},
+    {val:"comunidade",label:"Comunidade — criar conexões e pertencimento"},{val:"liberdade",label:"Liberdade — fazer o que amo sem precisar de aprovação"}
+  ],next:"val_impacto"},
+  val_impacto:{stage:"valores",text:"Qual impacto você quer ter com seu trabalho?",options:[
+    {val:"individual",label:"Transformar vidas individualmente"},{val:"escala",label:"Alcançar muitas pessoas com conteúdo"},
+    {val:"mercado",label:"Melhorar o mercado audiovisual"},{val:"sustento",label:"Sustentar minha família com qualidade"}
+  ],next:"estilo_comunicacao"},
+
+  // Módulo Estilo
+  estilo_comunicacao:{stage:"estilo",text:"Como você prefere se comunicar com clientes?",options:[
+    {val:"async",label:"Assíncrono — e-mail e mensagens"},{val:"video",label:"Videochamadas com hora marcada"},
+    {val:"direto",label:"Direto — objetiva e rápida"},{val:"relacional",label:"Relacional — gosto de construir vínculo"}
+  ],next:"estilo_aprendizagem"},
+  estilo_aprendizagem:{stage:"estilo",text:"Como você aprende melhor?",options:[
+    {val:"fazendo",label:"Fazendo — aprendo na prática"},{val:"conteudo",label:"Consumindo conteúdo (cursos, livros)"},
+    {val:"mentoria",label:"Mentoria e acompanhamento personalizado"},{val:"comunidade",label:"Comunidade — aprendendo com pares"}
+  ],next:"estilo_trabalho"},
+  estilo_trabalho:{stage:"estilo",text:"Como você prefere organizar seu trabalho?",options:[
+    {val:"projetos",label:"Por projetos com início e fim claros"},{val:"rotina",label:"Rotina diária estruturada"},
+    {val:"demanda",label:"Conforme a demanda surgir"},{val:"tematico",label:"Por temas ou áreas"}
+  ],next:"exposicao_publica"},
+
+  // Módulo Exposição
+  exposicao_publica:{stage:"exposicao",text:"Como você se sente em relação à exposição pública?",options:[
+    {val:"amo",label:"Amo — adoro aparecer e me expressar"},{val:"ok",label:"OK — faço se necessário"},
+    {val:"desconforto",label:"Desconforto — prefiro ficar nos bastidores"},{val:"nao_quero",label:"Não quero expor minha imagem"}
+  ],next:"formato_preferido"},
+  formato_preferido:{stage:"exposicao",text:"Qual formato de conteúdo você prefere criar?",options:[
+    {val:"video_longo",label:"Vídeos longos (YouTube, documentários)"},{val:"video_curto",label:"Vídeos curtos (Reels, TikTok)"},
+    {val:"texto",label:"Texto (artigos, newsletters)"},{val:"visual",label:"Visual (carrosséis, infográficos)"}
+  ],next:"idioma_conteudo"},
+  idioma_conteudo:{stage:"exposicao",text:"Em que idioma você prefere criar conteúdo?",options:[
+    {val:"portugues",label:"Português — foco no mercado brasileiro"},{val:"ingles",label:"Inglês — mercado internacional"},
+    {val:"ambos",label:"Ambos"},{val:"outro",label:"Outro idioma"}
+  ],next:"maior_conquista"},
+
+  // Módulo Histórico
+  maior_conquista:{stage:"historico",text:"Qual foi sua maior conquista profissional recente?",options:[
+    {val:"cliente_grande",label:"Conquistei um cliente grande ou de prestígio"},{val:"projeto_autoral",label:"Lancei um projeto autoral"},
+    {val:"renda_record",label:"Bati minha maior renda mensal"},{val:"habilidade",label:"Dominei uma nova habilidade"}
+  ],next:"maior_dificuldade"},
+  maior_dificuldade:{stage:"historico",text:"Qual dificuldade você enfrenta com mais frequência?",options:[
+    {val:"precificacao",label:"Dificuldade em precificar e negociar"},{val:"captacao",label:"Captação de novos clientes"},
+    {val:"entrega",label:"Gestão de prazos e entrega"},{val:"constancia",label:"Manter constância e motivação"}
+  ],next:"equipamentos"},
+
+  // Módulo Restrições
+  equipamentos:{stage:"restricoes",text:"Você tem equipamento adequado para trabalhar?",options:[
+    {val:"completo",label:"Sim, equipamento completo e atualizado"},{val:"basico",label:"Básico — funciona mas precisa melhorar"},
+    {val:"emprestado",label:"Uso emprestado ou compartilhado"},{val:"nao",label:"Não — é uma barreira real"}
+  ],next:"idiomas_fluentes"},
+  idiomas_fluentes:{stage:"restricoes",text:"Além do português, quais idiomas você fala?",options:[
+    {val:"ingles_fluente",label:"Inglês fluente"},{val:"ingles_intermediario",label:"Inglês intermediário"},
+    {val:"outro",label:"Outro idioma"},{val:"so_portugues",label:"Só português por enquanto"}
   ],next:null}
 };
 const TOTAL_Q = Object.keys(QUESTIONS).length;
@@ -1111,22 +1195,61 @@ function scorePathsClient(answers){
     educador_digital:{name:"Educadora Digital",desc:"Cursos, workshops e mentorias transformando conhecimento em produtos escaláveis.",time_to_revenue:"2–4 meses",monthly_potential:"R$ 3.000–15.000",risk:"médio"},
     criador_conteudo:{name:"Criadora de Conteúdo",desc:"Canal próprio com audiência engajada, monetização via AdSense e patrocínios.",time_to_revenue:"6–12 meses",monthly_potential:"R$ 2.000–20.000+",risk:"alto"},
     empreendedor_audiovisual:{name:"Empreendedora Audiovisual",desc:"Negócio próprio combinando serviços, produtos digitais e posicionamento de marca.",time_to_revenue:"3–6 meses",monthly_potential:"R$ 6.000–25.000+",risk:"alto"},
+    editora_conteudo_digital:{name:"Editora de Conteúdo Digital",desc:"Edição especializada para criadores de conteúdo no YouTube e redes sociais.",time_to_revenue:"1–2 meses",monthly_potential:"R$ 3.000–10.000",risk:"baixo"},
+    freelancer_internacional:{name:"Freelancer Internacional",desc:"Clientes estrangeiros com tarifas em moeda forte via plataformas internacionais.",time_to_revenue:"2–4 meses",monthly_potential:"R$ 6.000–20.000",risk:"médio"},
+    criadora_produtos_educativos:{name:"Criadora de Produtos Educativos",desc:"E-books, templates, cartilhas e materiais formativos vendidos online.",time_to_revenue:"2–3 meses",monthly_potential:"R$ 2.000–10.000",risk:"médio"},
   };
   return Object.entries(PATHS).map(([id,path])=>{
     let score=50,reasons=[],gaps=[];
-    if(answers.a1===({freelancer_premium:'executar',educador_digital:'ensinar',criador_conteudo:'criar',empreendedor_audiovisual:'estrategia'}[id])){score+=25;reasons.push('Perfil energético alinhado');}
+    // Energia
+    const energyMap={freelancer_premium:'executar',educador_digital:'ensinar',criador_conteudo:'criar',empreendedor_audiovisual:'estrategia',editora_conteudo_digital:'executar',freelancer_internacional:'executar',criadora_produtos_educativos:'ensinar'};
+    if(answers.a1===energyMap[id]){score+=20;reasons.push('Perfil energético alinhado');}
+    // Risco
     const e2=answers.e2||'moderado';
     if(path.risk==='alto'&&e2==='baixo'){score-=25;gaps.push('Risco alto não alinhado com tolerância');}
     else if(path.risk==='baixo'&&e2==='baixo') score+=10;
+    // Urgência
     const e1=answers.e1||'em_6m';
-    if(e1==='urgente_3m'){if(id==='criador_conteudo'){score-=30;gaps.push('Canal leva 6–12 meses para monetizar');}else if(id==='freelancer_premium'){score+=15;reasons.push('Retorno rápido ideal para urgência');}}
-    if(id==='freelancer_premium'){if(answers.b4==='fluente'){score+=15;reasons.push('Inglês fluente — mercado internacional');}else if(answers.b4==='nao'){score-=10;gaps.push('Desenvolver inglês para mercado internacional');}}
-    if(id==='educador_digital'){if(answers.d2==='muito'){score+=20;reasons.push('Alto interesse em ensinar');}else if(answers.d2==='nao'){score-=30;gaps.push('Interesse em ensinar ausente');}}
+    if(e1==='urgente_3m'){
+      if(id==='criador_conteudo'){score-=30;gaps.push('Canal leva 6–12 meses para monetizar');}
+      else if(['freelancer_premium','editora_conteudo_digital'].includes(id)){score+=15;reasons.push('Retorno rápido ideal para urgência');}
+    }
+    // Inglês
+    if(['freelancer_premium','freelancer_internacional'].includes(id)){
+      if(answers.b4==='fluente'||answers.idiomas_fluentes==='ingles_fluente'){score+=20;reasons.push('Inglês fluente — mercado internacional');}
+      else if(id==='freelancer_internacional'){score-=20;gaps.push('Inglês fluente necessário para clientes internacionais');}
+    }
+    // Ensinar
+    if(['educador_digital','criadora_produtos_educativos'].includes(id)){
+      if(answers.d2==='muito'){score+=20;reasons.push('Alto interesse em ensinar');}
+      else if(answers.d2==='nao'){score-=30;gaps.push('Interesse em ensinar ausente');}
+    }
+    // Conteúdo
     if(id==='criador_conteudo'&&answers.d3==='muito'){score+=20;reasons.push('Alta afinidade com criação de conteúdo');}
+    if(id==='editora_conteudo_digital'&&answers.d3!=='nao'){score+=10;reasons.push('Conhece o universo de criadores de conteúdo');}
+    // Empresa
     if(id==='empreendedor_audiovisual'&&answers.a3==='propria_empresa'){score+=20;reasons.push('Já atua com empresa própria');}
-    if(['5_10','mais_10'].includes(answers.anos_exp)&&id==='freelancer_premium'){score+=10;reasons.push('Experiência robusta valoriza posicionamento premium');}
-    if(answers.portfolio_status==='sim_forte'&&['freelancer_premium','empreendedor_audiovisual'].includes(id)){score+=10;reasons.push('Portfólio sólido disponível');}
+    // Experiência
+    if(['5_10','mais_10'].includes(answers.anos_exp)){
+      if(['freelancer_premium','freelancer_internacional'].includes(id)){score+=10;reasons.push('Experiência robusta valoriza posicionamento premium');}
+    }
+    // Portfólio
+    if(answers.portfolio_status==='sim_forte'&&['freelancer_premium','empreendedor_audiovisual','freelancer_internacional'].includes(id)){score+=10;reasons.push('Portfólio sólido disponível');}
+    // Audiência
     if(['sim_engajada','sim_crescendo'].includes(answers.audiencia)&&id==='criador_conteudo'){score+=15;reasons.push('Audiência existente acelera monetização');}
+    // Exposição pública
+    if(answers.exposicao_publica==='nao_quero'){
+      if(['criador_conteudo','empreendedor_audiovisual'].includes(id)){score-=20;gaps.push('Requer exposição pública');}
+      if(['editora_conteudo_digital','freelancer_premium','freelancer_internacional','criadora_produtos_educativos'].includes(id)){score+=10;reasons.push('Trabalha nos bastidores');}
+    } else if(answers.exposicao_publica==='amo'){
+      if(['criador_conteudo','educador_digital'].includes(id)){score+=15;reasons.push('Exposição pública bem-vinda');}
+    }
+    // Autonomia
+    if(answers.val_autonomia==='essencial'&&['freelancer_premium','freelancer_internacional','editora_conteudo_digital'].includes(id)){score+=8;reasons.push('Alta autonomia neste modelo');}
+    // Equipamento
+    if(answers.equipamentos==='nao'&&id==='freelancer_internacional'){score-=10;gaps.push('Equipamento adequado necessário');}
+    // Idioma de conteúdo
+    if(id==='freelancer_internacional'&&answers.idioma_conteudo==='ingles'){score+=10;reasons.push('Orientação internacional alinhada');}
     return{id,...path,score:Math.max(0,Math.min(100,score)),reasons:reasons.slice(0,3),gaps:gaps.slice(0,3),recommended:false};
   }).sort((a,b)=>b.score-a.score).map((p,i)=>({...p,recommended:i===0}));
 }
@@ -1178,58 +1301,79 @@ async function updateHomeMetrics(){
   const pct = Math.round(answered/TOTAL_Q*100);
   document.getElementById('home-diag-pct').textContent=pct+'%';
   document.getElementById('home-diag-bar').style.width=pct+'%';
-  document.getElementById('home-diag-label').textContent=answered===0?'Não iniciado':answered>=TOTAL_Q?'Completo':`${answered} de ${TOTAL_Q} perguntas`;
+  document.getElementById('home-diag-label').textContent=answered===0?'Não iniciado':answered>=TOTAL_Q?'Completo':`${answered}/${TOTAL_Q} perguntas`;
 
   if(answered>=5){
     const paths = scorePathsClient(diagAnswers);
     const top = paths[0];
-    document.getElementById('home-path-content').innerHTML=`
-      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">${top.name}</div>
-      <div style="font-size:13px;color:var(--text-2);">${top.desc}</div>
-      <div style="font-size:12px;color:var(--accent);margin-top:8px;">${top.monthly_potential} · ${top.time_to_revenue}</div>`;
+    document.getElementById('home-path-content').innerHTML=`<b style="color:var(--text);">${top.name}</b> — ${top.desc} <span style="color:var(--accent);">${top.monthly_potential}</span>`;
   }
 
+  // Q1 — Projetos ativos
+  const active = allProjects.filter(p=>p.status==='em_andamento');
+  document.getElementById('home-projects').innerHTML = active.length
+    ? active.slice(0,4).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--sep);font-size:13px;"><span style="font-weight:500;">${escHtml(p.name)}</span><span class="badge badge-amber">${p.progress||0}%</span></div>`).join('')
+    : '<span style="font-size:13px;color:var(--text-2);">Nenhum projeto em andamento.</span>';
+
+  // Q1 — Oportunidades com prazo próximo
+  try{
+    const opps = await api('/api/opportunities');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const soon = opps.filter(o=>o.deadline&&o.status==='identificada').sort((a,b)=>new Date(a.deadline)-new Date(b.deadline)).slice(0,4);
+    document.getElementById('home-opps').innerHTML = soon.length
+      ? soon.map(o=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--sep);font-size:13px;"><span style="font-weight:500;">${escHtml(o.title)}</span><span style="font-size:11px;color:var(--text-3);">${fmtDate(o.deadline)}</span></div>`).join('')
+      : '<span style="font-size:13px;color:var(--text-2);">Nenhuma oportunidade com prazo.</span>';
+  }catch(e){ document.getElementById('home-opps').innerHTML='<span style="font-size:13px;color:var(--text-2);">—</span>'; }
+
+  // Q2 — Próximas ações
+  const actions = [];
+  if(answered===0) actions.push({icon:'📋',text:'Iniciar diagnóstico de carreira',href:'s-perfil'});
+  else if(answered<TOTAL_Q) actions.push({icon:'📋',text:`Continuar diagnóstico (${answered}/${TOTAL_Q})`,href:'s-perfil'});
+  const today2 = new Date(); today2.setHours(0,0,0,0);
+  const week = new Date(today2); week.setDate(today2.getDate()+7);
+  allEvents.filter(e=>{const d=new Date(e.date);return d>=today2&&d<=week;}).slice(0,3).forEach(e=>actions.push({icon:'📅',text:`${fmtDate(e.date)} — ${e.title}`}));
+  allProjects.filter(p=>p.status==='em_andamento'&&!p.deadline).slice(0,2).forEach(p=>actions.push({icon:'⚠️',text:`Definir prazo: ${p.name}`,href:'s-projetos'}));
+  const actEl = document.getElementById('home-actions');
+  actEl.innerHTML = actions.length
+    ? actions.slice(0,6).map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--sep);font-size:13px;">${a.icon?`<span>${a.icon}</span>`:''}<span${a.href?` style="cursor:pointer;color:var(--accent);" onclick="nav(null,'${a.href}')"`:''} >${a.href?`<b>${escHtml(a.text)}</b>`:escHtml(a.text)}</span></div>`).join('')
+    : '<span style="font-size:13px;color:var(--text-2);">Tudo em dia ✓</span>';
+
+  // Q3 — Meta financeira
   try{
     const fin = await api('/api/finances');
     if(fin.income_goal){
       const goal=parseFloat(fin.income_goal)||0, cur=parseFloat(fin.current_income)||0;
-      const pctF = goal>0?Math.round(cur/goal*100):0;
+      const pctF = goal>0?Math.min(Math.round(cur/goal*100),100):0;
       document.getElementById('home-finance-content').innerHTML=`
-        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Meta: R$ ${goal.toLocaleString('pt-BR')}/mês</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:8px;"><span>Meta: R$ ${goal.toLocaleString('pt-BR')}/mês</span><span style="color:var(--accent);">${pctF}%</span></div>
         <div class="progress"><div class="progress-fill" style="width:${pctF}%"></div></div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:4px;">Atual: R$ ${cur.toLocaleString('pt-BR')} (${pctF}% da meta)</div>`;
+        <div style="font-size:12px;color:var(--text-3);margin-top:6px;">Atual: R$ ${cur.toLocaleString('pt-BR')}</div>`;
     }
   }catch(e){}
 
-  // Upcoming events
-  const today = new Date(); today.setHours(0,0,0,0);
-  const week = new Date(today); week.setDate(today.getDate()+7);
-  const upcoming = allEvents.filter(e=>{const d=new Date(e.date);return d>=today&&d<=week;}).slice(0,4);
-  document.getElementById('home-upcoming').innerHTML = upcoming.length
-    ? upcoming.map(e=>`<div style="padding:6px 0;border-bottom:1px solid var(--sep);font-size:13px;"><span style="color:var(--text-2);">${fmtDate(e.date)}</span> — ${e.title}</div>`).join('')
-    : '<span style="font-size:13px;color:var(--text-2);">Nenhum evento nos próximos 7 dias.</span>';
-
-  // Active projects
-  const active = allProjects.filter(p=>p.status==='em_andamento');
-  document.getElementById('home-projects').innerHTML = active.length
-    ? active.slice(0,3).map(p=>`<div class="card" style="padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:500;">${p.name}</span><span class="badge badge-amber">${p.progress||0}%</span></div>`).join('')
-    : '<span style="font-size:13px;color:var(--text-2);">Nenhum projeto em andamento.</span>';
-
-  // Pending actions
-  const pending = [];
-  const stalled = allProjects.filter(p=>p.status==='em_andamento'&&(p.progress||0)<10);
-  stalled.slice(0,2).forEach(p=>pending.push(`Projeto sem progresso: <b>${p.name}</b>`));
-  const noDeadline = allProjects.filter(p=>p.status==='em_andamento'&&!p.deadline);
-  noDeadline.slice(0,2).forEach(p=>pending.push(`Definir prazo: <b>${p.name}</b>`));
-  if(answered===0) pending.push('Iniciar diagnóstico de carreira');
-  else if(answered<TOTAL_Q) pending.push(`Continuar diagnóstico (${answered}/${TOTAL_Q})`);
-  const pendEl = document.getElementById('home-pending');
-  if(pending.length){
-    pendEl.innerHTML=pending.slice(0,4).map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--sep);font-size:13px;">${t}</div>`).join('');
-    pendEl.style.color='var(--text)';
-  } else {
-    pendEl.innerHTML='<span style="font-size:13px;color:var(--text-2);">Tudo em dia! ✓</span>';
-  }
+  // Q4 — Alertas
+  const alerts = [];
+  try{
+    const oppsAll = await api('/api/opportunities');
+    const now = new Date();
+    oppsAll.filter(o=>o.deadline&&o.status==='identificada').forEach(o=>{
+      const d=new Date(o.deadline); const diff=Math.round((d-now)/86400000);
+      if(diff<=7&&diff>=0) alerts.push(`⏳ Prazo em ${diff===0?'hoje':diff+'d'}: <b>${escHtml(o.title)}</b>`);
+      else if(diff<0) alerts.push(`❌ Prazo expirado: <b>${escHtml(o.title)}</b>`);
+    });
+  }catch(e){}
+  allProjects.filter(p=>p.status==='em_andamento'&&!p.deadline).slice(0,3).forEach(p=>alerts.push(`📌 Sem prazo definido: <b>${escHtml(p.name)}</b>`));
+  try{
+    const fin = await api('/api/finances');
+    if(fin.income_goal&&fin.current_income){
+      const gap=parseFloat(fin.income_goal)-parseFloat(fin.current_income);
+      if(gap>0) alerts.push(`💰 Gap de renda: R$ ${gap.toLocaleString('pt-BR')}/mês para atingir a meta`);
+    }
+  }catch(e){}
+  const alertEl = document.getElementById('home-alerts');
+  alertEl.innerHTML = alerts.length
+    ? alerts.slice(0,6).map(a=>`<div style="padding:7px 0;border-bottom:1px solid var(--sep);font-size:13px;">${a}</div>`).join('')
+    : '<span style="font-size:13px;color:var(--green);">✓ Nenhum alerta no momento.</span>';
 }
 
 // ── PESQUISA ─────────────────────────────────────────────────────
