@@ -1012,9 +1012,8 @@ async function updateHomeMetrics(){
   stalled.slice(0,2).forEach(p=>pending.push(`Projeto sem progresso: <b>${p.name}</b>`));
   const noDeadline = allProjects.filter(p=>p.status==='em_andamento'&&!p.deadline);
   noDeadline.slice(0,2).forEach(p=>pending.push(`Definir prazo: <b>${p.name}</b>`));
-  const answered = Object.keys(diagAnswers).length;
   if(answered===0) pending.push('Iniciar diagnóstico de carreira');
-  else if(answered>0&&answered<TOTAL_Q) pending.push(`Continuar diagnóstico (${answered}/${TOTAL_Q})`);
+  else if(answered<TOTAL_Q) pending.push(`Continuar diagnóstico (${answered}/${TOTAL_Q})`);
   const pendEl = document.getElementById('home-pending');
   if(pending.length){
     pendEl.innerHTML=pending.slice(0,4).map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--sep);font-size:13px;">${t}</div>`).join('');
