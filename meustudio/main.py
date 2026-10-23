@@ -201,7 +201,7 @@ def score_career_paths(answers: dict) -> list:
         reasons = []
         gaps = []
 
-        a2 = answers.get("a2", "")
+        a2 = answers.get("a1", "")
         signal_map = {
             "freelancer_premium": ["executar"],
             "educador_digital": ["ensinar"],
@@ -481,6 +481,15 @@ async def get_decisions():
     with db() as c:
         rows = c.execute("SELECT * FROM decisions ORDER BY id DESC").fetchall()
         return [dict(r) for r in rows]
+
+@app.get("/api/decisions/{did}")
+async def get_decision(did: int):
+    with db() as c:
+        row = c.execute("SELECT * FROM decisions WHERE id=?", (did,)).fetchone()
+        if not row:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Not found")
+        return dict(row)
 
 @app.post("/api/decisions")
 async def add_decision(request: Request):
