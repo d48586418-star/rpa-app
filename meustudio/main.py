@@ -35,7 +35,8 @@ except ImportError:
     HAS_PYTRENDS = False
 
 try:
-    import google.generativeai as genai
+    from google import genai as genai_client
+    from google.genai import types as genai_types
     HAS_GEMINI = True
 except ImportError:
     HAS_GEMINI = False
@@ -1005,17 +1006,19 @@ async def ai_chat(request: Request):
                   (session_id, "user", message))
 
     try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            system_instruction=GEMINI_SYSTEM.format(context=context)
+        client = genai_client.Client(api_key=api_key)
+        contents = []
+        for role, content in history:
+            contents.append(genai_types.Content(role=role, parts=[genai_types.Part(text=content)]))
+        contents.append(genai_types.Content(role='user', parts=[genai_types.Part(text=message)]))
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=contents,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=GEMINI_SYSTEM.format(context=context),
+                max_output_tokens=1024,
+            )
         )
-        chat_history = [
-            {"role": role, "parts": [content]}
-            for role, content in history
-        ]
-        chat = model.start_chat(history=chat_history)
-        response = chat.send_message(message)
         reply = response.text
     except Exception as e:
         log.error(f"Gemini error: {e}")
