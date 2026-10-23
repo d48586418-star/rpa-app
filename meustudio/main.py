@@ -253,10 +253,10 @@ def score_career_paths(answers: dict) -> list:
 
         # English for international market
         if path_id == "freelancer_premium":
-            if answers.get("b4") == "sim":
+            if answers.get("b4") == "fluente":
                 score += 15
                 reasons.append("Inglês fluente — mercado internacional")
-            elif answers.get("b4") == "nao":
+            elif answers.get("b4") in ("basico", "nao"):
                 score -= 10
                 gaps.append("Desenvolver inglês para mercado internacional")
 

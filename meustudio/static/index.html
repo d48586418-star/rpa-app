@@ -671,7 +671,8 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 const API = '';
 const SECTION_TITLES = {
   's-home':'Visão Geral','s-perfil':'Meu Perfil','s-estrategia':'Estratégia',
-  's-pesquisa':'Pesquisa de Mercado','s-projetos':'Projetos','s-calendario':'Calendário',
+  's-assistente':'Assistente IA','s-pesquisa':'Pesquisa de Mercado',
+  's-projetos':'Projetos','s-calendario':'Calendário',
   's-financeiro':'Financeiro','s-identidade':'Identidade Visual',
   's-revisoes':'Revisões e Resultados','s-config':'Configurações'
 };
@@ -715,7 +716,8 @@ function nav(el, targetId){
   if(id==='s-estrategia') runCareerAnalysis();
   if(id==='s-calendario') renderCalendar();
   if(id==='s-identidade') loadIdentidade();
-  if(id==='s-revisoes') loadDecisions();
+  if(id==='s-pesquisa') loadTrends();
+  if(id==='s-revisoes'){ loadDecisions(); loadResults(); }
   if(id==='s-config') loadConnectorStatus();
 }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); }
@@ -727,6 +729,46 @@ function switchTab(section,tab,el){
   el.classList.add('active');
   document.querySelectorAll(`[id^="${section}-tab-"]`).forEach(p=>p.classList.remove('active'));
   document.getElementById(`${section}-tab-${tab}`).classList.add('active');
+  if(section==='perfil'&&tab==='sintese') renderSintese();
+}
+
+function renderSintese(){
+  const el = document.getElementById('sintese-content');
+  const answered = Object.keys(diagAnswers).length;
+  if(answered===0){
+    el.innerHTML='<p style="color:var(--text-2);">Complete o diagnóstico para ver a síntese.</p>';
+    return;
+  }
+  const labels = {
+    a1:{executar:'Execução de projetos',ensinar:'Ensino e mentoria',criar:'Criação de conteúdo próprio',estrategia:'Estratégia e gestão'},
+    a2:{edicao_video:'Edição de vídeo',motion_graphics:'Motion graphics / VFX',direcao:'Direção e produção',multiplas:'Múltiplas áreas'},
+    a3:{clt:'CLT / Empregada',freelancer:'Freelancer',propria_empresa:'Empresa própria',transicao:'Em transição'},
+    anos_exp:{menos_2:'Menos de 2 anos','2_5':'2 a 5 anos','5_10':'5 a 10 anos',mais_10:'Mais de 10 anos'},
+    b4:{fluente:'Fluente / Avançado',intermediario:'Intermediário',basico:'Básico',nao:'Não falo inglês'},
+    c1:{sim:'Sim',nao:'Não',em_construcao:'Em construção'},
+    d2:{muito:'Muito interesse',talvez:'Talvez',nao:'Não tenho interesse'},
+    e1:{urgente:'Urgente — 3 meses',medio:'6 a 12 meses',longo:'Mais de 1 ano'},
+    e2:{baixo:'Menos de R$ 3 mil',medio:'R$ 3–6 mil',alto:'R$ 6–12 mil',muito_alto:'Acima de R$ 12 mil'},
+  };
+  const rows = [
+    ['Energia principal', labels.a1?.[diagAnswers.a1]],
+    ['Área de atuação', labels.a2?.[diagAnswers.a2]],
+    ['Situação actual', labels.a3?.[diagAnswers.a3]],
+    ['Experiência', labels.anos_exp?.[diagAnswers.anos_exp]],
+    ['Nível de inglês', labels.b4?.[diagAnswers.b4]],
+    ['Portfólio online', labels.c1?.[diagAnswers.c1]],
+    ['Interesse em ensinar', labels.d2?.[diagAnswers.d2]],
+    ['Urgência de renda', labels.e1?.[diagAnswers.e1]],
+    ['Meta de renda mensal', labels.e2?.[diagAnswers.e2]],
+  ].filter(r=>r[1]);
+  el.innerHTML=`
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:13px;color:var(--text-2);">${answered} de ${TOTAL_Q} perguntas respondidas</span>
+      <div class="progress" style="flex:1;max-width:160px;"><div class="progress-fill" style="width:${Math.round(answered/TOTAL_Q*100)}%"></div></div>
+    </div>
+    <div style="display:grid;gap:8px;">
+      ${rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius);font-size:13px;"><span style="color:var(--text-2);">${k}</span><span style="font-weight:600;color:var(--text);">${v}</span></div>`).join('')}
+    </div>`;
 }
 
 // ── DIAGNOSTIC ───────────────────────────────────────────────────
@@ -963,6 +1005,23 @@ async function updateHomeMetrics(){
   document.getElementById('home-projects').innerHTML = active.length
     ? active.slice(0,3).map(p=>`<div class="card" style="padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:500;">${p.name}</span><span class="badge badge-amber">${p.progress||0}%</span></div>`).join('')
     : '<span style="font-size:13px;color:var(--text-2);">Nenhum projeto em andamento.</span>';
+
+  // Pending actions
+  const pending = [];
+  const stalled = allProjects.filter(p=>p.status==='em_andamento'&&(p.progress||0)<10);
+  stalled.slice(0,2).forEach(p=>pending.push(`Projeto sem progresso: <b>${p.name}</b>`));
+  const noDeadline = allProjects.filter(p=>p.status==='em_andamento'&&!p.deadline);
+  noDeadline.slice(0,2).forEach(p=>pending.push(`Definir prazo: <b>${p.name}</b>`));
+  const answered = Object.keys(diagAnswers).length;
+  if(answered===0) pending.push('Iniciar diagnóstico de carreira');
+  else if(answered>0&&answered<TOTAL_Q) pending.push(`Continuar diagnóstico (${answered}/${TOTAL_Q})`);
+  const pendEl = document.getElementById('home-pending');
+  if(pending.length){
+    pendEl.innerHTML=pending.slice(0,4).map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--sep);font-size:13px;">${t}</div>`).join('');
+    pendEl.style.color='var(--text)';
+  } else {
+    pendEl.innerHTML='<span style="font-size:13px;color:var(--text-2);">Tudo em dia! ✓</span>';
+  }
 }
 
 // ── PESQUISA ─────────────────────────────────────────────────────
