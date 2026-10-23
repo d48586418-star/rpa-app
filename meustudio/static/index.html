@@ -1,1522 +1,1472 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Meu Studio — D.A.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Meu Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ── TOKENS ──────────────────────────────────────────────────── */
+/* Layout: dark sidebar 220px + light content area */
 :root {
-  --bg:#0C0C0A; --surface:#141411; --surface-2:#1C1B18; --surface-3:#242320;
-  --text:#E4E1D8; --text-2:#9A9690; --text-3:#5A5852;
-  --sep:#252320; --sep-2:#1C1B18;
-  --accent:#C4904A; --accent-dim:rgba(196,144,74,.14);
-  --green:#5A9E65; --red:#C45050; --blue:#5A8FC4;
-  --font-serif:'DM Serif Display',Georgia,serif;
-  --font-sans:'Inter',-apple-system,sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
-  --nav-h:52px;
+  --sidebar:#111110; --sidebar-hover:#1F1E1C; --sidebar-active:#2A2927;
+  --bg:#F8F7F5; --surface:#FFFFFF; --surface-2:#F2F0ED;
+  --text:#1A1917; --text-2:#6B6965; --text-3:#A8A5A0;
+  --sep:#E5E3DF; --accent:#C4904A; --accent-dim:rgba(196,144,74,.12);
+  --green:#2E7D52; --red:#C0392B; --sidebar-w:220px; --top-h:56px;
+  --radius:8px; color-scheme:light;
 }
-/* ── RESET ───────────────────────────────────────────────────── */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1A1917; --surface:#232220; --surface-2:#2A2927;
+  --text:#E8E5DF; --text-2:#9A9690; --text-3:#6B6965;
+  --sep:#333130; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1A1917; --surface:#232220; --surface-2:#2A2927;
+  --text:#E8E5DF; --text-2:#9A9690; --text-3:#6B6965;
+  --sep:#333130; color-scheme:dark;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--font-sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
-a{color:var(--accent);text-decoration:none;}
-a:hover{text-decoration:underline;}
-/* ── NAV ─────────────────────────────────────────────────────── */
-#nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(12,12,10,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--sep);z-index:200;display:flex;align-items:center;padding:0 24px;gap:0;}
-.nav-logo{font-family:var(--font-serif);font-size:17px;color:var(--text);letter-spacing:-.3px;margin-right:32px;flex-shrink:0;}
-.nav-logo em{color:var(--accent);font-style:italic;}
-.nav-links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;}
-.nav-links::-webkit-scrollbar{display:none;}
-.nav-link{padding:6px 12px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-radius:4px;white-space:nowrap;transition:color .15s,background .15s;}
-.nav-link:hover{color:var(--text);background:var(--surface-2);}
-.nav-link.active{color:var(--accent);}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-#status-indicator{width:6px;height:6px;border-radius:50%;background:var(--text-3);}
-#status-indicator.online{background:var(--green);}
-#status-indicator.offline{background:var(--red);}
-/* ── LAYOUT ──────────────────────────────────────────────────── */
-#main{padding-top:var(--nav-h);}
-.section{display:none;max-width:860px;margin:0 auto;padding:48px 24px 80px;}
+html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.6;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+body{display:flex;overflow:hidden;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--sidebar);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;z-index:100;transition:transform .25s;}
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-logo-name{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;letter-spacing:-.3px;}
+.sb-logo-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.sb-section{padding:16px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;margin:1px 6px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;transition:all .15s;user-select:none;}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff;}
+.nav-item.active{background:var(--sidebar-active);color:#fff;}
+.nav-item svg{flex-shrink:0;opacity:.7;}
+.nav-item.active svg{opacity:1;}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+#topbar{height:var(--top-h);background:var(--surface);border-bottom:1px solid var(--sep);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;}
+#hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--text);}
+#topbar-title{font-size:15px;font-weight:600;color:var(--text);flex:1;}
+#srv-dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);transition:background .3s;}
+#srv-dot.ok{background:var(--green);}
+#srv-dot.err{background:var(--red);}
+#srv-label{font-size:12px;color:var(--text-3);}
+#content{flex:1;overflow-y:auto;padding:32px;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));}
+.section{display:none;}
 .section.active{display:block;}
-/* ── TYPOGRAPHY ──────────────────────────────────────────────── */
-.display{font-family:var(--font-serif);font-size:36px;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px;}
-.display em{color:var(--accent);font-style:italic;}
-.caption{font-size:13px;color:var(--text-2);margin-bottom:32px;}
-h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-3);margin-bottom:16px;}
-h3{font-size:17px;font-weight:600;margin-bottom:8px;}
-p{color:var(--text-2);line-height:1.7;}
-/* ── HORIZONTAL RULE ─────────────────────────────────────────── */
-.rule{border:none;border-top:1px solid var(--sep);margin:32px 0;}
-/* ── CARD ────────────────────────────────────────────────────── */
-.card{background:var(--surface);border:1px solid var(--sep);border-radius:6px;padding:24px;margin-bottom:16px;}
-.card.accent-border{border-left:3px solid var(--accent);}
-/* ── METRIC GRID ─────────────────────────────────────────────── */
-.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--sep);border:1px solid var(--sep);border-radius:6px;overflow:hidden;margin-bottom:32px;}
-.metric{background:var(--surface);padding:20px 18px;}
-.metric-val{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--text);line-height:1;}
+
+/* BACKDROP */
+#backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;}
+#backdrop.show{display:block;}
+
+/* TYPOGRAPHY */
+.page-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);margin-bottom:4px;line-height:1.2;}
+.page-sub{font-size:14px;color:var(--text-2);margin-bottom:28px;}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:10px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:20px;margin-bottom:12px;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;}
+.metric-card{background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:18px;}
+.metric-val{font-size:22px;font-weight:600;color:var(--text);line-height:1;}
 .metric-val.accent{color:var(--accent);}
-.metric-label{font-size:11px;color:var(--text-3);margin-top:6px;text-transform:uppercase;letter-spacing:.8px;}
-/* ── FORM ────────────────────────────────────────────────────── */
-.field{margin-bottom:20px;}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
-input[type=text],input[type=number],input[type=email],textarea,select{
-  width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--sep);
-  border-radius:4px;color:var(--text);font-family:var(--font-sans);font-size:14px;
-  transition:border .2s;outline:none;resize:vertical;
+.metric-label{font-size:12px;color:var(--text-2);margin-top:4px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:inherit;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{background:#b8843e;}
+.btn-ghost{background:transparent;color:var(--text-2);border-color:var(--sep);}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text);}
+.btn-danger{background:transparent;color:var(--red);border-color:var(--sep);}
+.btn-danger:hover{background:#fef2f2;border-color:var(--red);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+
+/* FORMS */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;}
+input[type=text],input[type=number],input[type=email],input[type=date],textarea,select{
+  width:100%;padding:9px 11px;background:var(--surface);border:1px solid var(--sep);
+  border-radius:6px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border .15s;
 }
 input:focus,textarea:focus,select:focus{border-color:var(--accent);}
-textarea{min-height:80px;}
-select option{background:var(--surface-2);}
-/* ── BUTTONS ─────────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:4px;font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;letter-spacing:.2px;}
-.btn:active{transform:scale(.98);}
-.btn-primary{background:var(--accent);color:#111;border-color:var(--accent);}
-.btn-primary:hover{background:#D4A05A;}
-.btn-ghost{background:transparent;color:var(--text-2);border-color:var(--sep);}
-.btn-ghost:hover{color:var(--text);border-color:var(--text-3);}
-.btn-danger{background:transparent;color:var(--red);border-color:var(--red);}
-.btn-sm{padding:6px 12px;font-size:12px;}
-/* ── PROGRESS ────────────────────────────────────────────────── */
-.progress-track{height:3px;background:var(--sep);border-radius:99px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .6s cubic-bezier(.25,.46,.45,.94);}
-/* ── TAGS ────────────────────────────────────────────────────── */
-.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:3px;font-size:12px;font-weight:500;background:var(--surface-2);color:var(--text-2);border:1px solid var(--sep);}
-.tag.amber{background:var(--accent-dim);color:var(--accent);border-color:transparent;}
-.tag.green{background:rgba(90,158,101,.15);color:var(--green);border-color:transparent;}
-.tag.red{background:rgba(196,80,80,.15);color:var(--red);border-color:transparent;}
-.tag.blue{background:rgba(90,143,196,.15);color:var(--blue);border-color:transparent;}
-/* ── TABLE ───────────────────────────────────────────────────── */
-table{width:100%;border-collapse:collapse;font-size:13px;}
-th{text-align:left;padding:10px 12px;color:var(--text-3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--sep);}
-td{padding:11px 12px;border-bottom:1px solid var(--sep-2);color:var(--text-2);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface-2);}
-/* ── ALERT ───────────────────────────────────────────────────── */
-.alert{padding:12px 16px;border-radius:4px;font-size:13px;line-height:1.5;margin-bottom:20px;}
-.alert-amber{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(196,144,74,.3);}
-.alert-red{background:rgba(196,80,80,.1);color:var(--red);border:1px solid rgba(196,80,80,.2);}
-.alert-green{background:rgba(90,158,101,.1);color:var(--green);border:1px solid rgba(90,158,101,.2);}
-/* ── LOADING ─────────────────────────────────────────────────── */
-.loader{display:inline-flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;}
-.spin{width:14px;height:14px;border:2px solid var(--sep);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-/* ── DIAGNOSTIC ──────────────────────────────────────────────── */
-.stage-bar{display:flex;gap:6px;margin-bottom:32px;}
-.stage-dot{flex:1;height:3px;background:var(--sep);border-radius:99px;transition:background .3s;}
-.stage-dot.done{background:var(--accent);}
-.stage-dot.active{background:var(--text-2);}
-.q-text{font-family:var(--font-serif);font-size:22px;line-height:1.4;margin-bottom:24px;}
-.q-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
-.q-opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--sep);border-radius:5px;cursor:pointer;transition:all .2s;background:var(--surface);}
-.q-opt:hover{border-color:var(--text-3);}
-.q-opt.selected{border-color:var(--accent);background:var(--accent-dim);}
-.q-opt-bullet{width:18px;height:18px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;margin-top:1px;transition:all .2s;}
-.q-opt.selected .q-opt-bullet{background:var(--accent);border-color:var(--accent);}
-.q-opt-text{font-size:14px;color:var(--text-2);}
-.q-opt.selected .q-opt-text{color:var(--text);}
-.q-multi .q-opt-bullet{border-radius:3px;}
-.q-nav{display:flex;justify-content:space-between;align-items:center;}
-.q-counter{font-size:12px;color:var(--text-3);font-family:var(--font-mono);}
-/* ── CHART ───────────────────────────────────────────────────── */
-.chart-box{position:relative;height:200px;}
-/* ── CAREER PATH CARD ────────────────────────────────────────── */
-.path-card{border:1px solid var(--sep);border-radius:6px;padding:20px;margin-bottom:12px;position:relative;}
-.path-card.top{border-color:var(--accent);}
-.path-score{font-family:var(--font-mono);font-size:28px;font-weight:500;color:var(--accent);}
-.path-bar{height:4px;background:var(--sep);border-radius:99px;margin:10px 0;}
-.path-bar-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .8s cubic-bezier(.25,.46,.45,.94);}
-.path-rec{position:absolute;top:16px;right:16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);}
-/* ── PROJECT ROW ─────────────────────────────────────────────── */
-.proj-row{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--sep-2);}
-.proj-row:last-child{border-bottom:none;}
-.proj-emoji{font-size:20px;flex-shrink:0;width:32px;text-align:center;}
-.proj-info{flex:1;min-width:0;}
-.proj-name{font-weight:600;font-size:14px;}
-.proj-sub{font-size:12px;color:var(--text-3);margin-top:2px;}
-.proj-prog{font-family:var(--font-mono);font-size:13px;color:var(--text-3);flex-shrink:0;}
-/* ── SCENARIO TABLE ──────────────────────────────────────────── */
-.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--sep);border:1px solid var(--sep);border-radius:6px;overflow:hidden;margin:16px 0;}
-.scenario-col{background:var(--surface);padding:16px;}
-.scenario-col.base{background:var(--surface-2);}
-.scenario-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin-bottom:12px;}
-.scenario-val{font-family:var(--font-mono);font-size:18px;color:var(--text);margin-bottom:4px;}
-.scenario-sub{font-size:12px;color:var(--text-3);}
-/* ── NEWS ────────────────────────────────────────────────────── */
-.news-item{padding:16px 0;border-bottom:1px solid var(--sep-2);}
-.news-item:last-child{border-bottom:none;}
-.news-source{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:4px;}
-.news-title{font-size:14px;font-weight:600;line-height:1.4;}
-.news-title a{color:var(--text);}
-.news-title a:hover{color:var(--accent);}
-.news-summary{font-size:13px;color:var(--text-3);margin-top:4px;line-height:1.5;}
-/* ── NEXT ACTION ─────────────────────────────────────────────── */
-.next-action{background:var(--accent-dim);border:1px solid rgba(196,144,74,.25);border-radius:6px;padding:20px 24px;margin-bottom:32px;}
-.next-action .label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px;}
-.next-action .action{font-size:17px;font-weight:600;color:var(--text);}
-.next-action .context{font-size:13px;color:var(--text-2);margin-top:4px;}
-/* ── EVIDENCE MARKERS ────────────────────────────────────────── */
-.ev-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--sep-2);}
-.ev-row:last-child{border-bottom:none;}
-.ev-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:3px;}
-.ev-declarado{background:rgba(90,143,196,.15);color:var(--blue);}
-.ev-evidencia{background:rgba(90,158,101,.15);color:var(--green);}
-.ev-hipotese{background:rgba(196,144,74,.15);color:var(--accent);}
-.ev-desconhecido{background:var(--surface-2);color:var(--text-3);}
-.ev-text{font-size:13px;color:var(--text-2);}
-/* ── TWO COL ─────────────────────────────────────────────────── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-/* ── TOAST ───────────────────────────────────────────────────── */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--sep);border-radius:4px;padding:10px 16px;font-size:13px;color:var(--text);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
-#toast.show{opacity:1;transform:none;}
-/* ── RESPONSIVE ──────────────────────────────────────────────── */
-@media(max-width:680px){
-  .metric-grid{grid-template-columns:repeat(2,1fr);}
-  .two-col{grid-template-columns:1fr;}
-  .scenario-grid{grid-template-columns:1fr;}
-  .section{padding:32px 16px 60px;}
-  .nav-link{display:none;}
-  .nav-link.mobile-show{display:block;}
-}
-/* monospace numbers everywhere */
-.mono{font-family:var(--font-mono);}
-</style>
-</head>
-<body>
+textarea{resize:vertical;min-height:72px;}
+input[type=range]{width:100%;accent-color:var(--accent);}
 
-<!-- NAV -->
-<nav id="nav">
-  <div class="nav-logo">Meu <em>Studio</em></div>
-  <div class="nav-links">
-    <div class="nav-link mobile-show active" data-s="inicio">Início</div>
-    <div class="nav-link" data-s="diagnostico">Diagnóstico</div>
-    <div class="nav-link" data-s="perfil">Perfil</div>
-    <div class="nav-link" data-s="mercado">Mercado</div>
-    <div class="nav-link" data-s="estrategia">Estratégia</div>
-    <div class="nav-link" data-s="financas">Finanças</div>
-    <div class="nav-link mobile-show" data-s="projetos">Projetos</div>
-    <div class="nav-link" data-s="identidade">Identidade</div>
-    <div class="nav-link" data-s="decisoes">Decisões</div>
+/* PROGRESS BAR */
+.progress{height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-green{background:#dcfce7;color:#166534;}
+.badge-amber{background:#fef3c7;color:#92400e;}
+.badge-gray{background:var(--surface-2);color:var(--text-2);}
+.badge-red{background:#fee2e2;color:#991b1b;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--sep);margin-bottom:24px;gap:0;}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* DIAGNOSTIC */
+.diag-question{font-size:16px;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.diag-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.diag-opt{padding:12px 14px;background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text-2);transition:all .15s;text-align:left;}
+.diag-opt:hover{border-color:var(--accent);color:var(--text);}
+.diag-opt.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--text);}
+.diag-progress-text{font-size:12px;color:var(--text-3);margin-bottom:12px;}
+.diag-nav{display:flex;gap:8px;margin-top:20px;}
+
+/* PATH CARDS */
+.path-card{background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:18px;margin-bottom:10px;}
+.path-card.recommended{border-color:var(--accent);}
+.path-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.path-name{font-size:15px;font-weight:600;color:var(--text);}
+.path-score-bar{height:3px;background:var(--surface-2);border-radius:2px;margin-bottom:12px;}
+.path-score-fill{height:100%;border-radius:2px;}
+.path-meta{display:flex;gap:16px;font-size:12px;color:var(--text-2);}
+.path-meta span{display:flex;gap:4px;align-items:center;}
+
+/* CONNECTOR CARDS */
+.connector-card{background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:20px;margin-bottom:12px;}
+.connector-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.connector-name{font-size:14px;font-weight:600;color:var(--text);}
+.connector-status{display:flex;align-items:center;gap:6px;font-size:12px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);}
+.status-dot.ok{background:var(--green);}
+.status-dot.err{background:var(--red);}
+
+/* CALENDAR GRID */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:20px;}
+.cal-day-header{text-align:center;font-size:11px;font-weight:600;color:var(--text-3);padding:6px 0;text-transform:uppercase;}
+.cal-day{min-height:60px;background:var(--surface);border:1px solid var(--sep);border-radius:4px;padding:4px;font-size:12px;cursor:pointer;transition:border .15s;}
+.cal-day:hover{border-color:var(--accent);}
+.cal-day.today{border-color:var(--accent);background:var(--accent-dim);}
+.cal-day.other-month{opacity:.4;}
+.cal-day-num{font-weight:600;color:var(--text);margin-bottom:2px;}
+.cal-event-dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin:1px 0;}
+
+/* HOME 2-col */
+.home-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr;}}
+
+/* SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--sep);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* DIVIDER */
+hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
+
+/* MOBILE */
+@media(max-width:768px){
+  #sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);z-index:95;}
+  #sidebar.open{transform:translateX(0);}
+  #hamburger{display:flex;}
+  #content{padding:20px 16px;}
+  .diag-options{grid-template-columns:1fr;}
+  .home-grid{grid-template-columns:1fr;}
+  .card-grid{grid-template-columns:1fr;}
+}
+</style>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-name">Meu Studio</div>
+    <div class="sb-logo-sub">Sistema de Carreira</div>
   </div>
-  <div class="nav-right">
-    <div id="status-indicator" title="Status do servidor"></div>
-    <button class="btn btn-ghost btn-sm" onclick="exportData()">↓ Exportar</button>
+  <div class="sb-section">Principal</div>
+  <div class="nav-item active" data-target="s-home" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>Visão Geral
+  </div>
+  <div class="nav-item" data-target="s-perfil" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Meu Perfil
+  </div>
+  <div class="nav-item" data-target="s-estrategia" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Estratégia
+  </div>
+  <div class="nav-item" data-target="s-pesquisa" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Pesquisa
+  </div>
+  <div class="nav-item" data-target="s-projetos" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Projetos
+  </div>
+  <div class="nav-item" data-target="s-calendario" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 2v2M11 2v2M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Calendário
+  </div>
+  <div class="nav-item" data-target="s-financeiro" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v1.5m0 3V11m-2-3.5c0-.83.67-1.5 2-1.5s2 .67 2 1.5S9.33 9 8 9s-2 .67-2 1.5S7.17 12 8.5 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Financeiro
+  </div>
+  <div class="nav-item" data-target="s-identidade" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4h4l-3.5 2.5 1.5 4L8 10.5 4.5 12.5l1.5-4L2.5 6h4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Identidade
+  </div>
+  <div class="nav-item" data-target="s-revisoes" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 109 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 5l1 3h-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Revisões
+  </div>
+  <div class="sb-section" style="margin-top:8px;">Sistema</div>
+  <div class="nav-item" data-target="s-config" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.4"/><path d="M13.3 7l.7-.4-.7-2-.8.2a5 5 0 00-1-.6l-.1-.8H9.6l-.1.8a5 5 0 00-1 .6L7.7 4.6l-1.4 2 .6.4a5 5 0 000 1.2l-.6.4 1.4 2 .8-.2a5 5 0 001 .6l.1.8h2.8l.1-.8a5 5 0 001-.6l.8.2.7-2-.7-.4a5 5 0 000-1.2z" stroke="currentColor" stroke-width="1.2"/></svg>Configurações
   </div>
 </nav>
 
-<main id="main">
+<!-- BACKDROP -->
+<div id="backdrop" onclick="closeSidebar()"></div>
 
-<!-- ═══ INÍCIO ═══════════════════════════════════════════════════ -->
-<section id="s-inicio" class="section active">
-  <div id="greeting" class="display" style="margin-bottom:4px">Olá, Débora.</div>
-  <div class="caption" id="today-caption"></div>
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <span id="topbar-title">Visão Geral</span>
+    <div id="srv-dot"></div>
+    <span id="srv-label">servidor</span>
+  </header>
+  <div id="content">
 
-  <div id="next-action-box" class="next-action" style="display:none">
-    <div class="label">Próxima Ação Recomendada</div>
-    <div class="action" id="next-action-text"></div>
-    <div class="context" id="next-action-ctx"></div>
-  </div>
-
-  <div class="metric-grid" id="home-metrics">
-    <div class="metric"><div class="metric-val accent" id="m-diag">—</div><div class="metric-label">Diagnóstico</div></div>
-    <div class="metric"><div class="metric-val" id="m-path">—</div><div class="metric-label">Caminho Principal</div></div>
-    <div class="metric"><div class="metric-val" id="m-proj">0</div><div class="metric-label">Projetos Ativos</div></div>
-    <div class="metric"><div class="metric-val" id="m-meta">—</div><div class="metric-label">Meta Mensal</div></div>
-  </div>
-
-  <hr class="rule">
-  <h2>Jornada de Carreira</h2>
-  <div style="display:flex;flex-direction:column;gap:0;margin-bottom:32px" id="journey-list"></div>
-
-  <hr class="rule">
-  <h2>Início Rápido</h2>
-  <div class="two-col">
-    <div class="card" style="cursor:pointer" onclick="nav('diagnostico')">
-      <div style="font-size:24px;margin-bottom:8px">🧭</div>
-      <h3>Diagnóstico Adaptativo</h3>
-      <p style="font-size:13px">Investigação profunda do seu perfil em 5 etapas.</p>
-    </div>
-    <div class="card" style="cursor:pointer" onclick="nav('estrategia')">
-      <div style="font-size:24px;margin-bottom:8px">📊</div>
-      <h3>Análise de Carreira</h3>
-      <p style="font-size:13px">Comparação de caminhos com base no seu perfil.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ DIAGNÓSTICO ═══════════════════════════════════════════════ -->
-<section id="s-diagnostico" class="section">
-  <div class="display">Diagnóstico <em>Adaptativo</em></div>
-  <div class="caption">5 etapas · Salvo automaticamente · Retome quando quiser</div>
-
-  <div id="diag-completed" style="display:none">
-    <div class="alert alert-green">✓ Diagnóstico concluído. Seus resultados estão em <strong>Perfil</strong> e <strong>Estratégia</strong>.</div>
-    <button class="btn btn-ghost" onclick="resetDiag()">↺ Reiniciar diagnóstico</button>
-  </div>
-
-  <div id="diag-quiz">
-    <div class="stage-bar" id="stage-bar">
-      <div class="stage-dot" id="sd0"></div>
-      <div class="stage-dot" id="sd1"></div>
-      <div class="stage-dot" id="sd2"></div>
-      <div class="stage-dot" id="sd3"></div>
-      <div class="stage-dot" id="sd4"></div>
-    </div>
-    <div style="font-size:12px;color:var(--text-3);margin-bottom:20px" id="stage-label"></div>
-
-    <div class="q-text" id="q-text"></div>
-    <div class="q-opts" id="q-opts"></div>
-
-    <div class="q-nav">
-      <button class="btn btn-ghost" id="q-back" onclick="diagBack()">← Voltar</button>
-      <div class="q-counter" id="q-counter"></div>
-      <button class="btn btn-primary" id="q-next" onclick="diagNext()" disabled>Continuar →</button>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ PERFIL ════════════════════════════════════════════════════ -->
-<section id="s-perfil" class="section">
-  <div class="display">Perfil <em>Profissional</em></div>
-  <div class="caption">Síntese do diagnóstico + campos editáveis</div>
-
-  <div id="profile-empty" class="alert alert-amber" style="display:none">
-    Complete o <strong>Diagnóstico</strong> para gerar seu perfil automaticamente, ou preencha os campos abaixo.
-  </div>
-
-  <h2>Síntese do Diagnóstico</h2>
-  <div id="profile-synthesis" class="card" style="margin-bottom:24px">
-    <div id="synthesis-content"><p style="color:var(--text-3)">Complete o diagnóstico para ver a síntese.</p></div>
-  </div>
-
-  <h2>Evidências e Hipóteses</h2>
-  <div class="card" id="evidence-list">
-    <div id="evidence-content"><p style="color:var(--text-3)">Nenhuma evidência registrada ainda.</p></div>
-  </div>
-
-  <hr class="rule">
-  <h2>Campos Editáveis</h2>
-  <div class="card">
-    <div class="field"><label>Nome Profissional</label><input type="text" id="pf-name" placeholder="Débora Augusta"></div>
-    <div class="field"><label>Posicionamento (1 frase)</label><input type="text" id="pf-pos" placeholder="Editora de vídeo especialista em..."></div>
-    <div class="two-col">
-      <div class="field"><label>Softwares principais</label><input type="text" id="pf-sw" placeholder="DaVinci Resolve, Premiere..."></div>
-      <div class="field"><label>Especialidade</label><input type="text" id="pf-esp" placeholder="Montagem narrativa, color..."></div>
-    </div>
-    <div class="field"><label>Inglês</label>
-      <select id="pf-eng"><option value="nao">Não falo</option><option value="basico">Básico</option><option value="intermediario">Intermediário</option><option value="fluente">Fluente</option></select>
-    </div>
-    <div class="field"><label>Portfólio / Link</label><input type="text" id="pf-port" placeholder="https://..."></div>
-    <div class="field"><label>Notas adicionais</label><textarea id="pf-notes" placeholder="Informações relevantes que o sistema não captou..."></textarea></div>
-    <button class="btn btn-primary" onclick="saveProfile()">Salvar Perfil</button>
-  </div>
-</section>
-
-<!-- ═══ MERCADO ═══════════════════════════════════════════════════ -->
-<section id="s-mercado" class="section">
-  <div class="display">Radar de <em>Mercado</em></div>
-  <div class="caption">Google Trends + notícias do setor · Dados reais da internet</div>
-
-  <div id="mercado-offline" class="alert alert-amber" style="display:none">
-    ⚠️ Servidor offline — rode <code>python main.py</code> para ativar pesquisa em tempo real.
-  </div>
-
-  <div class="card">
-    <div class="field"><label>Palavras-chave</label>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="kw-input" value="edição de vídeo,DaVinci Resolve,Adobe Premiere" style="flex:1">
-        <button class="btn btn-primary" onclick="loadTrends()">Pesquisar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>🔥 Em alta agora no Brasil</h2>
-    <div id="hoje-loading" class="loader"><div class="spin"></div> Carregando...</div>
-    <div id="hoje-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
-  </div>
-
-  <div class="card">
-    <h2>Google Trends — 12 semanas (Brasil)</h2>
-    <div id="trends-loading" class="loader"><div class="spin"></div> Carregando dados...</div>
-    <div id="trends-err" class="alert alert-red" style="display:none"></div>
-    <div class="chart-box"><canvas id="c-trends"></canvas></div>
-  </div>
-
-  <h2 style="margin-top:24px">Notícias do Setor</h2>
-  <div id="news-loading" class="loader"><div class="spin"></div></div>
-  <div id="news-feed"></div>
-</section>
-
-<!-- ═══ ESTRATÉGIA ════════════════════════════════════════════════ -->
-<section id="s-estrategia" class="section">
-  <div class="display">Análise de <em>Carreira</em></div>
-  <div class="caption">Caminhos pontuados com base no seu diagnóstico</div>
-
-  <div id="strat-empty" class="alert alert-amber" style="display:none">
-    Complete o diagnóstico para ver a análise de caminhos personalizada. Abaixo você vê uma análise com perfil padrão.
-  </div>
-
-  <div id="career-paths" style="margin-bottom:32px"></div>
-
-  <hr class="rule">
-  <h2>Comparativo de Caminhos</h2>
-  <div style="overflow-x:auto;margin-bottom:24px">
-    <table id="paths-table">
-      <thead><tr><th>Caminho</th><th>Score</th><th>Tempo p/ receita</th><th>Potencial/mês</th><th>Risco</th><th>Investimento</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <hr class="rule">
-  <h2>Plano de 90 Dias</h2>
-  <div class="card">
-    <div class="field"><label>Meta de 90 Dias</label><textarea id="st-d90" rows="3" placeholder="O que você quer ter conquistado em 90 dias?"></textarea></div>
-    <div class="field"><label>Referências que você admira</label><textarea id="st-ref" rows="2" placeholder="Criadores, educadores ou profissionais de referência..."></textarea></div>
-    <div class="field"><label>Oportunidades que você enxerga</label><textarea id="st-op" rows="2" placeholder="Nichos pouco explorados, problemas sem solução..."></textarea></div>
-    <button class="btn btn-primary" onclick="saveStrategy()">Salvar</button>
-  </div>
-</section>
-
-<!-- ═══ FINANÇAS ══════════════════════════════════════════════════ -->
-<section id="s-financas" class="section">
-  <div class="display">Motor <em>Financeiro</em></div>
-  <div class="caption">Projeções reais com cenários e análise de sensibilidade</div>
-
-  <div class="card">
-    <h2>Parâmetros Base</h2>
-    <div class="two-col">
-      <div class="field"><label>Preço por projeto (R$)</label><input type="number" id="fi-price" placeholder="1500" oninput="calcFinance()"></div>
-      <div class="field"><label>Horas por projeto</label><input type="number" id="fi-hours-proj" placeholder="20" oninput="calcFinance()"></div>
-      <div class="field"><label>Horas disponíveis/mês</label><input type="number" id="fi-hours-month" placeholder="80" oninput="calcFinance()"></div>
-      <div class="field"><label>Taxa de conversão (%)</label><input type="number" id="fi-conv" placeholder="10" oninput="calcFinance()"></div>
-      <div class="field"><label>Custos fixos/mês (R$)</label><input type="number" id="fi-costs" placeholder="500" oninput="calcFinance()"></div>
-      <div class="field"><label>Meta de renda (R$)</label><input type="number" id="fi-goal" placeholder="7000" oninput="calcFinance()"></div>
-    </div>
-  </div>
-
-  <h2>Cenários de Receita</h2>
-  <div class="scenario-grid" id="scenarios"></div>
-
-  <div class="card" style="margin-top:16px">
-    <h2>Fontes de Receita Projetadas</h2>
-    <table>
-      <thead><tr><th>Fonte</th><th>Receita/mês (R$)</th></tr></thead>
-      <tbody>
-        <tr><td>📚 Produto Digital (cartilha/curso)</td><td><input type="number" class="fi-source" id="fi-s1" placeholder="0" oninput="calcSources()"></td></tr>
-        <tr><td>✂️ Freela de Edição</td><td><input type="number" class="fi-source" id="fi-s2" placeholder="0" oninput="calcSources()"></td></tr>
-        <tr><td>📺 YouTube AdSense</td><td><input type="number" class="fi-source" id="fi-s3" placeholder="0" oninput="calcSources()"></td></tr>
-        <tr><td>🎓 Mentorias / Aulas</td><td><input type="number" class="fi-source" id="fi-s4" placeholder="0" oninput="calcSources()"></td></tr>
-        <tr><td>🤝 Patrocínio</td><td><input type="number" class="fi-source" id="fi-s5" placeholder="0" oninput="calcSources()"></td></tr>
-        <tr><td>💼 Outros</td><td><input type="number" class="fi-source" id="fi-s6" placeholder="0" oninput="calcSources()"></td></tr>
-      </tbody>
-    </table>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--sep)">
-      <div><div style="font-size:12px;color:var(--text-3);margin-bottom:2px">Total Projetado</div><div class="mono" style="font-size:24px;font-weight:600" id="fi-total">R$ 0</div></div>
-      <div id="fi-feedback" style="font-size:13px;font-weight:600;text-align:right"></div>
-    </div>
-    <div class="progress-track" style="margin-top:12px"><div class="progress-fill" id="fi-pbar" style="width:0%"></div></div>
-  </div>
-
-  <div class="card">
-    <h2>Referência de Mercado — Precificação</h2>
-    <table>
-      <tr><th>Serviço</th><th>Faixa de Mercado</th><th>Premissa</th></tr>
-      <tr><td>Edição vídeo curto (&lt;5min)</td><td class="mono">R$ 150–400</td><td>Redes sociais, reels</td></tr>
-      <tr><td>Edição vídeo médio (5–15min)</td><td class="mono">R$ 400–900</td><td>YouTube, corporativo</td></tr>
-      <tr><td>Edição vídeo longo (&gt;15min)</td><td class="mono">R$ 800–2.500</td><td>Documentário, eventos</td></tr>
-      <tr><td>Color grading por cena</td><td class="mono">R$ 50–200</td><td>Serviço avulso</td></tr>
-      <tr><td>E-book / PDF educacional</td><td class="mono">R$ 29–97</td><td>Produto digital</td></tr>
-      <tr><td>Mini-curso online</td><td class="mono">R$ 97–497</td><td>Plataforma digital</td></tr>
-      <tr><td>Mentoria individual (1h)</td><td class="mono">R$ 150–500</td><td>Sênior = mais</td></tr>
-      <tr><td>Pacote mensal retainer</td><td class="mono">R$ 2.000–6.000</td><td>3–5 vídeos/mês</td></tr>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="field"><label>Notas / Clientes em perspectiva</label><textarea id="fi-notes" rows="3" placeholder="Contatos, oportunidades, clientes em aberto..."></textarea></div>
-    <button class="btn btn-primary" onclick="saveFinances()">Salvar</button>
-  </div>
-</section>
-
-<!-- ═══ PROJETOS ══════════════════════════════════════════════════ -->
-<section id="s-projetos" class="section">
-  <div class="display">Central de <em>Projetos</em></div>
-  <div class="caption">Transforme objetivos em entregas concretas</div>
-
-  <div id="proj-list" style="margin-bottom:24px"></div>
-
-  <hr class="rule">
-  <h2>Novo Projeto</h2>
-  <div class="card">
-    <div class="two-col">
-      <div class="field"><label>Nome</label><input type="text" id="np-name" placeholder="Nome do projeto"></div>
-      <div class="field"><label>Status</label>
-        <select id="np-status">
-          <option value="planejando">Planejando</option>
-          <option value="em_andamento">Em andamento</option>
-          <option value="funcional">Funcional</option>
-          <option value="pausado">Pausado</option>
-          <option value="concluido">Concluído</option>
-        </select>
-      </div>
-    </div>
-    <div class="field"><label>Objetivo</label><textarea id="np-obj" rows="2" placeholder="O que este projeto vai realizar?"></textarea></div>
-    <div class="field"><label>Próxima ação</label><input type="text" id="np-next" placeholder="Próximo passo concreto..."></div>
-    <div class="two-col">
-      <div class="field"><label>Progresso (0–100)</label><input type="number" id="np-prog" min="0" max="100" value="0"></div>
-      <div class="field"><label>Prazo</label><input type="text" id="np-deadline" placeholder="Ex: Nov 2025"></div>
-    </div>
-    <button class="btn btn-primary" onclick="addProject()">Adicionar</button>
-  </div>
-</section>
-
-<!-- ═══ IDENTIDADE ════════════════════════════════════════════════ -->
-<section id="s-identidade" class="section">
-  <div class="display">Direção de <em>Arte</em></div>
-  <div class="caption">Linguagem visual e posicionamento de marca</div>
-
-  <div class="alert alert-amber">
-    A identidade visual da sua marca profissional é diferente do design deste sistema. Preencha os campos abaixo para gerar uma análise fundamentada.
-  </div>
-
-  <div class="card">
-    <h2>Referências Visuais</h2>
-    <div class="field"><label>Marcas / Criadores que você admira visualmente</label><textarea id="id-ref" rows="3" placeholder="Ex: A Faixa da 2112, MK2 Films, Kirsten Johnson..."></textarea></div>
-    <div class="field"><label>Palavras que descrevem sua estética</label><input type="text" id="id-words" placeholder="Ex: Sóbria, cinematográfica, humana, técnica..."></div>
-    <div class="field"><label>Público que você quer atrair com sua marca</label><input type="text" id="id-audience" placeholder="Ex: Diretores independentes, criadores de conteúdo..."></div>
-  </div>
-
-  <div class="card">
-    <h2>Direção Tipográfica</h2>
-    <div class="two-col">
+  <!-- ═══ HOME ═══════════════════════════════════════════════════ -->
+  <section id="s-home" class="section active">
+    <div class="home-grid">
       <div>
-        <div style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:4px">Débora Augusta</div>
-        <div style="font-size:12px;color:var(--text-3)">Serif editorial — autoridade</div>
+        <p class="page-sub" id="home-greeting">Carregando…</p>
+        <h1 class="page-title" style="margin-bottom:24px;">Sistema de Carreira</h1>
+
+        <div class="section-label">Diagnóstico</div>
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:13px;font-weight:600;" id="home-diag-label">Não iniciado</span>
+            <span style="font-size:12px;color:var(--text-3);" id="home-diag-pct">0%</span>
+          </div>
+          <div class="progress"><div class="progress-fill" id="home-diag-bar" style="width:0%"></div></div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary btn-sm" onclick="nav(null,'s-perfil')">Continuar Diagnóstico →</button>
+          </div>
+        </div>
+
+        <div class="section-label">Caminho Recomendado</div>
+        <div class="card accent-border" id="home-path-card" style="border-left:3px solid var(--accent);">
+          <div id="home-path-content" style="color:var(--text-2);font-size:13px;">Complete o diagnóstico para ver sua recomendação.</div>
+        </div>
+
+        <div class="section-label" style="margin-top:20px;">Projetos Ativos</div>
+        <div id="home-projects" style="color:var(--text-2);font-size:13px;">Nenhum projeto ainda.</div>
       </div>
       <div>
-        <div style="font-family:'Inter',sans-serif;font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:3px;margin-bottom:4px">DÉBORA AUGUSTA</div>
-        <div style="font-size:12px;color:var(--text-3)">Sans-serif maiúscula — precisão</div>
+        <div class="section-label">Meta Financeira</div>
+        <div class="card" style="margin-bottom:12px;">
+          <div id="home-finance-content" style="font-size:13px;color:var(--text-2);">Configure sua meta em Financeiro.</div>
+        </div>
+        <div class="section-label">Próximos 7 dias</div>
+        <div id="home-upcoming" class="card" style="font-size:13px;color:var(--text-2);">Nenhum evento.</div>
+        <div class="section-label" style="margin-top:12px;">Ações Pendentes</div>
+        <div id="home-pending" class="card" style="font-size:13px;color:var(--text-2);">—</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h2>Paleta Monocromática + Acento</h2>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <div style="width:40px;height:40px;background:#0C0C0A;border:1px solid var(--sep);border-radius:4px" title="Preto profundo"></div>
-      <div style="width:40px;height:40px;background:#F5F4F0;border:1px solid var(--sep);border-radius:4px" title="Branco quente"></div>
-      <div style="width:40px;height:40px;background:#5A5852;border:1px solid var(--sep);border-radius:4px" title="Cinza médio"></div>
-      <div style="width:40px;height:40px;background:#C4904A;border:1px solid var(--sep);border-radius:4px" title="Âmbar — acento"></div>
+  <!-- ═══ PERFIL / DIAGNÓSTICO ═══════════════════════════════════ -->
+  <section id="s-perfil" class="section">
+    <h1 class="page-title">Meu Perfil</h1>
+    <p class="page-sub">Diagnóstico adaptativo para mapear sua carreira.</p>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('perfil','diagnostico',this)">Diagnóstico</div>
+      <div class="tab" onclick="switchTab('perfil','sintese',this)">Síntese de Perfil</div>
     </div>
-    <p style="font-size:13px">Paleta editorial: base monocromática com um único acento quente. Evoca cinema, profundidade técnica e elegância.</p>
-  </div>
-
-  <div class="card">
-    <h2>Análise de Posicionamento Visual</h2>
-    <div id="id-analysis"><p style="color:var(--text-3)">Preencha os campos acima e salve para ver a análise.</p></div>
-    <div class="field" style="margin-top:16px"><label>Notas de referência</label><textarea id="id-notes" rows="3" placeholder="Insights, experimentos, feedbacks recebidos..."></textarea></div>
-    <button class="btn btn-primary" onclick="saveIdentidade()">Salvar e Analisar</button>
-  </div>
-</section>
-
-<!-- ═══ DECISÕES ══════════════════════════════════════════════════ -->
-<section id="s-decisoes" class="section">
-  <div class="display">Registro de <em>Decisões</em></div>
-  <div class="caption">Decisões importantes com contexto e resultado</div>
-
-  <div class="card">
-    <div class="field"><label>Decisão tomada</label><input type="text" id="dc-desc" placeholder="Ex: Vou focar em clientes internacionais nos próximos 6 meses"></div>
-    <div class="two-col">
-      <div class="field"><label>Justificativa</label><textarea id="dc-rat" rows="2" placeholder="Por que esta decisão?"></textarea></div>
-      <div class="field"><label>Contexto</label><textarea id="dc-ctx" rows="2" placeholder="Informações que embasaram..."></textarea></div>
+    <div id="perfil-tab-diagnostico" class="tab-panel active">
+      <div id="diag-complete" style="display:none;" class="card">
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">✓ Diagnóstico completo</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px;">Seu perfil foi mapeado. Acesse Estratégia para ver os caminhos recomendados.</p>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="nav(null,'s-estrategia')">Ver Estratégia →</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetDiag()">Reiniciar Diagnóstico</button>
+        </div>
+      </div>
+      <div id="diag-ui">
+        <div class="diag-progress-text" id="diag-progress-text">Pergunta 1</div>
+        <div class="progress" style="margin-bottom:24px;"><div class="progress-fill" id="diag-prog-bar" style="width:0%"></div></div>
+        <div class="diag-question" id="diag-question-text">Carregando…</div>
+        <div class="diag-options" id="diag-options"></div>
+        <div class="diag-nav">
+          <button class="btn btn-ghost btn-sm" id="diag-back" onclick="diagBack()">← Voltar</button>
+          <span style="flex:1"></span>
+          <span style="font-size:12px;color:var(--text-3);align-self:center;" id="diag-skip-hint"></span>
+        </div>
+      </div>
     </div>
-    <div class="two-col">
-      <div class="field"><label>Data</label><input type="text" id="dc-date" placeholder="Ex: Out 2025"></div>
-      <div class="field"><label>Resultado esperado</label><input type="text" id="dc-out" placeholder="Ex: R$3k/mês em 3 meses"></div>
+    <div id="perfil-tab-sintese" class="tab-panel">
+      <div id="sintese-content" style="color:var(--text-2);font-size:13px;">Complete o diagnóstico para ver a síntese.</div>
     </div>
-    <button class="btn btn-primary" onclick="addDecision()">Registrar Decisão</button>
-  </div>
+  </section>
 
-  <h2 style="margin-top:24px">Histórico</h2>
-  <div id="decisions-list"></div>
-</section>
+  <!-- ═══ ESTRATÉGIA ═════════════════════════════════════════════ -->
+  <section id="s-estrategia" class="section">
+    <h1 class="page-title">Estratégia de Carreira</h1>
+    <p class="page-sub">Caminhos recomendados com base no seu perfil.</p>
+    <div id="estrategia-cta" class="card" style="display:none;">
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Complete o diagnóstico para ver seus caminhos de carreira.</p>
+      <button class="btn btn-primary btn-sm" onclick="nav(null,'s-perfil')">Iniciar Diagnóstico →</button>
+    </div>
+    <div id="estrategia-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> Analisando perfil…</div>
+    <div id="estrategia-paths"></div>
+    <div style="margin-top:16px;display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()">↻ Recalcular</button>
+    </div>
+  </section>
 
-</main>
-<div id="toast"></div>
+  <!-- ═══ PESQUISA ═══════════════════════════════════════════════ -->
+  <section id="s-pesquisa" class="section">
+    <h1 class="page-title">Pesquisa de Mercado</h1>
+    <p class="page-sub">Tendências, notícias e busca de conteúdo.</p>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('pesquisa','tendencias',this);loadTrends()">Tendências</div>
+      <div class="tab" onclick="switchTab('pesquisa','hoje',this);loadHoje()">Hoje</div>
+      <div class="tab" onclick="switchTab('pesquisa','noticias',this);loadNoticias()">Notícias</div>
+      <div class="tab" onclick="switchTab('pesquisa','youtube',this)">YouTube</div>
+      <div class="tab" onclick="switchTab('pesquisa','busca',this)">Busca</div>
+    </div>
+    <div id="pesquisa-tab-tendencias" class="tab-panel active">
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <input type="text" id="trends-input" value="edição de vídeo,DaVinci Resolve,Adobe Premiere" style="flex:1;">
+        <button class="btn btn-primary btn-sm" onclick="loadTrends()">Buscar</button>
+      </div>
+      <div id="trends-status"></div>
+      <canvas id="trends-chart" style="max-height:260px;"></canvas>
+    </div>
+    <div id="pesquisa-tab-hoje" class="tab-panel">
+      <div id="hoje-status"></div>
+      <div id="hoje-list"></div>
+    </div>
+    <div id="pesquisa-tab-noticias" class="tab-panel">
+      <div id="noticias-status"></div>
+      <div id="noticias-list"></div>
+    </div>
+    <div id="pesquisa-tab-youtube" class="tab-panel">
+      <div id="yt-needs-key" style="display:none;" class="card">
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:10px;">Configure sua YouTube API Key em <strong>Configurações → Conectores</strong> para usar esta funcionalidade.</p>
+        <button class="btn btn-ghost btn-sm" onclick="nav(null,'s-config')">Ir para Configurações</button>
+      </div>
+      <div id="yt-search-ui">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <input type="text" id="yt-input" placeholder="Pesquisar vídeos…" style="flex:1;">
+          <button class="btn btn-primary btn-sm" onclick="searchYoutube()">Buscar</button>
+        </div>
+        <div id="yt-status"></div>
+        <div id="yt-results" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+      </div>
+    </div>
+    <div id="pesquisa-tab-busca" class="tab-panel">
+      <div id="gcs-needs-key" style="display:none;" class="card">
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:10px;">Configure Google Custom Search em <strong>Configurações → Conectores</strong>.</p>
+        <button class="btn btn-ghost btn-sm" onclick="nav(null,'s-config')">Ir para Configurações</button>
+      </div>
+      <div id="gcs-search-ui">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <input type="text" id="gcs-input" placeholder="Pesquisar na web…" style="flex:1;">
+          <button class="btn btn-primary btn-sm" onclick="searchGoogle()">Buscar</button>
+        </div>
+        <div id="gcs-status"></div>
+        <div id="gcs-results"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROJETOS ═══════════════════════════════════════════════ -->
+  <section id="s-projetos" class="section">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;">
+      <div><h1 class="page-title">Projetos</h1><p class="page-sub">Acompanhamento de projetos e tarefas.</p></div>
+      <button class="btn btn-primary btn-sm" onclick="openNewProject()">+ Novo Projeto</button>
+    </div>
+    <div id="project-form" class="card" style="display:none;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px;" id="project-form-title">Novo Projeto</div>
+      <div class="field"><label>Nome</label><input type="text" id="pf-name"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label>Status</label>
+          <select id="pf-status">
+            <option value="planejando">Planejando</option>
+            <option value="em_andamento">Em andamento</option>
+            <option value="pausado">Pausado</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+        <div class="field"><label>Prazo</label><input type="date" id="pf-deadline"></div>
+      </div>
+      <div class="field"><label>Progresso: <span id="pf-prog-val">0</span>%</label>
+        <input type="range" id="pf-progress" min="0" max="100" value="0" oninput="document.getElementById('pf-prog-val').textContent=this.value">
+      </div>
+      <div class="field"><label>Notas</label><textarea id="pf-notes" rows="2"></textarea></div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-primary btn-sm" onclick="saveProject()">Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelProject()">Cancelar</button>
+      </div>
+    </div>
+    <div id="projects-list"></div>
+  </section>
+
+  <!-- ═══ CALENDÁRIO ════════════════════════════════════════════ -->
+  <section id="s-calendario" class="section">
+    <h1 class="page-title">Calendário</h1>
+    <p class="page-sub">Prazos, metas e eventos.</p>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:20px;">
+      <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>
+      <span style="font-size:14px;font-weight:600;flex:1;text-align:center;" id="cal-month-label"></span>
+      <button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
+      <button class="btn btn-primary btn-sm" onclick="openEventForm()">+ Evento</button>
+    </div>
+    <div id="event-form" class="card" style="display:none;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Novo Evento</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label>Título</label><input type="text" id="ef-title"></div>
+        <div class="field"><label>Data</label><input type="date" id="ef-date"></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea id="ef-notes" rows="2"></textarea></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveEvent()">Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('event-form').style.display='none'">Cancelar</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-headers"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div style="margin-top:20px;">
+      <div class="section-label">Próximos Eventos</div>
+      <div id="events-list"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FINANCEIRO ════════════════════════════════════════════ -->
+  <section id="s-financeiro" class="section">
+    <h1 class="page-title">Financeiro</h1>
+    <p class="page-sub">Cenários de receita e projeção de 12 meses.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div>
+        <div class="section-label">Parâmetros</div>
+        <div class="card">
+          <div class="field"><label>Preço por projeto (R$)</label>
+            <input type="number" id="fin-price" value="0" oninput="updateFinSlider('price')">
+            <input type="range" id="fin-price-r" min="100" max="20000" value="0" oninput="updateFinInput('price')">
+          </div>
+          <div class="field"><label>Horas por projeto</label>
+            <input type="number" id="fin-hpp" value="10" oninput="updateFinSlider('hpp')">
+            <input type="range" id="fin-hpp-r" min="1" max="200" value="10" oninput="updateFinInput('hpp')">
+          </div>
+          <div class="field"><label>Horas disponíveis/mês</label>
+            <input type="number" id="fin-hpm" value="80" oninput="updateFinSlider('hpm')">
+            <input type="range" id="fin-hpm-r" min="10" max="200" value="80" oninput="updateFinInput('hpm')">
+          </div>
+          <div class="field"><label>Taxa de conversão (%)</label>
+            <input type="number" id="fin-conv" value="10" oninput="updateFinSlider('conv')">
+            <input type="range" id="fin-conv-r" min="1" max="50" value="10" oninput="updateFinInput('conv')">
+          </div>
+          <div class="field"><label>Custos fixos/mês (R$)</label><input type="number" id="fin-fixed" value="0"></div>
+          <div class="field"><label>Renda atual/mês (R$)</label><input type="number" id="fin-current" value="0"></div>
+          <div class="field"><label>Meta de renda/mês (R$)</label><input type="number" id="fin-goal" value="6000"></div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="calcFinance()">Calcular Cenários</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Cenários</div>
+        <div id="fin-scenarios" style="color:var(--text-2);font-size:13px;">Preencha os parâmetros e calcule.</div>
+        <div class="section-label" style="margin-top:20px;">Projeção 12 meses</div>
+        <canvas id="fin-chart" style="max-height:200px;"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ IDENTIDADE ════════════════════════════════════════════ -->
+  <section id="s-identidade" class="section">
+    <h1 class="page-title">Identidade Visual</h1>
+    <p class="page-sub">Sua marca pessoal e posicionamento profissional.</p>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="field"><label>Nome Profissional</label><input type="text" id="id-name"></div>
+        <div class="field"><label>Tagline</label><input type="text" id="id-tagline" placeholder="Em uma frase…"></div>
+      </div>
+      <div class="field"><label>Bio Profissional</label><textarea id="id-bio" rows="3"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="field"><label>Palavras-chave (separadas por vírgula)</label><input type="text" id="id-keywords"></div>
+        <div class="field"><label>Tom de Voz</label>
+          <select id="id-tone">
+            <option value="">Selecione…</option>
+            <option value="profissional">Profissional e direto</option>
+            <option value="criativo">Criativo e descontraído</option>
+            <option value="educativo">Educativo e acessível</option>
+            <option value="premium">Premium e exclusivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Público-Alvo</label><input type="text" id="id-audience" placeholder="Quem você atende?"></div>
+      <div class="field"><label>Diferenciais</label><textarea id="id-differentials" rows="2" placeholder="O que te diferencia da concorrência?"></textarea></div>
+      <button class="btn btn-primary" onclick="saveIdentidade()">Salvar Identidade</button>
+      <span id="id-saved" style="display:none;font-size:12px;color:var(--green);margin-left:12px;">✓ Salvo</span>
+    </div>
+    <div id="id-analysis" class="card" style="margin-top:16px;display:none;">
+      <div class="section-label">Análise de Consistência</div>
+      <div id="id-analysis-content"></div>
+    </div>
+  </section>
+
+  <!-- ═══ REVISÕES ══════════════════════════════════════════════ -->
+  <section id="s-revisoes" class="section">
+    <h1 class="page-title">Revisões e Resultados</h1>
+    <p class="page-sub">Histórico de decisões, resultados e revisão estratégica.</p>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('revisoes','decisoes',this);loadDecisions()">Decisões</div>
+      <div class="tab" onclick="switchTab('revisoes','resultados',this);loadResults()">Resultados</div>
+      <div class="tab" onclick="switchTab('revisoes','checklist',this)">Checklist</div>
+    </div>
+    <div id="revisoes-tab-decisoes" class="tab-panel active">
+      <button class="btn btn-primary btn-sm" style="margin-bottom:16px;" onclick="toggleDecisionForm()">+ Nova Decisão</button>
+      <div id="decision-form" class="card" style="display:none;margin-bottom:16px;">
+        <div class="field"><label>Decisão tomada</label><input type="text" id="df-desc"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field"><label>Porquê</label><textarea id="df-rationale" rows="2"></textarea></div>
+          <div class="field"><label>Contexto</label><textarea id="df-context" rows="2"></textarea></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field"><label>Resultado observado</label><textarea id="df-outcome" rows="2"></textarea></div>
+          <div class="field"><label>Data</label><input type="date" id="df-date"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="saveDecision()">Salvar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDecisionForm()">Cancelar</button>
+        </div>
+      </div>
+      <div id="decisions-list"></div>
+    </div>
+    <div id="revisoes-tab-resultados" class="tab-panel">
+      <button class="btn btn-primary btn-sm" style="margin-bottom:16px;" onclick="toggleResultForm()">+ Registrar Resultado</button>
+      <div id="result-form" class="card" style="display:none;margin-bottom:16px;">
+        <div class="field"><label>Descrição</label><textarea id="rf-desc" rows="2"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field"><label>Categoria</label>
+            <select id="rf-cat">
+              <option value="conquista">Conquista</option>
+              <option value="aprendizado">Aprendizado</option>
+              <option value="ajuste">Ajuste necessário</option>
+            </select>
+          </div>
+          <div class="field"><label>Data</label><input type="date" id="rf-date"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="saveResult()">Salvar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleResultForm()">Cancelar</button>
+        </div>
+      </div>
+      <div id="results-list"></div>
+    </div>
+    <div id="revisoes-tab-checklist" class="tab-panel">
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text);">Revisão Estratégica Mensal</div>
+        <div class="field"><label>O caminho principal ainda faz sentido?</label><textarea id="cl-1" rows="2"></textarea></div>
+        <div class="field"><label>A meta mensal ainda é válida?</label><textarea id="cl-2" rows="2"></textarea></div>
+        <div class="field"><label>Quais projetos precisam de atenção?</label><textarea id="cl-3" rows="2"></textarea></div>
+        <div class="field"><label>O que aprendi nos últimos 30 dias?</label><textarea id="cl-4" rows="2"></textarea></div>
+        <div class="field"><label>O que devo parar de fazer?</label><textarea id="cl-5" rows="2"></textarea></div>
+        <button class="btn btn-primary btn-sm" onclick="saveChecklist()">Salvar Revisão</button>
+        <span id="cl-saved" style="display:none;font-size:12px;color:var(--green);margin-left:10px;">✓ Salvo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONFIGURAÇÕES ══════════════════════════════════════════ -->
+  <section id="s-config" class="section">
+    <h1 class="page-title">Configurações</h1>
+    <p class="page-sub">Conectores, integrações e dados.</p>
+    <div class="section-label">Conectores</div>
+
+    <!-- YouTube -->
+    <div class="connector-card">
+      <div class="connector-header">
+        <span class="connector-name">YouTube Data API v3</span>
+        <span class="connector-status"><span class="status-dot" id="yt-status-dot"></span><span id="yt-status-text">Não configurado</span></span>
+      </div>
+      <div class="field"><label>API Key</label><input type="text" id="cfg-yt-key" placeholder="AIzaSy…"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveConnector('yt')">Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="testConnector('yt')">Testar</button>
+        <button class="btn btn-danger btn-sm" onclick="removeConnector('yt')">Remover</button>
+      </div>
+    </div>
+
+    <!-- Google Search -->
+    <div class="connector-card">
+      <div class="connector-header">
+        <span class="connector-name">Google Custom Search</span>
+        <span class="connector-status"><span class="status-dot" id="gcs-status-dot"></span><span id="gcs-status-text">Não configurado</span></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label>API Key</label><input type="text" id="cfg-gcs-key" placeholder="AIzaSy…"></div>
+        <div class="field"><label>Search Engine ID (CX)</label><input type="text" id="cfg-gcs-cx" placeholder="b12345…"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveConnector('gcs')">Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="testConnector('gcs')">Testar</button>
+        <button class="btn btn-danger btn-sm" onclick="removeConnector('gcs')">Remover</button>
+      </div>
+    </div>
+
+    <!-- Google Calendar -->
+    <div class="connector-card">
+      <div class="connector-header">
+        <span class="connector-name">Google Calendar</span>
+        <span class="connector-status"><span class="status-dot" id="gcal-status-dot"></span><span id="gcal-status-text">Verificando…</span></span>
+      </div>
+      <p style="font-size:12px;color:var(--text-2);margin-bottom:12px;">Autenticação OAuth 2.0. As credenciais são configuradas no servidor (<code>.env</code>).</p>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="connectCalendar()">Conectar Google Calendar</button>
+        <button class="btn btn-danger btn-sm" onclick="disconnectCalendar()">Desconectar</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Dados</div>
+    <div class="card">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="exportData()">Exportar JSON</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <p style="font-size:12px;color:var(--text-3);margin-top:10px;">O export inclui perfil, diagnóstico, projetos, finanças, decisões, eventos e resultados.</p>
+    </div>
+  </section>
+
+  </div><!-- #content -->
+</div><!-- #main -->
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
-// CORE
-// ═══════════════════════════════════════════════════════════════════
-const API = 'http://localhost:8000';
-let serverOnline = false;
-let trendsChart = null;
-let mercadoLoaded = false;
-
-// localStorage helpers
-const ls = {
-  get:(k,d=null)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}},
-  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+const API = '';
+const SECTION_TITLES = {
+  's-home':'Visão Geral','s-perfil':'Meu Perfil','s-estrategia':'Estratégia',
+  's-pesquisa':'Pesquisa de Mercado','s-projetos':'Projetos','s-calendario':'Calendário',
+  's-financeiro':'Financeiro','s-identidade':'Identidade Visual',
+  's-revisoes':'Revisões e Resultados','s-config':'Configurações'
 };
+let diagAnswers = {};
+let diagHistory = [];
+let diagCurrentQ = 'a1';
+let trendsChartInst = null;
+let finChartInst = null;
+let editingProjectId = null;
+let editingDecisionId = null;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let allEvents = [];
+let allProjects = [];
 
-// ── Navigation ─────────────────────────────────────────────────────
-function nav(id){
+// ── API helpers ──────────────────────────────────────────────────
+function cfgHeaders(){
+  const h = {};
+  const yk = ls('ms_cfg_yt_key'); if(yk) h['X-Youtube-Key']=yk;
+  const gk = ls('ms_cfg_google_key'); if(gk) h['X-Google-Key']=gk;
+  const gc = ls('ms_cfg_google_cx'); if(gc) h['X-Google-Cx']=gc;
+  return h;
+}
+async function api(path,opts={}){
+  const r = await fetch(API+path,{headers:{'Content-Type':'application/json',...cfgHeaders()},...opts});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+function ls(k,v){
+  try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){return null;}
+}
+
+// ── Navigation ───────────────────────────────────────────────────
+function nav(el, targetId){
+  const id = targetId || el.dataset.target;
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById('s-'+id)?.classList.add('active');
-  document.querySelectorAll('[data-s="'+id+'"]').forEach(l=>l.classList.add('active'));
-  if(id==='mercado' && !mercadoLoaded){mercadoLoaded=true;initMercado();}
-  if(id==='estrategia') renderCareerPaths();
-  if(id==='projetos') renderProjects();
-  if(id==='decisoes') renderDecisions();
-  if(id==='perfil') renderProfile();
-  window.scrollTo(0,0);
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.target===id));
+  document.getElementById('topbar-title').textContent = SECTION_TITLES[id]||id;
+  closeSidebar();
+  if(id==='s-estrategia') runCareerAnalysis();
+  if(id==='s-calendario') renderCalendar();
+  if(id==='s-identidade') loadIdentidade();
+  if(id==='s-revisoes') loadDecisions();
+  if(id==='s-config') loadConnectorStatus();
 }
-document.querySelectorAll('[data-s]').forEach(el=>el.addEventListener('click',()=>nav(el.dataset.s)));
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
 
-// ── Toast ──────────────────────────────────────────────────────────
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
-
-// ── Server check ────────────────────────────────────────────────────
-async function checkServer(){
-  try{
-    const r=await fetch(API+'/api/status',{signal:AbortSignal.timeout(4000)});
-    serverOnline=r.ok;
-  }catch{serverOnline=false;}
-  const dot=document.getElementById('status-indicator');
-  dot.className=serverOnline?'online':'offline';
-  dot.title=serverOnline?'Servidor online':'Servidor offline';
-  document.querySelectorAll('.mercado-offline-msg').forEach(el=>el.style.display=serverOnline?'none':'block');
-}
-setInterval(checkServer,30000);
-checkServer();
-
-// ── Sync ───────────────────────────────────────────────────────────
-async function apiGet(path){
-  if(!serverOnline)return null;
-  try{const r=await fetch(API+path);return r.ok?r.json():null;}catch{return null;}
-}
-async function apiPost(path,body){
-  if(!serverOnline)return null;
-  try{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok?r.json():null;}catch{return null;}
-}
-async function apiPut(path,body){
-  if(!serverOnline)return null;
-  try{const r=await fetch(API+path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok?r.json():null;}catch{return null;}
+// ── Tabs ─────────────────────────────────────────────────────────
+function switchTab(section,tab,el){
+  document.querySelectorAll(`#s-${section} .tab`).forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll(`[id^="${section}-tab-"]`).forEach(p=>p.classList.remove('active'));
+  document.getElementById(`${section}-tab-${tab}`).classList.add('active');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// DIAGNOSTIC ENGINE
-// ═══════════════════════════════════════════════════════════════════
-const STAGES = [
-  {id:'A',label:'A — Fundação'},
-  {id:'B',label:'B — Técnica'},
-  {id:'C',label:'C — Carreira'},
-  {id:'D',label:'D — Criatividade'},
-  {id:'E',label:'E — Estratégia'},
-];
-
+// ── DIAGNOSTIC ───────────────────────────────────────────────────
 const QUESTIONS = {
-  // ── STAGE A ─────────────────────────────────────────
-  a1:{stage:0,text:'Como você se posiciona profissionalmente hoje?',type:'single',opts:[
-    {v:'editor_freelance',l:'Editora freelancer com clientes'},
-    {v:'editor_empresa',l:'Editora em empresa ou produtora'},
-    {v:'procurando',l:'Estou buscando minha posição no mercado'},
-    {v:'outro',l:'Outra situação'},
-  ],next:'a2'},
-  a2:{stage:0,text:'O que mais te energiza no trabalho?',type:'single',opts:[
-    {v:'criar',l:'Criar do zero e ver o resultado'},
-    {v:'ensinar',l:'Ensinar alguém e ver a transformação'},
-    {v:'executar',l:'Resolver desafios técnicos com precisão'},
-    {v:'estrategia',l:'Planejar e construir algo maior'},
-  ],next:'a3'},
-  a3:{stage:0,text:'Como você prefere trabalhar?',type:'single',opts:[
-    {v:'clientes',l:'Com clientes — recebendo briefings e entregando'},
-    {v:'solo',l:'De forma independente no meu próprio ritmo'},
-    {v:'propria_empresa',l:'Construindo meu próprio negócio ou marca'},
-    {v:'equipe',l:'Em equipe, colaborando com outros profissionais'},
-  ],next:(ans)=>{
-    if(ans.a3==='propria_empresa') return 'a3b';
-    return 'a4';
-  }},
-  a3b:{stage:0,text:'Que tipo de negócio te imaginas construindo?',type:'single',opts:[
-    {v:'produto_digital',l:'Produto digital (curso, e-book, template)'},
-    {v:'escola',l:'Escola ou plataforma educacional'},
-    {v:'agencia',l:'Agência ou estúdio audiovisual'},
-    {v:'hibrido',l:'Combinação de serviços + produtos'},
-  ],next:'a4'},
-  a4:{stage:0,text:'Qual é sua disponibilidade de tempo para a carreira agora?',type:'single',opts:[
-    {v:'muita',l:'Bastante — tenho tempo livre para investir'},
-    {v:'moderada',l:'Moderada — algumas horas por dia'},
-    {v:'pouca',l:'Pouca — estou com a agenda cheia'},
-    {v:'varia',l:'Varia muito semana a semana'},
-  ],next:'b1'},
-  // ── STAGE B ─────────────────────────────────────────
-  b1:{stage:1,text:'Quais softwares você domina?',type:'multi',opts:[
-    {v:'davinci',l:'DaVinci Resolve'},
-    {v:'premiere',l:'Adobe Premiere'},
-    {v:'fcpx',l:'Final Cut Pro'},
-    {v:'aftereffects',l:'After Effects'},
-    {v:'avid',l:'Avid Media Composer'},
-    {v:'outros',l:'Outros softwares'},
-  ],next:'b2'},
-  b2:{stage:1,text:'Qual é sua maior especialidade na edição?',type:'single',opts:[
-    {v:'narrativa',l:'Montagem narrativa e storytelling'},
-    {v:'tecnica',l:'Execução técnica de alta qualidade'},
-    {v:'motion',l:'Motion design e efeitos visuais'},
-    {v:'color',l:'Color grading e tratamento de imagem'},
-    {v:'todos',l:'Equilibro entre várias especialidades'},
-  ],next:(ans)=>{
-    if(ans.b2==='motion') return 'b2a';
-    return 'b3';
-  }},
-  b2a:{stage:1,text:'Qual é seu nível em motion design?',type:'single',opts:[
-    {v:'basico',l:'Básico — transições e animações simples'},
-    {v:'intermediario',l:'Intermediário — animações complexas'},
-    {v:'avancado',l:'Avançado — VFX, 3D, composição'},
-  ],next:'b3'},
-  b3:{stage:1,text:'Que tipos de projetos você já editou?',type:'multi',opts:[
-    {v:'youtube',l:'Vídeos para YouTube'},
-    {v:'comercial',l:'Vídeos comerciais / institucionais'},
-    {v:'docu',l:'Documentários / curtas-metragens'},
-    {v:'eventos',l:'Cobertura de eventos'},
-    {v:'social',l:'Conteúdo para redes sociais'},
-    {v:'serie',l:'Séries ou projetos de longa duração'},
-  ],next:'b4'},
-  b4:{stage:1,text:'Você trabalha em inglês com fluência?',type:'single',opts:[
-    {v:'sim',l:'Sim — leitura, escrita e conversação profissional'},
-    {v:'parcialmente',l:'Parcialmente — leio e entendo bem, mas não falo fluente'},
-    {v:'basico',l:'Básico — consigo me virar com esforço'},
-    {v:'nao',l:'Não — trabalho apenas em português'},
-  ],next:'c1'},
-  // ── STAGE C ─────────────────────────────────────────
-  c1:{stage:2,text:'Sua renda mensal atual como profissional audiovisual é de:',type:'single',opts:[
-    {v:'sem_renda',l:'Ainda não tenho renda com isso'},
-    {v:'ate_2k',l:'Até R$ 2.000'},
-    {v:'2k_5k',l:'Entre R$ 2.000 e R$ 5.000'},
-    {v:'5k_10k',l:'Entre R$ 5.000 e R$ 10.000'},
-    {v:'acima_10k',l:'Acima de R$ 10.000'},
-  ],next:'c2'},
-  c2:{stage:2,text:'Quantos clientes ativos você tem agora?',type:'single',opts:[
-    {v:'nenhum',l:'Nenhum — estou buscando o primeiro'},
-    {v:'1_2',l:'1 a 2 clientes'},
-    {v:'3_5',l:'3 a 5 clientes'},
-    {v:'mais_5',l:'Mais de 5 clientes'},
-  ],next:(ans)=>{
-    if(ans.c2==='nenhum') return 'c2a';
-    return 'c3';
-  }},
-  c2a:{stage:2,text:'Qual é o maior obstáculo para conseguir seus primeiros clientes?',type:'single',opts:[
-    {v:'portf_fraco',l:'Portfólio fraco ou inexistente'},
-    {v:'nao_divulga',l:'Não divulgo / não sei como prospectar'},
-    {v:'sem_tempo',l:'Não tenho tempo para prospectar'},
-    {v:'medo',l:'Insegurança sobre cobrar ou propor serviços'},
-  ],next:'c3'},
-  c3:{stage:2,text:'Como você consegue seus projetos / clientes hoje?',type:'multi',opts:[
-    {v:'indicacao',l:'Indicação de clientes anteriores ou colegas'},
-    {v:'redes',l:'Redes sociais (Instagram, LinkedIn)'},
-    {v:'plataformas',l:'Plataformas de freela (Workana, 99freelas)'},
-    {v:'divulgacao_ativa',l:'Prospecção ativa (cold email, DM direto)'},
-    {v:'ainda_nao',l:'Ainda não consigo clientes ativamente'},
-  ],next:'c4'},
-  c4:{stage:2,text:'Qual é sua meta de renda profissional em 12 meses?',type:'single',opts:[
-    {v:'ate_3k',l:'Até R$ 3.000/mês'},
-    {v:'3k_6k',l:'Entre R$ 3.000 e R$ 6.000/mês'},
-    {v:'6k_10k',l:'Entre R$ 6.000 e R$ 10.000/mês'},
-    {v:'acima_10k',l:'Acima de R$ 10.000/mês'},
-  ],next:'d1'},
-  // ── STAGE D ─────────────────────────────────────────
-  d1:{stage:3,text:'Você tem projetos autorais? (curtas, docs, ensaios visuais)',type:'single',opts:[
-    {v:'sim_varios',l:'Sim — tenho vários projetos autorais concluídos'},
-    {v:'sim_1_2',l:'Sim — 1 ou 2 projetos finalizados'},
-    {v:'em_construcao',l:'Em construção — trabalho em andamento'},
-    {v:'nao',l:'Não tenho projetos autorais ainda'},
-  ],next:'d2'},
-  d2:{stage:3,text:'Qual é seu interesse em criar conteúdo educacional?',type:'single',opts:[
-    {v:'muito',l:'Muito — quero transformar conhecimento em produto'},
-    {v:'algum',l:'Tenho interesse, mas não é prioridade'},
-    {v:'pouco',l:'Pouco — prefiro executar do que ensinar'},
-    {v:'nao',l:'Não me interessa ensinar'},
-  ],next:(ans)=>{
-    if(ans.d2==='muito') return 'd2a';
-    return 'd3';
-  }},
-  d2a:{stage:3,text:'O que você quer ensinar?',type:'multi',opts:[
-    {v:'software',l:'Software específico (DaVinci, Premiere...)'},
-    {v:'narrativa',l:'Narrativa e linguagem cinematográfica'},
-    {v:'industria',l:'Como funciona a indústria audiovisual'},
-    {v:'carreira',l:'Como construir carreira como editora'},
-    {v:'tecnica',l:'Técnicas avançadas de pós-produção'},
-  ],next:'d3'},
-  d3:{stage:3,text:'Qual é seu interesse em criar conteúdo próprio no YouTube?',type:'single',opts:[
-    {v:'muito',l:'Muito — quero construir meu canal e audiência'},
-    {v:'algum',l:'Algum interesse, mas não como prioridade agora'},
-    {v:'pouco',l:'Pouco — prefiro trabalhar para outros'},
-    {v:'nao',l:'Não tenho interesse em canal próprio'},
-  ],next:'e1'},
-  // ── STAGE E ─────────────────────────────────────────
-  e1:{stage:4,text:'Em quanto tempo você precisa mudar sua situação financeira?',type:'single',opts:[
-    {v:'urgente_3m',l:'Urgente — preciso de resultado em até 3 meses'},
-    {v:'em_6m',l:'Em 6 meses — há alguma urgência'},
-    {v:'em_1ano',l:'Em 1 ano — posso planejar com calma'},
-    {v:'sem_pressa',l:'Sem pressa — estou confortável agora'},
-  ],next:'e2'},
-  e2:{stage:4,text:'Qual é seu apetite de risco profissional?',type:'single',opts:[
-    {v:'baixo',l:'Baixo — prefiro caminhos seguros mesmo que mais lentos'},
-    {v:'moderado',l:'Moderado — aceito riscos calculados'},
-    {v:'alto',l:'Alto — estou disposta a apostar em algo novo'},
-  ],next:'e3'},
-  e3:{stage:4,text:'Quanto você pode investir na sua carreira agora?',type:'single',opts:[
-    {v:'nada',l:'Nada — não tenho capital para investir'},
-    {v:'ate_500',l:'Até R$ 500'},
-    {v:'500_2k',l:'Entre R$ 500 e R$ 2.000'},
-    {v:'acima_2k',l:'Mais de R$ 2.000'},
-  ],next:'e4'},
-  e4:{stage:4,text:'Qual desafio mais te trava na execução?',type:'single',opts:[
-    {v:'procrastinacao',l:'Procrastinação — sei o que fazer mas não faço'},
-    {v:'perfeccionismo',l:'Perfeccionismo — nunca está bom o suficiente'},
-    {v:'falta_clareza',l:'Falta de clareza — não sei exatamente por onde começar'},
-    {v:'falta_tempo',l:'Falta de tempo — agenda sobrecarregada'},
-    {v:'medo',l:'Medo — de não dar certo ou de exposição'},
-  ],next:null}, // END
+  a1:{stage:"perfil",text:"Como você se sente mais energizada no trabalho?",options:[
+    {val:"executar",label:"Executando projetos de clientes"},{val:"ensinar",label:"Ensinando e mentorando"},
+    {val:"criar",label:"Criando conteúdo próprio"},{val:"estrategia",label:"Estratégia e gestão de negócio"}
+  ],next:"a2"},
+  a2:{stage:"perfil",text:"Qual é sua área principal de atuação?",options:[
+    {val:"edicao_video",label:"Edição de vídeo"},{val:"motion_graphics",label:"Motion graphics/VFX"},
+    {val:"direcao",label:"Direção e produção"},{val:"multiplas",label:"Múltiplas áreas"}
+  ],next:"a3"},
+  a3:{stage:"perfil",text:"Como você trabalha atualmente?",options:[
+    {val:"clt",label:"CLT/Empregada"},{val:"freelancer",label:"Freelancer"},
+    {val:"propria_empresa",label:"Empresa própria"},{val:"transicao",label:"Em transição"}
+  ],next:"anos_exp"},
+  anos_exp:{stage:"experiencia",text:"Quantos anos de experiência você tem na área?",options:[
+    {val:"menos_2",label:"Menos de 2 anos"},{val:"2_5",label:"2 a 5 anos"},
+    {val:"5_10",label:"5 a 10 anos"},{val:"mais_10",label:"Mais de 10 anos"}
+  ],next:"portfolio_status"},
+  portfolio_status:{stage:"experiencia",text:"Você tem portfólio com amostras do seu trabalho?",options:[
+    {val:"sim_forte",label:"Sim, sólido e atualizado"},{val:"sim_fraco",label:"Sim, mas desatualizado"},
+    {val:"parcial",label:"Parcial — algumas amostras"},{val:"nao",label:"Não tenho ainda"}
+  ],next:"b1"},
+  b1:{stage:"habilidades",text:"Qual software de edição você domina?",options:[
+    {val:"premiere",label:"Adobe Premiere"},{val:"davinci",label:"DaVinci Resolve"},
+    {val:"final_cut",label:"Final Cut Pro"},{val:"varios",label:"Vários"}
+  ],next:"b4"},
+  b4:{stage:"habilidades",text:"Qual é seu nível de inglês?",options:[
+    {val:"fluente",label:"Fluente/Avançado"},{val:"intermediario",label:"Intermediário"},
+    {val:"basico",label:"Básico"},{val:"nao",label:"Não falo inglês"}
+  ],next:"audiencia"},
+  audiencia:{stage:"audiencia",text:"Você já tem audiência em alguma plataforma?",options:[
+    {val:"sim_engajada",label:"Sim, engajada (>1k)"},{val:"sim_crescendo",label:"Sim, crescendo (<1k)"},
+    {val:"pequena",label:"Presente mas pequena"},{val:"nao",label:"Não tenho ainda"}
+  ],next:a=>a.audiencia!=="nao"?"audiencia_onde":"c2"},
+  audiencia_onde:{stage:"audiencia",text:"Onde está sua principal audiência?",options:[
+    {val:"instagram",label:"Instagram"},{val:"youtube",label:"YouTube"},
+    {val:"tiktok",label:"TikTok"},{val:"linkedin",label:"LinkedIn/Outros"}
+  ],next:"c2"},
+  c2:{stage:"mercado",text:"Você já tem clientes ativos ou recorrentes?",options:[
+    {val:"sim_recorrentes",label:"Sim, clientes recorrentes"},{val:"sim_esporadico",label:"Sim, mas esporádico"},
+    {val:"poucos",label:"Poucos, iniciando"},{val:"nao",label:"Ainda não"}
+  ],next:"d1"},
+  d1:{stage:"proposta",text:"Você tem projetos autorais (cursos, canais, produtos)?",options:[
+    {val:"sim_varios",label:"Sim, vários"},{val:"sim_1_2",label:"Sim, 1 ou 2"},
+    {val:"planejando",label:"Planejando iniciar"},{val:"nao",label:"Não"}
+  ],next:"d2"},
+  d2:{stage:"proposta",text:"Você tem interesse em ensinar o que sabe?",options:[
+    {val:"muito",label:"Muito — adoro ensinar"},{val:"sim",label:"Sim, me interessa"},
+    {val:"talvez",label:"Talvez"},{val:"nao",label:"Não é meu foco"}
+  ],next:"d3"},
+  d3:{stage:"proposta",text:"Você quer criar conteúdo consistente para redes sociais?",options:[
+    {val:"muito",label:"Sim, é um objetivo claro"},{val:"sim",label:"Sim, mas sem prioridade"},
+    {val:"talvez",label:"Talvez"},{val:"nao",label:"Não, prefiro foco em clientes"}
+  ],next:"barreira_principal"},
+  barreira_principal:{stage:"barreiras",text:"Qual é sua principal barreira hoje?",options:[
+    {val:"tempo",label:"Falta de tempo"},{val:"dinheiro",label:"Falta de capital/investimento"},
+    {val:"visibilidade",label:"Falta de visibilidade/clientes"},{val:"clareza",label:"Falta de clareza/direção"}
+  ],next:"disponibilidade"},
+  disponibilidade:{stage:"barreiras",text:"Quantas horas/semana você pode dedicar ao negócio?",options:[
+    {val:"menos_10",label:"Menos de 10h"},{val:"10_20",label:"10 a 20h"},
+    {val:"20_40",label:"20 a 40h"},{val:"mais_40",label:"Mais de 40h (integral)"}
+  ],next:"e1"},
+  e1:{stage:"estrategia",text:"Com que urgência você precisa de retorno financeiro?",options:[
+    {val:"urgente_3m",label:"Urgente — em até 3 meses"},{val:"em_6m",label:"Nos próximos 6 meses"},
+    {val:"em_1a",label:"No próximo ano"},{val:"longo_prazo",label:"Longo prazo, sem urgência"}
+  ],next:"e2"},
+  e2:{stage:"estrategia",text:"Qual é sua tolerância a risco?",options:[
+    {val:"baixo",label:"Baixo — prefiro estabilidade"},{val:"moderado",label:"Moderado — aceito incerteza"},
+    {val:"alto",label:"Alto — vou de tudo ou nada"}
+  ],next:"e3"},
+  e3:{stage:"estrategia",text:"Quanto você pode investir no negócio agora?",options:[
+    {val:"nada",label:"Nada — zero capital"},{val:"ate_500",label:"Até R$ 500"},
+    {val:"ate_2000",label:"Até R$ 2.000"},{val:"mais_2000",label:"Mais de R$ 2.000"}
+  ],next:null}
 };
+const TOTAL_Q = Object.keys(QUESTIONS).length;
 
-// State
-let diagAnswers = ls.get('ms_diag_answers', {});
-let diagHistory = ls.get('ms_diag_history', []);
-let diagDone = ls.get('ms_diag_done', false);
-let currentQ = diagHistory.length > 0 ? diagHistory[diagHistory.length-1] : 'a1';
-
-function initDiag(){
-  if(diagDone){
-    document.getElementById('diag-completed').style.display='block';
-    document.getElementById('diag-quiz').style.display='none';
-  } else {
-    document.getElementById('diag-completed').style.display='none';
-    document.getElementById('diag-quiz').style.display='block';
-    renderQuestion();
-  }
+function resolveNext(qId){
+  const q = QUESTIONS[qId]; if(!q) return null;
+  return typeof q.next==='function' ? q.next(diagAnswers) : q.next;
 }
-
-function renderQuestion(){
-  const q = QUESTIONS[currentQ];
-  if(!q){finishDiag();return;}
-
-  // Stage bar
-  STAGES.forEach((s,i)=>{
-    const dot=document.getElementById('sd'+i);
-    if(i < q.stage) dot.className='stage-dot done';
-    else if(i === q.stage) dot.className='stage-dot active';
-    else dot.className='stage-dot';
-  });
-  document.getElementById('stage-label').textContent = STAGES[q.stage].label;
-
-  // Question
-  document.getElementById('q-text').textContent = q.text;
-  const optsEl = document.getElementById('q-opts');
-  optsEl.className = 'q-opts' + (q.type==='multi' ? ' q-multi' : '');
-
-  const currentVal = diagAnswers[currentQ];
-  optsEl.innerHTML = q.opts.map(o=>`
-    <div class="q-opt${q.type==='multi'?(Array.isArray(currentVal)&&currentVal.includes(o.v)?' selected':''):(currentVal===o.v?' selected':'')}"
-         onclick="selectOpt('${currentQ}','${o.v}','${q.type}',this)">
-      <div class="q-opt-bullet"></div>
-      <div class="q-opt-text">${o.l}</div>
-    </div>`).join('');
-
-  // Counter
-  const allQKeys = Object.keys(QUESTIONS);
-  const done = Object.keys(diagAnswers).length;
-  document.getElementById('q-counter').textContent = `${done} / ~${allQKeys.length}`;
-
-  // Back button
-  document.getElementById('q-back').disabled = diagHistory.length <= 1;
-
-  // Next button
-  const hasAnswer = q.type==='multi'
-    ? (Array.isArray(diagAnswers[currentQ]) && diagAnswers[currentQ].length > 0)
-    : !!diagAnswers[currentQ];
-  document.getElementById('q-next').disabled = !hasAnswer;
-  document.getElementById('q-next').textContent = '—'===getNextQ() ? 'Concluir ✓' : 'Continuar →';
+function renderDiagQuestion(){
+  const q = QUESTIONS[diagCurrentQ]; if(!q){diagDone();return;}
+  const answered = Object.keys(diagAnswers).length;
+  document.getElementById('diag-progress-text').textContent = `Pergunta ${answered+1} de ~${TOTAL_Q}`;
+  document.getElementById('diag-prog-bar').style.width = Math.round(answered/TOTAL_Q*100)+'%';
+  document.getElementById('diag-question-text').textContent = q.text;
+  const optEl = document.getElementById('diag-options');
+  const cur = diagAnswers[diagCurrentQ];
+  optEl.innerHTML = q.options.map(o=>`<button class="diag-opt${cur===o.val?' selected':''}" onclick="selectDiagOption('${diagCurrentQ}','${o.val}',this)">${o.label}</button>`).join('');
+  document.getElementById('diag-back').style.visibility = diagHistory.length>0 ? 'visible' : 'hidden';
 }
-
-function selectOpt(qid, val, type, el){
-  if(type==='multi'){
-    let arr = Array.isArray(diagAnswers[qid]) ? [...diagAnswers[qid]] : [];
-    const idx=arr.indexOf(val);
-    if(idx>-1) arr.splice(idx,1); else arr.push(val);
-    diagAnswers[qid]=arr;
-    // toggle visual
-    const isSelected = arr.includes(val);
-    el.classList.toggle('selected', isSelected);
-  } else {
-    diagAnswers[qid]=val;
-    document.querySelectorAll('.q-opt').forEach(o=>o.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  ls.set('ms_diag_answers',diagAnswers);
-  const hasAnswer = type==='multi'
-    ? (Array.isArray(diagAnswers[qid]) && diagAnswers[qid].length > 0)
-    : !!diagAnswers[qid];
-  document.getElementById('q-next').disabled = !hasAnswer;
-  if(type!=='multi') document.getElementById('q-next').textContent = '—'===getNextQ() ? 'Concluir ✓' : 'Continuar →';
+async function selectDiagOption(qId,val,el){
+  el.parentElement.querySelectorAll('.diag-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  diagAnswers[qId] = val;
+  try{ await api('/api/diagnostic/answer',{method:'POST',body:JSON.stringify({question_id:qId,stage:QUESTIONS[qId]?.stage||'',answer:val})}); }catch(e){}
+  setTimeout(()=>{
+    diagHistory.push(diagCurrentQ);
+    const next = resolveNext(qId);
+    if(!next){diagDone();return;}
+    diagCurrentQ = next;
+    renderDiagQuestion();
+  },250);
 }
-
-function getNextQ(){
-  const q = QUESTIONS[currentQ];
-  if(!q || !q.next) return '—';
-  if(typeof q.next === 'function') return q.next(diagAnswers) || '—';
-  return q.next;
-}
-
-function diagNext(){
-  const nq = getNextQ();
-  if(nq==='—' || !nq || !QUESTIONS[nq]){finishDiag();return;}
-  diagHistory.push(currentQ);
-  currentQ = nq;
-  ls.set('ms_diag_history',diagHistory);
-  renderQuestion();
-}
-
 function diagBack(){
-  if(diagHistory.length <= 1) return;
-  currentQ = diagHistory.pop();
-  ls.set('ms_diag_history',diagHistory);
-  renderQuestion();
+  if(diagHistory.length===0) return;
+  diagCurrentQ = diagHistory.pop();
+  renderDiagQuestion();
 }
-
-function finishDiag(){
-  diagDone=true;
-  ls.set('ms_diag_done',true);
-  document.getElementById('diag-completed').style.display='block';
-  document.getElementById('diag-quiz').style.display='none';
-  // Sync to server
-  apiPost('/api/diagnostic/answer', {stage:'sync', question_id:'all', answer: JSON.stringify(diagAnswers)});
+function diagDone(){
+  document.getElementById('diag-ui').style.display='none';
+  document.getElementById('diag-complete').style.display='block';
   updateHomeMetrics();
-  toast('✓ Diagnóstico concluído!');
+}
+async function resetDiag(){
+  if(!confirm('Reiniciar o diagnóstico apagará todas as respostas. Confirma?')) return;
+  await api('/api/diagnostic',{method:'DELETE'});
+  diagAnswers={}; diagHistory=[]; diagCurrentQ='a1';
+  document.getElementById('diag-complete').style.display='none';
+  document.getElementById('diag-ui').style.display='block';
+  renderDiagQuestion();
 }
 
-function resetDiag(){
-  if(!confirm('Reiniciar o diagnóstico? Suas respostas serão perdidas.')) return;
-  diagAnswers={};diagHistory=['a1'];diagDone=false;currentQ='a1';
-  ls.set('ms_diag_answers',{});ls.set('ms_diag_history',['a1']);ls.set('ms_diag_done',false);
-  document.getElementById('diag-completed').style.display='none';
-  document.getElementById('diag-quiz').style.display='block';
-  renderQuestion();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// CAREER ANALYSIS (client-side, matches server logic)
-// ═══════════════════════════════════════════════════════════════════
-const PATHS_DEF = {
-  freelancer_premium:{name:'Freelancer Premium',icon:'✂️',
-    desc:'Edição high-end para clientes nacionais e internacionais.',
-    time_to_revenue:'1–3 meses',monthly_potential:'R$ 4k–12k',risk:'baixo',investment:'Mínimo'},
-  educador_digital:{name:'Educadora Digital',icon:'🎓',
-    desc:'Cursos, workshops e mentorias transformando conhecimento em produtos.',
-    time_to_revenue:'2–4 meses',monthly_potential:'R$ 3k–15k',risk:'médio',investment:'Médio'},
-  criador_conteudo:{name:'Criadora de Conteúdo',icon:'📺',
-    desc:'Canal próprio com audiência engajada e múltiplas fontes de monetização.',
-    time_to_revenue:'6–12 meses',monthly_potential:'R$ 2k–20k+',risk:'alto',investment:'Baixo'},
-  empreendedor_audiovisual:{name:'Empreendedora Audiovisual',icon:'🚀',
-    desc:'Negócio próprio combinando serviços, produtos digitais e marca.',
-    time_to_revenue:'3–6 meses',monthly_potential:'R$ 6k–25k+',risk:'alto',investment:'Alto'},
-};
-
+// ── CAREER SCORING (client-side) ─────────────────────────────────
 function scorePathsClient(answers){
-  const results = [];
-  for(const [pid, pd] of Object.entries(PATHS_DEF)){
-    let score = 50;
-    const a2=answers.a2||'';
+  const PATHS = {
+    freelancer_premium:{name:"Freelancer Premium",desc:"Edição high-end para clientes com foco em qualidade e recorrência.",time_to_revenue:"1–3 meses",monthly_potential:"R$ 4.000–12.000",risk:"baixo"},
+    educador_digital:{name:"Educadora Digital",desc:"Cursos, workshops e mentorias transformando conhecimento em produtos escaláveis.",time_to_revenue:"2–4 meses",monthly_potential:"R$ 3.000–15.000",risk:"médio"},
+    criador_conteudo:{name:"Criadora de Conteúdo",desc:"Canal próprio com audiência engajada, monetização via AdSense e patrocínios.",time_to_revenue:"6–12 meses",monthly_potential:"R$ 2.000–20.000+",risk:"alto"},
+    empreendedor_audiovisual:{name:"Empreendedora Audiovisual",desc:"Negócio próprio combinando serviços, produtos digitais e posicionamento de marca.",time_to_revenue:"3–6 meses",monthly_potential:"R$ 6.000–25.000+",risk:"alto"},
+  };
+  return Object.entries(PATHS).map(([id,path])=>{
+    let score=50,reasons=[],gaps=[];
+    if(answers.a1===({freelancer_premium:'executar',educador_digital:'ensinar',criador_conteudo:'criar',empreendedor_audiovisual:'estrategia'}[id])){score+=25;reasons.push('Perfil energético alinhado');}
     const e2=answers.e2||'moderado';
+    if(path.risk==='alto'&&e2==='baixo'){score-=25;gaps.push('Risco alto não alinhado com tolerância');}
+    else if(path.risk==='baixo'&&e2==='baixo') score+=10;
     const e1=answers.e1||'em_6m';
-    const b4=answers.b4||'';
-    const d2=answers.d2||'';
-    const d3=answers.d3||'';
-    const a3=answers.a3||'';
-    const e3=answers.e3||'ate_500';
-
-    if(pid==='freelancer_premium'){
-      if(a2==='executar') score+=25;
-      if(a3==='clientes') score+=15;
-      if(b4==='sim') score+=20;
-      if(b4==='nao') score-=10;
-      if(d2==='muito') score-=5;
-      if(e2==='baixo') score+=10;
-      if(e1==='urgente_3m') score+=15;
-    }
-    if(pid==='educador_digital'){
-      if(a2==='ensinar') score+=25;
-      if(d2==='muito') score+=25;
-      if(d2==='nao') score-=30;
-      if(a2==='executar') score-=10;
-      if(e3==='nada') score-=5;
-    }
-    if(pid==='criador_conteudo'){
-      if(a2==='criar') score+=20;
-      if(d3==='muito') score+=25;
-      if(d3==='nao') score-=30;
-      if(e1==='urgente_3m') score-=30;
-      if(e2==='baixo') score-=20;
-    }
-    if(pid==='empreendedor_audiovisual'){
-      if(a2==='estrategia') score+=25;
-      if(a3==='propria_empresa') score+=20;
-      if(e2==='alto') score+=15;
-      if(e2==='baixo') score-=25;
-      if(e1==='urgente_3m') score-=15;
-      if(e3==='nada') score-=20;
-    }
-
-    // Universal
-    if(pd.risk==='alto' && e2==='baixo') score-=20;
-    score = Math.max(0,Math.min(100,score));
-    results.push({...pd, id:pid, score});
-  }
-  results.sort((a,b)=>b.score-a.score);
-  if(results.length) results[0].recommended=true;
-  return results;
+    if(e1==='urgente_3m'){if(id==='criador_conteudo'){score-=30;gaps.push('Canal leva 6–12 meses para monetizar');}else if(id==='freelancer_premium'){score+=15;reasons.push('Retorno rápido ideal para urgência');}}
+    if(id==='freelancer_premium'){if(answers.b4==='fluente'){score+=15;reasons.push('Inglês fluente — mercado internacional');}else if(answers.b4==='nao'){score-=10;gaps.push('Desenvolver inglês para mercado internacional');}}
+    if(id==='educador_digital'){if(answers.d2==='muito'){score+=20;reasons.push('Alto interesse em ensinar');}else if(answers.d2==='nao'){score-=30;gaps.push('Interesse em ensinar ausente');}}
+    if(id==='criador_conteudo'&&answers.d3==='muito'){score+=20;reasons.push('Alta afinidade com criação de conteúdo');}
+    if(id==='empreendedor_audiovisual'&&answers.a3==='propria_empresa'){score+=20;reasons.push('Já atua com empresa própria');}
+    if(['5_10','mais_10'].includes(answers.anos_exp)&&id==='freelancer_premium'){score+=10;reasons.push('Experiência robusta valoriza posicionamento premium');}
+    if(answers.portfolio_status==='sim_forte'&&['freelancer_premium','empreendedor_audiovisual'].includes(id)){score+=10;reasons.push('Portfólio sólido disponível');}
+    if(['sim_engajada','sim_crescendo'].includes(answers.audiencia)&&id==='criador_conteudo'){score+=15;reasons.push('Audiência existente acelera monetização');}
+    return{id,...path,score:Math.max(0,Math.min(100,score)),reasons:reasons.slice(0,3),gaps:gaps.slice(0,3),recommended:false};
+  }).sort((a,b)=>b.score-a.score).map((p,i)=>({...p,recommended:i===0}));
 }
 
-function renderCareerPaths(){
-  const answers = diagAnswers;
-  const paths = scorePathsClient(Object.keys(answers).length > 2 ? answers : {});
-  const hasData = Object.keys(answers).length > 2;
-
-  document.getElementById('strat-empty').style.display = hasData ? 'none' : 'block';
-
-  const container=document.getElementById('career-paths');
-  container.innerHTML=paths.map(p=>`
-    <div class="path-card${p.recommended?' top':''}">
-      ${p.recommended?'<div class="path-rec">Recomendado</div>':''}
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <div style="font-size:28px">${p.icon}</div>
-        <div style="flex:1">
-          <div style="font-weight:700;font-size:16px;margin-bottom:4px">${p.name}</div>
-          <div style="font-size:13px;color:var(--text-2);margin-bottom:10px">${p.desc}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span class="tag">⏱ ${p.time_to_revenue}</span>
-            <span class="tag amber">📈 ${p.monthly_potential}</span>
-            <span class="tag">⚡ Risco ${p.risk}</span>
-            <span class="tag">💰 ${p.investment}</span>
-          </div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div class="path-score">${p.score}</div>
-          <div style="font-size:11px;color:var(--text-3)">/ 100</div>
+// ── ESTRATÉGIA ───────────────────────────────────────────────────
+async function runCareerAnalysis(){
+  const el = document.getElementById('estrategia-paths');
+  const loading = document.getElementById('estrategia-loading');
+  const cta = document.getElementById('estrategia-cta');
+  const answered = Object.keys(diagAnswers).length;
+  if(answered<5){cta.style.display='block';el.innerHTML='';return;}
+  cta.style.display='none';
+  loading.style.display='block';
+  try{
+    const data = await api('/api/analysis/career',{method:'POST',body:JSON.stringify({answers:diagAnswers})});
+    renderPaths(data.paths||[]);
+  }catch(e){
+    const paths = scorePathsClient(diagAnswers);
+    renderPaths(paths);
+  }
+  loading.style.display='none';
+}
+function renderPaths(paths){
+  const el = document.getElementById('estrategia-paths');
+  el.innerHTML = paths.map(p=>`
+    <div class="path-card${p.recommended?' recommended':''}">
+      <div class="path-header">
+        <span class="path-name">${p.name}</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${p.recommended?'<span class="badge badge-amber">Recomendado</span>':''}
+          <span style="font-size:13px;font-weight:600;color:${p.score>=70?'var(--green)':p.score>=50?'var(--accent)':'var(--text-3)'};">${p.score}%</span>
         </div>
       </div>
-      <div class="path-bar"><div class="path-bar-fill" data-w="${p.score}" style="width:0%"></div></div>
+      <div class="path-score-bar"><div class="path-score-fill" style="width:${p.score}%;background:${p.score>=70?'var(--green)':p.score>=50?'var(--accent)':'var(--text-3)'}"></div></div>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">${p.desc}</p>
+      <div class="path-meta">
+        <span>⏱ ${p.time_to_revenue}</span>
+        <span>💰 ${p.monthly_potential}</span>
+        <span>⚡ Risco ${p.risk}</span>
+      </div>
+      ${p.reasons?.length?`<div style="margin-top:12px;font-size:12px;color:var(--green);">✓ ${p.reasons.join(' · ')}</div>`:''}
+      ${p.gaps?.length?`<div style="margin-top:4px;font-size:12px;color:var(--text-3);">△ ${p.gaps.join(' · ')}</div>`:''}
     </div>`).join('');
-
-  setTimeout(()=>{
-    document.querySelectorAll('.path-bar-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});
-  },80);
-
-  // Table
-  const tbody=document.querySelector('#paths-table tbody');
-  tbody.innerHTML=paths.map(p=>`<tr>
-    <td><strong>${p.icon} ${p.name}</strong></td>
-    <td class="mono">${p.score}/100</td>
-    <td>${p.time_to_revenue}</td>
-    <td class="mono">${p.monthly_potential}</td>
-    <td><span class="tag ${p.risk==='baixo'?'green':p.risk==='alto'?'red':''}">${p.risk}</span></td>
-    <td>${p.investment}</td>
-  </tr>`).join('');
-
-  // Update home metric
-  if(paths.length) document.getElementById('m-path').textContent=paths[0].name;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// FINANCIAL ENGINE
-// ═══════════════════════════════════════════════════════════════════
-function calcFinance(){
-  const price=parseFloat(document.getElementById('fi-price').value)||0;
-  const hProj=parseFloat(document.getElementById('fi-hours-proj').value)||1;
-  const hMonth=parseFloat(document.getElementById('fi-hours-month').value)||80;
-  const conv=(parseFloat(document.getElementById('fi-conv').value)||10)/100;
-  const costs=parseFloat(document.getElementById('fi-costs').value)||0;
-  const goal=parseFloat(document.getElementById('fi-goal').value)||0;
+// ── HOME ─────────────────────────────────────────────────────────
+async function updateHomeMetrics(){
+  const answered = Object.keys(diagAnswers).length;
+  const pct = Math.round(answered/TOTAL_Q*100);
+  document.getElementById('home-diag-pct').textContent=pct+'%';
+  document.getElementById('home-diag-bar').style.width=pct+'%';
+  document.getElementById('home-diag-label').textContent=answered===0?'Não iniciado':answered>=TOTAL_Q?'Completo':`${answered} de ${TOTAL_Q} perguntas`;
 
-  const maxProj = hProj>0 ? Math.floor(hMonth/hProj) : 0;
+  if(answered>=5){
+    const paths = scorePathsClient(diagAnswers);
+    const top = paths[0];
+    document.getElementById('home-path-content').innerHTML=`
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">${top.name}</div>
+      <div style="font-size:13px;color:var(--text-2);">${top.desc}</div>
+      <div style="font-size:12px;color:var(--accent);margin-top:8px;">${top.monthly_potential} · ${top.time_to_revenue}</div>`;
+  }
 
-  const scenario=(pm,pp,pc)=>{
-    const p=price*pp, n=Math.floor(maxProj*pm);
-    const rev=p*n, net=rev-costs;
-    const contacts=conv*pc>0?Math.ceil(n/(conv*pc)):0;
-    return {rev,net,n,contacts,p};
-  };
-  const con=scenario(0.6,0.85,0.7);
-  const base=scenario(1,1,1);
-  const opt=scenario(1,1.15,1.4);
-
-  const goalPct=goal>0?Math.min(base.rev/goal*100,150):0;
-
-  document.getElementById('scenarios').innerHTML=`
-    <div class="scenario-col">
-      <div class="scenario-label">Conservador</div>
-      <div class="scenario-val">R$ ${fmt(con.rev)}</div>
-      <div class="scenario-sub">${con.n} projetos × R$${fmt(con.p)}</div>
-      <div class="scenario-sub" style="margin-top:8px">Líquido: R$${fmt(con.net)}</div>
-      <div class="scenario-sub">Contatos p/ fechar: ${con.contacts}</div>
-    </div>
-    <div class="scenario-col base">
-      <div class="scenario-label" style="color:var(--accent)">Base ★</div>
-      <div class="scenario-val" style="color:var(--accent)">R$ ${fmt(base.rev)}</div>
-      <div class="scenario-sub">${base.n} projetos × R$${fmt(base.p)}</div>
-      <div class="scenario-sub" style="margin-top:8px">Líquido: R$${fmt(base.net)}</div>
-      <div class="scenario-sub">Contatos p/ fechar: ${base.contacts}</div>
-    </div>
-    <div class="scenario-col">
-      <div class="scenario-label">Otimista</div>
-      <div class="scenario-val">R$ ${fmt(opt.rev)}</div>
-      <div class="scenario-sub">${opt.n} projetos × R$${fmt(opt.p)}</div>
-      <div class="scenario-sub" style="margin-top:8px">Líquido: R$${fmt(opt.net)}</div>
-      <div class="scenario-sub">Contatos p/ fechar: ${opt.contacts}</div>
-    </div>`;
-
-  if(goal>0){
-    const pct=Math.min(base.rev/goal*100,100);
-    const bar=document.getElementById('fi-pbar');
-    if(bar) bar.style.width=pct+'%';
-    const fb=document.getElementById('fi-feedback');
-    if(fb){
-      if(base.rev>=goal){
-        fb.innerHTML=`<span style="color:var(--green)">✓ Meta atingida no cenário base</span>`;
-      } else {
-        const falta=goal-base.rev;
-        fb.innerHTML=`<span style="color:var(--accent)">${pct.toFixed(0)}% da meta<br><small>Faltam R$${fmt(falta)}/mês</small></span>`;
-      }
+  try{
+    const fin = await api('/api/finances');
+    if(fin.income_goal){
+      const goal=parseFloat(fin.income_goal)||0, cur=parseFloat(fin.current_income)||0;
+      const pctF = goal>0?Math.round(cur/goal*100):0;
+      document.getElementById('home-finance-content').innerHTML=`
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Meta: R$ ${goal.toLocaleString('pt-BR')}/mês</div>
+        <div class="progress"><div class="progress-fill" style="width:${pctF}%"></div></div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px;">Atual: R$ ${cur.toLocaleString('pt-BR')} (${pctF}% da meta)</div>`;
     }
-  }
+  }catch(e){}
+
+  // Upcoming events
+  const today = new Date(); today.setHours(0,0,0,0);
+  const week = new Date(today); week.setDate(today.getDate()+7);
+  const upcoming = allEvents.filter(e=>{const d=new Date(e.date);return d>=today&&d<=week;}).slice(0,4);
+  document.getElementById('home-upcoming').innerHTML = upcoming.length
+    ? upcoming.map(e=>`<div style="padding:6px 0;border-bottom:1px solid var(--sep);font-size:13px;"><span style="color:var(--text-2);">${fmtDate(e.date)}</span> — ${e.title}</div>`).join('')
+    : '<span style="font-size:13px;color:var(--text-2);">Nenhum evento nos próximos 7 dias.</span>';
+
+  // Active projects
+  const active = allProjects.filter(p=>p.status==='em_andamento');
+  document.getElementById('home-projects').innerHTML = active.length
+    ? active.slice(0,3).map(p=>`<div class="card" style="padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:500;">${p.name}</span><span class="badge badge-amber">${p.progress||0}%</span></div>`).join('')
+    : '<span style="font-size:13px;color:var(--text-2);">Nenhum projeto em andamento.</span>';
 }
 
-function calcSources(){
-  const ids=['fi-s1','fi-s2','fi-s3','fi-s4','fi-s5','fi-s6'];
-  const total=ids.reduce((s,id)=>s+(parseFloat(document.getElementById(id)?.value)||0),0);
-  document.getElementById('fi-total').textContent='R$ '+fmt(total);
-  const goal=parseFloat(document.getElementById('fi-goal').value)||0;
-  if(goal>0){
-    const pct=Math.min(total/goal*100,100);
-    const bar=document.getElementById('fi-pbar');
-    if(bar) bar.style.width=pct+'%';
-  }
-  document.getElementById('m-meta').textContent=goal>0?'R$ '+fmt(goal):'—';
+// ── PESQUISA ─────────────────────────────────────────────────────
+async function loadTrends(){
+  const el=document.getElementById('trends-status');
+  const kw=document.getElementById('trends-input').value||'edição de vídeo';
+  el.innerHTML='<span class="spinner"></span>';
+  try{
+    const data = await api(`/api/research/trends?keywords=${encodeURIComponent(kw)}`);
+    el.innerHTML='';
+    if(data.error){el.innerHTML=`<p style="color:var(--text-2);font-size:13px;">Trends indisponível: ${data.error}</p>`;return;}
+    if(!data.data?.length){el.innerHTML='<p style="font-size:13px;color:var(--text-2);">Sem dados de tendência.</p>';return;}
+    if(trendsChartInst) trendsChartInst.destroy();
+    trendsChartInst = new Chart(document.getElementById('trends-chart'),{
+      type:'line',
+      data:{labels:data.dates||[],datasets:data.data.map((d,i)=>({
+        label:d.keyword,data:d.values,
+        borderColor:['#C4904A','#5A9E65','#5A8FC4','#C45050','#9A5AC4'][i%5],
+        tension:.4,fill:false,pointRadius:3
+      }))},
+      options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}
+    });
+  }catch(e){el.innerHTML=`<p style="font-size:13px;color:var(--text-2);">Servidor offline ou erro. Tente novamente.</p>`;}
+}
+async function loadHoje(){
+  const el=document.getElementById('hoje-status'),list=document.getElementById('hoje-list');
+  el.innerHTML='<span class="spinner"></span>';list.innerHTML='';
+  try{
+    const data=await api('/api/research/hoje');
+    el.innerHTML='';
+    if(data.error){el.innerHTML=`<p style="font-size:13px;color:var(--text-2);">Erro: ${data.error}</p>`;return;}
+    list.innerHTML=(data.trending||[]).map((t,i)=>`<div style="padding:8px 12px;background:var(--surface);border:1px solid var(--sep);border-radius:6px;margin-bottom:6px;font-size:13px;"><span style="color:var(--text-3);margin-right:8px;">${i+1}</span>${t}</div>`).join('');
+  }catch(e){el.innerHTML='<p style="font-size:13px;color:var(--text-2);">Servidor offline.</p>';}
+}
+async function loadNoticias(){
+  const el=document.getElementById('noticias-status'),list=document.getElementById('noticias-list');
+  el.innerHTML='<span class="spinner"></span>';list.innerHTML='';
+  try{
+    const data=await api('/api/research/noticias');
+    el.innerHTML='';
+    list.innerHTML=(data.articles||[]).map(a=>`<div class="card" style="padding:14px;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;"><a href="${a.link}" target="_blank" style="color:var(--text);">${a.title}</a></div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;">${a.source} · ${a.published?.slice(0,10)||''}</div>
+      <div style="font-size:12px;color:var(--text-2);">${a.summary||''}</div>
+    </div>`).join('');
+  }catch(e){el.innerHTML='<p style="font-size:13px;color:var(--text-2);">Servidor offline.</p>';}
+}
+async function searchYoutube(){
+  const q=document.getElementById('yt-input').value.trim(); if(!q) return;
+  const key=ls('ms_cfg_yt_key');
+  if(!key){document.getElementById('yt-needs-key').style.display='block';document.getElementById('yt-search-ui').style.display='none';return;}
+  const st=document.getElementById('yt-status'),res=document.getElementById('yt-results');
+  st.innerHTML='<span class="spinner"></span>';res.innerHTML='';
+  try{
+    const data=await api(`/api/research/youtube?q=${encodeURIComponent(q)}`);
+    st.innerHTML='';
+    if(data.status==='needs_api_key'){document.getElementById('yt-needs-key').style.display='block';document.getElementById('yt-search-ui').style.display='none';return;}
+    if(data.status==='error'){st.innerHTML=`<p style="color:var(--red);font-size:13px;">${data.message}</p>`;return;}
+    res.innerHTML=(data.results||[]).map(v=>`<div class="card" style="padding:0;overflow:hidden;">
+      ${v.thumbnail?`<img src="${v.thumbnail}" style="width:100%;aspect-ratio:16/9;object-fit:cover;" loading="lazy">`:''}
+      <div style="padding:12px;">
+        <a href="${v.url}" target="_blank" style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">${v.title}</a>
+        <div style="font-size:12px;color:var(--text-3);">${v.channel} · ${v.published}</div>
+      </div></div>`).join('');
+  }catch(e){st.innerHTML='<p style="font-size:13px;color:var(--text-2);">Erro na busca. Verifique sua API key.</p>';}
+}
+async function searchGoogle(){
+  const q=document.getElementById('gcs-input').value.trim(); if(!q) return;
+  const key=ls('ms_cfg_google_key'),cx=ls('ms_cfg_google_cx');
+  if(!key||!cx){document.getElementById('gcs-needs-key').style.display='block';document.getElementById('gcs-search-ui').style.display='none';return;}
+  const st=document.getElementById('gcs-status'),res=document.getElementById('gcs-results');
+  st.innerHTML='<span class="spinner"></span>';res.innerHTML='';
+  try{
+    const data=await api(`/api/research/search?q=${encodeURIComponent(q)}`);
+    st.innerHTML='';
+    if(data.status==='needs_api_key'){document.getElementById('gcs-needs-key').style.display='block';document.getElementById('gcs-search-ui').style.display='none';return;}
+    if(data.status==='error'){st.innerHTML=`<p style="color:var(--red);font-size:13px;">${data.message}</p>`;return;}
+    res.innerHTML=(data.results||[]).map(r=>`<div class="card" style="padding:14px;margin-bottom:8px;">
+      <a href="${r.link}" target="_blank" style="font-size:14px;font-weight:600;color:var(--accent);">${r.title}</a>
+      <div style="font-size:12px;color:var(--text-3);margin:2px 0;">${r.source}</div>
+      <div style="font-size:13px;color:var(--text-2);">${r.snippet}</div>
+    </div>`).join('');
+  }catch(e){st.innerHTML='<p style="font-size:13px;color:var(--text-2);">Erro na busca.</p>';}
 }
 
-function fmt(n){return Math.round(n).toLocaleString('pt-BR');}
-
-async function saveFinances(){
+// ── PROJETOS ─────────────────────────────────────────────────────
+async function loadProjects(){
+  try{ allProjects = await api('/api/projects'); }catch(e){ allProjects=[]; }
+  renderProjects();
+}
+function renderProjects(){
+  const el=document.getElementById('projects-list');
+  if(!allProjects.length){el.innerHTML='<div class="card" style="text-align:center;padding:32px;color:var(--text-2);font-size:13px;">Nenhum projeto ainda. Crie o primeiro!</div>';return;}
+  const statusLabel={planejando:'Planejando',em_andamento:'Em andamento',pausado:'Pausado',concluido:'Concluído'};
+  const statusBadge={planejando:'badge-gray',em_andamento:'badge-amber',pausado:'badge-gray',concluido:'badge-green'};
+  el.innerHTML=allProjects.map(p=>`<div class="card" style="margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">${p.name||'Sem nome'}</div>
+        ${p.deadline?`<div style="font-size:12px;color:var(--text-3);margin-top:2px;">Prazo: ${fmtDate(p.deadline)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="badge ${statusBadge[p.status]||'badge-gray'}">${statusLabel[p.status]||p.status}</span>
+        <button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">×</button>
+      </div>
+    </div>
+    <div class="progress"><div class="progress-fill" style="width:${p.progress||0}%"></div></div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:4px;">${p.progress||0}% concluído</div>
+    ${p.notes?`<div style="font-size:12px;color:var(--text-2);margin-top:8px;">${p.notes}</div>`:''}
+  </div>`).join('');
+}
+function openNewProject(){
+  editingProjectId=null;
+  document.getElementById('project-form-title').textContent='Novo Projeto';
+  ['pf-name','pf-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pf-status').value='planejando';
+  document.getElementById('pf-progress').value=0;
+  document.getElementById('pf-prog-val').textContent='0';
+  document.getElementById('pf-deadline').value='';
+  document.getElementById('project-form').style.display='block';
+}
+function editProject(id){
+  const p=allProjects.find(x=>x.id===id); if(!p) return;
+  editingProjectId=id;
+  document.getElementById('project-form-title').textContent='Editar Projeto';
+  document.getElementById('pf-name').value=p.name||'';
+  document.getElementById('pf-status').value=p.status||'planejando';
+  document.getElementById('pf-progress').value=p.progress||0;
+  document.getElementById('pf-prog-val').textContent=p.progress||0;
+  document.getElementById('pf-deadline').value=p.deadline||'';
+  document.getElementById('pf-notes').value=p.notes||'';
+  document.getElementById('project-form').style.display='block';
+}
+async function saveProject(){
   const data={
-    price:document.getElementById('fi-price').value,
-    hours_proj:document.getElementById('fi-hours-proj').value,
-    hours_month:document.getElementById('fi-hours-month').value,
-    conv:document.getElementById('fi-conv').value,
-    costs:document.getElementById('fi-costs').value,
-    goal:document.getElementById('fi-goal').value,
-    s1:document.getElementById('fi-s1').value,
-    s2:document.getElementById('fi-s2').value,
-    s3:document.getElementById('fi-s3').value,
-    s4:document.getElementById('fi-s4').value,
-    s5:document.getElementById('fi-s5').value,
-    s6:document.getElementById('fi-s6').value,
-    notes:document.getElementById('fi-notes').value,
-  };
-  ls.set('ms_finances',data);
-  await apiPut('/api/finances',data);
-  document.getElementById('m-meta').textContent=data.goal?'R$ '+fmt(Number(data.goal)):'—';
-  toast('✓ Finanças salvas');
-}
-
-function loadFinances(){
-  const data=ls.get('ms_finances',{});
-  const map={price:'fi-price',hours_proj:'fi-hours-proj',hours_month:'fi-hours-month',
-    conv:'fi-conv',costs:'fi-costs',goal:'fi-goal',
-    s1:'fi-s1',s2:'fi-s2',s3:'fi-s3',s4:'fi-s4',s5:'fi-s5',s6:'fi-s6',notes:'fi-notes'};
-  Object.entries(map).forEach(([k,id])=>{const el=document.getElementById(id);if(el&&data[k])el.value=data[k];});
-  calcFinance();calcSources();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// PROFILE
-// ═══════════════════════════════════════════════════════════════════
-function renderProfile(){
-  const answers=diagAnswers;
-  const hasDiag=Object.keys(answers).length>5;
-  document.getElementById('profile-empty').style.display=hasDiag?'none':'block';
-
-  if(hasDiag){
-    const paths=scorePathsClient(answers);
-    const top=paths[0];
-    const a2_map={criar:'Criação autoral',ensinar:'Ensino e transformação',executar:'Execução técnica de qualidade',estrategia:'Construção estratégica'};
-    const c4_map={ate_3k:'R$ 3k/mês',  '3k_6k':'R$ 3–6k/mês','6k_10k':'R$ 6–10k/mês',acima_10k:'R$10k+/mês'};
-    const e2_map={baixo:'baixo',moderado:'moderado',alto:'alto'};
-
-    document.getElementById('synthesis-content').innerHTML=`
-      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px">
-        <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px">Caminho recomendado</div>
-          <div style="font-weight:700;font-size:18px;color:var(--accent)">${top.icon} ${top.name}</div></div>
-        <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px">Energia central</div>
-          <div style="font-weight:600;font-size:15px">${a2_map[answers.a2]||answers.a2||'—'}</div></div>
-        <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px">Meta de renda</div>
-          <div style="font-weight:600;font-size:15px">${c4_map[answers.c4]||'—'}</div></div>
-        <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px">Tolerância a risco</div>
-          <div style="font-weight:600;font-size:15px">${e2_map[answers.e2]||'—'}</div></div>
-      </div>`;
-
-    // Evidence
-    const ev=[
-      answers.b1 && {type:'evidencia',text:`Domínio: ${[].concat(answers.b1).join(', ')}`},
-      answers.b4 && {type:answers.b4==='sim'?'evidencia':'hipotese',text:`Inglês: ${answers.b4}`},
-      answers.c2 && {type:'declarado',text:`Clientes ativos: ${answers.c2}`},
-      answers.c1 && {type:'declarado',text:`Renda atual: ${answers.c1}`},
-      answers.d1 && {type:'evidencia',text:`Projetos autorais: ${answers.d1}`},
-      answers.e4 && {type:'declarado',text:`Principal bloqueio: ${answers.e4}`},
-      !answers.c3 && {type:'desconhecido',text:'Canal de aquisição de clientes não mapeado'},
-    ].filter(Boolean);
-
-    document.getElementById('evidence-content').innerHTML=ev.map(e=>`
-      <div class="ev-row">
-        <span class="ev-type ev-${e.type}">${{evidencia:'Evidência',declarado:'Declarado',hipotese:'Hipótese',desconhecido:'Desconhecido'}[e.type]||e.type}</span>
-        <span class="ev-text">${e.text}</span>
-      </div>`).join('');
-  }
-
-  // Load editable fields
-  const pf=ls.get('ms_profile',{});
-  const fields={name:'pf-name',pos:'pf-pos',sw:'pf-sw',esp:'pf-esp',eng:'pf-eng',port:'pf-port',notes:'pf-notes'};
-  Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el&&pf[k])el.value=pf[k];});
-}
-
-async function saveProfile(){
-  const pf={
     name:document.getElementById('pf-name').value,
-    pos:document.getElementById('pf-pos').value,
-    sw:document.getElementById('pf-sw').value,
-    esp:document.getElementById('pf-esp').value,
-    eng:document.getElementById('pf-eng').value,
-    port:document.getElementById('pf-port').value,
+    status:document.getElementById('pf-status').value,
+    progress:parseInt(document.getElementById('pf-progress').value),
+    deadline:document.getElementById('pf-deadline').value,
     notes:document.getElementById('pf-notes').value,
   };
-  ls.set('ms_profile',pf);
-  await apiPut('/api/profile',{...pf, diagnostic_answers:diagAnswers});
-  toast('✓ Perfil salvo');
+  try{
+    if(editingProjectId){
+      await api('/api/projects/'+editingProjectId,{method:'PUT',body:JSON.stringify(data)});
+    }else{
+      await api('/api/projects',{method:'POST',body:JSON.stringify(data)});
+    }
+    document.getElementById('project-form').style.display='none';
+    await loadProjects();
+    updateHomeMetrics();
+  }catch(e){alert('Erro ao salvar: '+e.message);}
+}
+function cancelProject(){ document.getElementById('project-form').style.display='none'; }
+async function deleteProject(id){
+  if(!confirm('Deletar este projeto?')) return;
+  try{ await api('/api/projects/'+id,{method:'DELETE'}); await loadProjects(); updateHomeMetrics(); }catch(e){}
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// PROJECTS
-// ═══════════════════════════════════════════════════════════════════
-const DEFAULT_PROJS=[
-  {id:'p1',emoji:'📚',name:'Cartilha de Edição de Vídeo',status:'em_andamento',progress:75,
-   objective:'Material educacional para o projeto de cinema na comunidade.',
-   next:'Revisar linguagem, adicionar glossário, definir plataforma de venda'},
-  {id:'p2',emoji:'🎮',name:'Simulador de Edição',status:'funcional',progress:60,
-   objective:'Simulador interativo de aprendizado prático.',
-   next:'Refinar UX, integrar com cartilha, pensar bundle de venda'},
-  {id:'p3',emoji:'📺',name:'Canal YouTube',status:'planejando',progress:5,
-   objective:'Canal educativo sobre edição de vídeo.',
-   next:'Definir nicho, nome, identidade, primeiro vídeo'},
-];
-
-function renderProjects(){
-  const custom=ls.get('ms_custom_projects',[])||[];
-  const all=[...DEFAULT_PROJS,...custom];
-  const statusColor={planejando:'var(--blue)',em_andamento:'var(--accent)',funcional:'var(--green)',pausado:'var(--text-3)',concluido:'var(--green)'};
-
-  document.getElementById('proj-list').innerHTML = all.map(p=>`
-    <div style="padding:16px 0;border-bottom:1px solid var(--sep-2)">
-      <div style="display:flex;align-items:flex-start;gap:12px">
-        <div style="font-size:22px;flex-shrink:0;padding-top:2px">${p.emoji||'📌'}</div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-            <div style="font-weight:600;font-size:15px">${p.name}</div>
-            <span class="tag" style="color:${statusColor[p.status]||'var(--text-3)'};border-color:${statusColor[p.status]||'var(--sep)'};background:transparent;flex-shrink:0">${p.status.replace('_',' ')}</span>
-          </div>
-          ${p.objective?`<div style="font-size:13px;color:var(--text-3);margin-top:3px">${p.objective}</div>`:''}
-          <div class="progress-track" style="margin:10px 0 4px">
-            <div class="progress-fill" data-w="${p.progress}" style="width:0%;background:${statusColor[p.status]||'var(--accent)'}"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between">
-            <div style="font-size:12px;color:var(--text-3)">${p.next?'→ '+p.next:''}</div>
-            <div class="mono" style="font-size:12px;color:var(--text-3)">${p.progress}%</div>
-          </div>
-        </div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('m-proj').textContent = all.filter(p=>p.status!=='concluido'&&p.status!=='pausado').length;
-
-  setTimeout(()=>document.querySelectorAll('#proj-list .progress-fill').forEach(b=>{b.style.width=b.dataset.w+'%';}),80);
+// ── CALENDÁRIO ───────────────────────────────────────────────────
+function fmtDate(d){
+  if(!d) return '';
+  const dt=new Date(d+'T12:00:00');
+  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
+async function loadEvents(){
+  try{ allEvents=await api('/api/events'); }catch(e){ allEvents=[]; }
+  renderCalendar();
+}
+function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function renderCalendar(){
+  const monthNames=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-month-label').textContent=`${monthNames[calMonth]} ${calYear}`;
+  const headers=document.getElementById('cal-headers');
+  headers.innerHTML=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cal-day-header">${d}</div>`).join('');
+  const grid=document.getElementById('cal-grid');
+  const first=new Date(calYear,calMonth,1).getDay();
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  let html='';
+  for(let i=0;i<first;i++) html+=`<div class="cal-day other-month"></div>`;
+  for(let d=1;d<=days;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+    const evs=allEvents.filter(e=>e.date===dateStr);
+    const pdeadlines=allProjects.filter(p=>p.deadline===dateStr);
+    html+=`<div class="cal-day${isToday?' today':''}" title="${evs.map(e=>e.title).join(', ')}">
+      <div class="cal-day-num">${d}</div>
+      ${evs.map(()=>'<span class="cal-event-dot"></span>').join('')}
+      ${pdeadlines.map(()=>'<span class="cal-event-dot" style="background:var(--red)"></span>').join('')}
+    </div>`;
+  }
+  grid.innerHTML=html;
+  // Events list
+  const upcoming=allEvents.sort((a,b)=>a.date.localeCompare(b.date)).filter(e=>e.date>=today.toISOString().slice(0,10));
+  const el=document.getElementById('events-list');
+  el.innerHTML=upcoming.length?upcoming.slice(0,10).map(e=>`<div class="card" style="padding:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+    <div><div style="font-size:13px;font-weight:500;">${e.title}</div><div style="font-size:12px;color:var(--text-3);">${fmtDate(e.date)}</div></div>
+    <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">×</button>
+  </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum evento próximo.</div>';
+}
+function openEventForm(){ document.getElementById('ef-date').value=new Date().toISOString().slice(0,10); document.getElementById('event-form').style.display='block'; }
+async function saveEvent(){
+  const title=document.getElementById('ef-title').value.trim(); if(!title) return;
+  try{
+    await api('/api/events',{method:'POST',body:JSON.stringify({title,date:document.getElementById('ef-date').value,notes:document.getElementById('ef-notes').value})});
+    document.getElementById('event-form').style.display='none';
+    document.getElementById('ef-title').value='';
+    document.getElementById('ef-notes').value='';
+    await loadEvents();
+  }catch(e){}
+}
+async function deleteEvent(id){ if(!confirm('Remover este evento?')) return; try{ await api('/api/events/'+id,{method:'DELETE'}); await loadEvents(); }catch(e){} }
 
-function addProject(){
-  const name=document.getElementById('np-name').value.trim();
-  if(!name)return toast('Digite o nome do projeto');
-  const p={
-    id:'c'+Date.now(),emoji:'📌',
-    name,status:document.getElementById('np-status').value,
-    objective:document.getElementById('np-obj').value,
-    next:document.getElementById('np-next').value,
-    progress:parseInt(document.getElementById('np-prog').value)||0,
-    deadline:document.getElementById('np-deadline').value,
+// ── FINANCEIRO ───────────────────────────────────────────────────
+function updateFinSlider(f){
+  const map={price:['fin-price','fin-price-r'],hpp:['fin-hpp','fin-hpp-r'],hpm:['fin-hpm','fin-hpm-r'],conv:['fin-conv','fin-conv-r']};
+  if(map[f]) document.getElementById(map[f][1]).value=document.getElementById(map[f][0]).value;
+}
+function updateFinInput(f){
+  const map={price:['fin-price','fin-price-r'],hpp:['fin-hpp','fin-hpp-r'],hpm:['fin-hpm','fin-hpm-r'],conv:['fin-conv','fin-conv-r']};
+  if(map[f]) document.getElementById(map[f][0]).value=document.getElementById(map[f][1]).value;
+}
+async function calcFinance(){
+  const body={
+    price_per_project:parseFloat(document.getElementById('fin-price').value)||0,
+    hours_per_project:parseFloat(document.getElementById('fin-hpp').value)||10,
+    hours_per_month:parseFloat(document.getElementById('fin-hpm').value)||80,
+    conversion_rate:parseFloat(document.getElementById('fin-conv').value)/100||0.1,
+    fixed_costs:parseFloat(document.getElementById('fin-fixed').value)||0,
+    current_income:parseFloat(document.getElementById('fin-current').value)||0,
+    income_goal:parseFloat(document.getElementById('fin-goal').value)||6000,
   };
-  const list=ls.get('ms_custom_projects',[])||[];
-  list.push(p);
-  ls.set('ms_custom_projects',list);
-  apiPost('/api/projects',p);
-  ['np-name','np-obj','np-next','np-deadline'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('np-prog').value='0';
-  renderProjects();
-  toast('✓ Projeto adicionado');
+  try{
+    await api('/api/finances',{method:'PUT',body:JSON.stringify(body)});
+    const data=await api('/api/analysis/finances',{method:'POST',body:JSON.stringify(body)});
+    renderFinScenarios(data);
+    if(data.monthly_projection) renderFinChart(data.monthly_projection);
+  }catch(e){document.getElementById('fin-scenarios').innerHTML='<p style="font-size:13px;color:var(--text-2);">Servidor offline — calcule quando conectado.</p>';}
+}
+function renderFinScenarios(data){
+  const el=document.getElementById('fin-scenarios');
+  const sc=data;
+  const fmt=v=>`R$ ${(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}`;
+  el.innerHTML=['conservative','base','optimistic'].map(k=>{
+    const s=sc[k];const label={conservative:'Conservador',base:'Base',optimistic:'Otimista'}[k];
+    return`<div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:600;">${label}</span>
+        <span style="font-size:16px;font-weight:600;color:var(--accent);">${fmt(s.revenue)}/mês</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-2);">${s.projects} projetos · ${s.goal_percent}% da meta · Líquido ${fmt(s.net_revenue)}</div>
+      <div class="progress" style="margin-top:8px;"><div class="progress-fill" style="width:${Math.min(100,s.goal_percent)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+function renderFinChart(projection){
+  const ctx=document.getElementById('fin-chart');
+  if(finChartInst) finChartInst.destroy();
+  finChartInst=new Chart(ctx,{
+    type:'line',
+    data:{labels:projection.map(p=>`Mês ${p.month}`),datasets:[{
+      label:'Receita Projetada',
+      data:projection.map(p=>p.projected_revenue),
+      borderColor:'#C4904A',backgroundColor:'rgba(196,144,74,.1)',fill:true,tension:.4,pointRadius:3
+    }]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}
+  });
+}
+async function loadFinances(){
+  try{
+    const data=await api('/api/finances');
+    if(data.price_per_project){
+      document.getElementById('fin-price').value=data.price_per_project||0;
+      document.getElementById('fin-price-r').value=data.price_per_project||0;
+      document.getElementById('fin-hpp').value=data.hours_per_project||10;
+      document.getElementById('fin-hpp-r').value=data.hours_per_project||10;
+      document.getElementById('fin-hpm').value=data.hours_per_month||80;
+      document.getElementById('fin-hpm-r').value=data.hours_per_month||80;
+      document.getElementById('fin-conv').value=(data.conversion_rate||0.1)*100;
+      document.getElementById('fin-conv-r').value=(data.conversion_rate||0.1)*100;
+      document.getElementById('fin-fixed').value=data.fixed_costs||0;
+      document.getElementById('fin-current').value=data.current_income||0;
+      document.getElementById('fin-goal').value=data.income_goal||6000;
+    }
+  }catch(e){}
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// IDENTIDADE
-// ═══════════════════════════════════════════════════════════════════
+// ── IDENTIDADE ───────────────────────────────────────────────────
+async function loadIdentidade(){
+  try{
+    const data=await api('/api/profile');
+    ['name','tagline','bio','keywords','tone','audience','differentials'].forEach(f=>{
+      const el=document.getElementById('id-'+f); if(el&&data[f]) el.value=data[f];
+    });
+    analyzeIdentidade(data);
+  }catch(e){}
+}
 async function saveIdentidade(){
   const data={
-    ref:document.getElementById('id-ref').value,
-    words:document.getElementById('id-words').value,
+    name:document.getElementById('id-name').value,
+    tagline:document.getElementById('id-tagline').value,
+    bio:document.getElementById('id-bio').value,
+    keywords:document.getElementById('id-keywords').value,
+    tone:document.getElementById('id-tone').value,
     audience:document.getElementById('id-audience').value,
-    notes:document.getElementById('id-notes').value,
+    differentials:document.getElementById('id-differentials').value,
   };
-  ls.set('ms_identidade',data);
-
-  // Generate analysis
-  const words=data.words.toLowerCase();
-  let analysis='';
-  if(words.includes('sobr')||words.includes('cinem')||words.includes('preto')) {
-    analysis+='<p>Sua estética aponta para uma direção editorial minimalista — editorial escuro, tipografia precisa, pouco ornamento. Isso comunica credibilidade técnica e maturidade artística.</p>';
-  }
-  if(words.includes('human')||words.includes('aut')||words.includes('pessoal')) {
-    analysis+='<p>A dimensão humana e autoral é um diferencial forte no mercado de edição — posicionamento como artesão, não como commodity.</p>';
-  }
-  if(!analysis) analysis='<p>Com base nas suas referências, sua direção parece equilibrar técnica e linguagem visual forte. Defina mais suas palavras-chave para ver uma análise mais precisa.</p>';
-  document.getElementById('id-analysis').innerHTML=analysis;
-
-  await apiPost('/api/profile', {identity: data});
-  toast('✓ Identidade salva');
-}
-
-function loadIdentidade(){
-  const data=ls.get('ms_identidade',{});
-  const fields={ref:'id-ref',words:'id-words',audience:'id-audience',notes:'id-notes'};
-  Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el&&data[k])el.value=data[k];});
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// STRATEGY
-// ═══════════════════════════════════════════════════════════════════
-async function saveStrategy(){
-  const data={
-    d90:document.getElementById('st-d90').value,
-    ref:document.getElementById('st-ref').value,
-    op:document.getElementById('st-op').value,
-  };
-  ls.set('ms_strategy',data);
-  await apiPut('/api/profile',{strategy:data});
-  toast('✓ Estratégia salva');
-}
-
-function loadStrategy(){
-  const data=ls.get('ms_strategy',{});
-  const fields={d90:'st-d90',ref:'st-ref',op:'st-op'};
-  Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el&&data[k])el.value=data[k];});
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// DECISIONS
-// ═══════════════════════════════════════════════════════════════════
-async function addDecision(){
-  const desc=document.getElementById('dc-desc').value.trim();
-  if(!desc)return toast('Descreva a decisão');
-  const d={description:desc,rationale:document.getElementById('dc-rat').value,
-    context:document.getElementById('dc-ctx').value,outcome:document.getElementById('dc-out').value,
-    date:document.getElementById('dc-date').value};
-  const list=ls.get('ms_decisions',[])||[];
-  list.unshift({...d,id:Date.now()});
-  ls.set('ms_decisions',list);
-  await apiPost('/api/decisions',d);
-  ['dc-desc','dc-rat','dc-ctx','dc-out','dc-date'].forEach(id=>document.getElementById(id).value='');
-  renderDecisions();
-  toast('✓ Decisão registrada');
-}
-
-function renderDecisions(){
-  const list=ls.get('ms_decisions',[])||[];
-  const el=document.getElementById('decisions-list');
-  if(!list.length){el.innerHTML='<p style="color:var(--text-3);font-size:14px">Nenhuma decisão registrada.</p>';return;}
-  el.innerHTML=list.map(d=>`
-    <div class="card" style="margin-bottom:12px">
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">${d.description}</div>
-      ${d.date?`<span class="tag" style="margin-bottom:8px">${d.date}</span>`:''}
-      ${d.rationale?`<p style="font-size:13px;margin-bottom:4px"><strong>Por quê:</strong> ${d.rationale}</p>`:''}
-      ${d.context?`<p style="font-size:13px;color:var(--text-3)">${d.context}</p>`:''}
-      ${d.outcome?`<p style="font-size:13px;color:var(--green);margin-top:4px">→ ${d.outcome}</p>`:''}
-    </div>`).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// MERCADO
-// ═══════════════════════════════════════════════════════════════════
-async function initMercado(){
-  document.getElementById('mercado-offline').style.display=serverOnline?'none':'block';
-  if(!serverOnline) return;
-  loadHoje();
-  loadTrends();
-  loadNoticias();
-}
-
-async function loadHoje(){
-  document.getElementById('hoje-loading').style.display='flex';
   try{
-    const d=await apiGet('/api/research/hoje');
-    document.getElementById('hoje-loading').style.display='none';
-    const wrap=document.getElementById('hoje-chips');
-    if(!d||!d.trending?.length){wrap.innerHTML='<span style="color:var(--text-3);font-size:13px">Sem dados disponíveis.</span>';return;}
-    wrap.innerHTML=d.trending.map(t=>`<span class="tag" style="cursor:pointer" onclick="document.getElementById('kw-input').value='${t}';loadTrends()">${t}</span>`).join('');
-  }catch{document.getElementById('hoje-loading').style.display='none';}
+    await api('/api/profile',{method:'PUT',body:JSON.stringify(data)});
+    const saved=document.getElementById('id-saved');
+    saved.style.display='inline';
+    setTimeout(()=>saved.style.display='none',2000);
+    analyzeIdentidade(data);
+  }catch(e){alert('Erro ao salvar.');}
+}
+function analyzeIdentidade(data){
+  const bio=(data.bio||'').toLowerCase();
+  const kws=(data.keywords||'').split(',').map(k=>k.trim().toLowerCase()).filter(Boolean);
+  const el=document.getElementById('id-analysis');
+  if(!bio&&!kws.length){el.style.display='none';return;}
+  el.style.display='block';
+  const hits=kws.filter(k=>bio.includes(k));
+  const score=kws.length?Math.round(hits.length/kws.length*100):0;
+  document.getElementById('id-analysis-content').innerHTML=`
+    <div style="font-size:13px;margin-bottom:8px;">Palavras-chave na bio: <strong>${hits.length}/${kws.length}</strong></div>
+    <div class="progress"><div class="progress-fill" style="width:${score}%"></div></div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:6px;">${score>=80?'✓ Bio bem alinhada com keywords.':score>=50?'△ Bio parcialmente alinhada.':'⚠ Bio não menciona a maioria das keywords.'}</div>
+    ${kws.filter(k=>!bio.includes(k)).length?`<div style="font-size:12px;color:var(--text-2);margin-top:6px;">Não mencionadas: ${kws.filter(k=>!bio.includes(k)).join(', ')}</div>`:''}`;
 }
 
-async function loadTrends(){
-  const kw=document.getElementById('kw-input')?.value||'edição de vídeo';
-  document.getElementById('trends-loading').style.display='flex';
-  document.getElementById('trends-err').style.display='none';
+// ── DECISÕES ─────────────────────────────────────────────────────
+function toggleDecisionForm(){ const el=document.getElementById('decision-form'); el.style.display=el.style.display==='none'?'block':'none'; }
+async function loadDecisions(){
   try{
-    const d=await apiGet('/api/research/trends?keywords='+encodeURIComponent(kw));
-    document.getElementById('trends-loading').style.display='none';
-    if(!d||!d.data?.length){
-      document.getElementById('trends-err').textContent=d?.error||'Sem dados.';
-      document.getElementById('trends-err').style.display='block';return;
+    const data=await api('/api/decisions');
+    const el=document.getElementById('decisions-list');
+    el.innerHTML=data.length?data.map(d=>`<div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:600;">${d.description}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm" onclick="editDecision(${d.id})">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteDecision(${d.id})">×</button>
+        </div>
+      </div>
+      ${d.rationale?`<div style="font-size:12px;color:var(--text-2);">Porquê: ${d.rationale}</div>`:''}
+      ${d.outcome?`<div style="font-size:12px;color:var(--green);margin-top:4px;">Resultado: ${d.outcome}</div>`:''}
+      ${d.date?`<div style="font-size:11px;color:var(--text-3);margin-top:4px;">${fmtDate(d.date)}</div>`:''}
+    </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhuma decisão registada ainda.</div>';
+  }catch(e){}
+}
+function editDecision(id){
+  // simple: fill form
+  editingDecisionId=id;
+  toggleDecisionForm();
+}
+async function saveDecision(){
+  const data={description:document.getElementById('df-desc').value,rationale:document.getElementById('df-rationale').value,context:document.getElementById('df-context').value,outcome:document.getElementById('df-outcome').value,date:document.getElementById('df-date').value};
+  if(!data.description) return;
+  try{
+    if(editingDecisionId){ await api('/api/decisions/'+editingDecisionId,{method:'PUT',body:JSON.stringify(data)}); editingDecisionId=null; }
+    else{ await api('/api/decisions',{method:'POST',body:JSON.stringify(data)}); }
+    ['df-desc','df-rationale','df-context','df-outcome','df-date'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('decision-form').style.display='none';
+    await loadDecisions();
+  }catch(e){alert('Erro ao salvar.');}
+}
+async function deleteDecision(id){ if(!confirm('Remover esta decisão?')) return; try{ await api('/api/decisions/'+id,{method:'DELETE'}); await loadDecisions(); }catch(e){} }
+
+// ── RESULTADOS ───────────────────────────────────────────────────
+function toggleResultForm(){ const el=document.getElementById('result-form'); el.style.display=el.style.display==='none'?'block':'none'; }
+async function loadResults(){
+  try{
+    const data=await api('/api/results');
+    const catLabel={conquista:'Conquista',aprendizado:'Aprendizado',ajuste:'Ajuste'};
+    const catBadge={conquista:'badge-green',aprendizado:'badge-amber',ajuste:'badge-gray'};
+    const el=document.getElementById('results-list');
+    el.innerHTML=data.length?data.map(r=>`<div class="card" style="margin-bottom:8px;padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-size:13px;flex:1;">${r.description}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-left:8px;">
+          <span class="badge ${catBadge[r.category]||'badge-gray'}">${catLabel[r.category]||r.category}</span>
+          <button class="btn btn-danger btn-sm" onclick="deleteResult(${r.id})">×</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${fmtDate(r.date)}</div>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum resultado registado ainda.</div>';
+  }catch(e){}
+}
+async function saveResult(){
+  const data={description:document.getElementById('rf-desc').value,category:document.getElementById('rf-cat').value,date:document.getElementById('rf-date').value};
+  if(!data.description) return;
+  try{
+    await api('/api/results',{method:'POST',body:JSON.stringify(data)});
+    document.getElementById('rf-desc').value='';
+    document.getElementById('result-form').style.display='none';
+    await loadResults();
+  }catch(e){}
+}
+async function deleteResult(id){ if(!confirm('Remover?')) return; try{ await api('/api/results/'+id,{method:'DELETE'}); await loadResults(); }catch(e){} }
+
+// ── CHECKLIST ────────────────────────────────────────────────────
+function saveChecklist(){
+  for(let i=1;i<=5;i++) ls(`ms_checklist_${i}`,document.getElementById('cl-'+i).value);
+  const el=document.getElementById('cl-saved'); el.style.display='inline'; setTimeout(()=>el.style.display='none',2000);
+}
+function loadChecklist(){ for(let i=1;i<=5;i++){ const v=ls(`ms_checklist_${i}`); if(v) document.getElementById('cl-'+i).value=v; } }
+
+// ── CONFIGURAÇÕES ────────────────────────────────────────────────
+function loadConnectorStatus(){
+  // YouTube
+  const yk=ls('ms_cfg_yt_key');
+  document.getElementById('cfg-yt-key').value=yk||'';
+  document.getElementById('yt-status-dot').className='status-dot'+(yk?' ok':'');
+  document.getElementById('yt-status-text').textContent=yk?'Configurado':'Não configurado';
+  // Google Search
+  const gk=ls('ms_cfg_google_key'),gc=ls('ms_cfg_google_cx');
+  document.getElementById('cfg-gcs-key').value=gk||'';
+  document.getElementById('cfg-gcs-cx').value=gc||'';
+  document.getElementById('gcs-status-dot').className='status-dot'+(gk&&gc?' ok':'');
+  document.getElementById('gcs-status-text').textContent=(gk&&gc)?'Configurado':'Não configurado';
+  // Google Calendar
+  api('/api/calendar/status').then(data=>{
+    document.getElementById('gcal-status-dot').className='status-dot'+(data.connected?' ok':' err');
+    document.getElementById('gcal-status-text').textContent=data.connected?'Conectado':data.reason==='no_credentials'?'Sem credenciais no servidor':'Não conectado';
+  }).catch(()=>{
+    document.getElementById('gcal-status-text').textContent='Servidor offline';
+  });
+}
+function saveConnector(type){
+  if(type==='yt'){
+    ls('ms_cfg_yt_key',document.getElementById('cfg-yt-key').value.trim());
+  } else if(type==='gcs'){
+    ls('ms_cfg_google_key',document.getElementById('cfg-gcs-key').value.trim());
+    ls('ms_cfg_google_cx',document.getElementById('cfg-gcs-cx').value.trim());
+  }
+  loadConnectorStatus();
+}
+function removeConnector(type){
+  if(type==='yt') ls('ms_cfg_yt_key','');
+  else if(type==='gcs'){ ls('ms_cfg_google_key',''); ls('ms_cfg_google_cx',''); }
+  loadConnectorStatus();
+}
+async function testConnector(type){
+  try{
+    if(type==='yt'){
+      const data=await api('/api/research/youtube?q=test');
+      alert(data.status==='ok'?'✓ YouTube API funcionando!':data.status==='needs_api_key'?'⚠ Sem API key.':'Erro: '+data.message);
+    } else if(type==='gcs'){
+      const data=await api('/api/research/search?q=test');
+      alert(data.status==='ok'?'✓ Google Search funcionando!':data.status==='needs_api_key'?'⚠ Sem API key/CX.':'Erro: '+data.message);
     }
-    const ctx=document.getElementById('c-trends');
-    const existing=Chart.getChart(ctx);if(existing)existing.destroy();
-    new Chart(ctx,{type:'line',data:{labels:d.dates,datasets:d.data.map((s,i)=>({
-      label:s.keyword,data:s.values,borderColor:['#C4904A','#5A8FC4','#5A9E65','#C45050','#9A6AC4'][i%5],
-      backgroundColor:'transparent',tension:.4,pointRadius:3,}))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#9A9690',font:{family:'Inter',size:12}}}},
-        scales:{x:{grid:{color:'#1C1B18'},ticks:{color:'#5A5852',font:{family:'Inter',size:11},maxTicksLimit:6}},
-          y:{min:0,max:100,grid:{color:'#1C1B18'},ticks:{color:'#5A5852',font:{family:'Inter',size:11}}}}}});
-  }catch{document.getElementById('trends-loading').style.display='none';}
+  }catch(e){ alert('Erro: '+e.message); }
+}
+function connectCalendar(){ window.location.href=API+'/api/calendar/auth'; }
+async function disconnectCalendar(){
+  if(!confirm('Desconectar Google Calendar?')) return;
+  try{ await api('/api/calendar/disconnect',{method:'DELETE'}); loadConnectorStatus(); }catch(e){}
 }
 
-async function loadNoticias(){
-  document.getElementById('news-loading').style.display='flex';
-  try{
-    const d=await apiGet('/api/research/noticias');
-    document.getElementById('news-loading').style.display='none';
-    const feed=document.getElementById('news-feed');
-    if(!d?.articles?.length){feed.innerHTML='<p style="color:var(--text-3)">Sem notícias.</p>';return;}
-    feed.innerHTML=d.articles.map(a=>`
-      <div class="news-item">
-        <div class="news-source">${a.source}</div>
-        <div class="news-title"><a href="${a.link}" target="_blank" rel="noopener">${a.title}</a></div>
-        <div class="news-summary">${a.summary||''}</div>
-      </div>`).join('');
-  }catch{document.getElementById('news-loading').style.display='none';}
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// HOME
-// ═══════════════════════════════════════════════════════════════════
-function initHome(){
-  const pf=ls.get('ms_profile',{});
-  const name=pf.name||'Débora';
-  document.getElementById('greeting').innerHTML=`Olá, <em>${name}</em>.`;
-  document.getElementById('today-caption').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-  // Diag progress
-  const total=Object.keys(QUESTIONS).length;
-  const done=Object.keys(diagAnswers).length;
-  document.getElementById('m-diag').textContent = diagDone ? '100%' : `${Math.round(done/total*100)}%`;
-
-  // Next action
-  if(diagDone){
-    const paths=scorePathsClient(diagAnswers);
-    const top=paths[0];
-    const box=document.getElementById('next-action-box');
-    box.style.display='block';
-    document.getElementById('next-action-text').textContent=`Aprofunde sua estratégia como ${top.name}`;
-    document.getElementById('next-action-ctx').textContent=`Score ${top.score}/100 · ${top.time_to_revenue} para primeira receita`;
-  } else if(done===0){
-    const box=document.getElementById('next-action-box');
-    box.style.display='block';
-    document.getElementById('next-action-text').textContent='Comece pelo Diagnóstico Adaptativo';
-    document.getElementById('next-action-ctx').textContent='5 etapas · ~10 minutos · Salvo automaticamente';
-  }
-
-  // Journey
-  const journey=[
-    {n:'01',title:'Diagnóstico',desc:'Investigar perfil e competências',done:diagDone},
-    {n:'02',title:'Estratégia',desc:'Definir caminho e posicionamento',done:false},
-    {n:'03',title:'Primeiros Clientes',desc:'Carteira sólida e renda previsível',done:false},
-    {n:'04',title:'Produto Digital',desc:'Cartilha, curso ou conteúdo próprio',done:false},
-    {n:'05',title:'Escala',desc:'Receita recorrente e crescimento',done:false},
-  ];
-  document.getElementById('journey-list').innerHTML=journey.map((j,i)=>`
-    <div style="display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--sep-2);cursor:pointer" onclick="nav(i===0?'diagnostico':i===1?'estrategia':'projetos')">
-      <div style="font-family:var(--font-mono);font-size:13px;color:${j.done?'var(--accent)':'var(--text-3)'};flex-shrink:0;width:20px;padding-top:2px">${j.done?'✓':j.n}</div>
-      <div><div style="font-weight:600;font-size:14px;color:${j.done?'var(--green)':'var(--text)'}">${j.title}</div>
-        <div style="font-size:13px;color:var(--text-3)">${j.desc}</div></div>
-    </div>`).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// HOME METRICS UPDATE
-// ═══════════════════════════════════════════════════════════════════
-function updateHomeMetrics(){
-  initHome();
-  renderProjects();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════════════════════════
+// ── EXPORT / IMPORT ──────────────────────────────────────────────
 async function exportData(){
-  let data;
-  if(serverOnline){
-    data=await apiGet('/api/export');
-  } else {
-    data={exported_at:new Date().toISOString(),
-      profile:ls.get('ms_profile',{}),
-      diagnostic:{answers:diagAnswers,done:diagDone},
-      finances:ls.get('ms_finances',{}),
-      projects:ls.get('ms_custom_projects',[]),
-      decisions:ls.get('ms_decisions',[])};
-  }
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='meustudio-backup.json';a.click();
-  URL.revokeObjectURL(url);
-  toast('✓ Exportado');
+  try{
+    const data=await api('/api/export');
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`meustudio-export-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  }catch(e){ alert('Erro ao exportar.'); }
+}
+async function importData(evt){
+  const file=evt.target.files[0]; if(!file) return;
+  const text=await file.text();
+  try{
+    const data=JSON.parse(text);
+    await api('/api/import',{method:'POST',body:JSON.stringify(data)});
+    alert('✓ Dados importados com sucesso!');
+    window.location.reload();
+  }catch(e){ alert('Erro ao importar: '+e.message); }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════
-diagHistory = ls.get('ms_diag_history', ['a1']);
-if(!diagHistory.length) diagHistory = ['a1'];
-currentQ = diagHistory[diagHistory.length-1] || 'a1';
+// ── SERVER STATUS ────────────────────────────────────────────────
+async function checkStatus(){
+  try{
+    await api('/api/status');
+    document.getElementById('srv-dot').className='ok';
+    document.getElementById('srv-label').textContent='online';
+  }catch(e){
+    document.getElementById('srv-dot').className='err';
+    document.getElementById('srv-label').textContent='offline';
+  }
+}
 
-(function init(){
-  loadFinances();
-  loadStrategy();
-  loadIdentidade();
-  initDiag();
-  initHome();
-  renderProjects();
-})();
+// ── INIT ─────────────────────────────────────────────────────────
+async function init(){
+  // Handle gcal callback params
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('gcal_connected')) alert('✓ Google Calendar conectado!');
+  if(params.get('gcal_error')) alert('Erro ao conectar Calendar: '+params.get('gcal_error'));
+
+  await checkStatus();
+  setInterval(checkStatus, 30000);
+
+  // Load diagnostic
+  try{
+    const data=await api('/api/diagnostic');
+    diagAnswers=data.answers||{};
+  }catch(e){}
+
+  // Determine current diagnostic position
+  if(Object.keys(diagAnswers).length>=Object.keys(QUESTIONS).length){
+    document.getElementById('diag-ui').style.display='none';
+    document.getElementById('diag-complete').style.display='block';
+  } else {
+    // Find first unanswered question
+    let q='a1';
+    while(q && diagAnswers[q]){
+      diagHistory.push(q);
+      q=resolveNext(q);
+    }
+    diagCurrentQ=q||'a1';
+    if(!q){ document.getElementById('diag-ui').style.display='none'; document.getElementById('diag-complete').style.display='block'; }
+    else renderDiagQuestion();
+  }
+
+  // Load profile greeting
+  try{
+    const prof=await api('/api/profile');
+    const hour=new Date().getHours();
+    const greeting=hour<12?'Bom dia':'hour'<18?'Boa tarde':'Boa noite';
+    document.getElementById('home-greeting').textContent=`${greeting}${prof.name?', '+prof.name:''}.`;
+  }catch(e){ document.getElementById('home-greeting').textContent='Bem-vinda.'; }
+
+  // Load data
+  await Promise.all([loadProjects(), loadEvents(), loadFinances()]);
+  await updateHomeMetrics();
+  loadChecklist();
+}
+
+init();
 </script>
-</body>
-</html>
