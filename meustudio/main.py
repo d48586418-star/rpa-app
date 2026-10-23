@@ -34,6 +34,12 @@ try:
 except ImportError:
     HAS_PYTRENDS = False
 
+try:
+    import google.generativeai as genai
+    HAS_GEMINI = True
+except ImportError:
+    HAS_GEMINI = False
+
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("meustudio")
 
@@ -116,6 +122,13 @@ def init_db():
             service TEXT PRIMARY KEY,
             token_data TEXT NOT NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS ai_conversations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         INSERT OR IGNORE INTO profile (id, data) VALUES (1, '{}');
         INSERT OR IGNORE INTO financial_data (id, data) VALUES (1, '{}');
@@ -910,6 +923,128 @@ async def gcal_disconnect():
     return {"ok": True}
 
 
+# ── GEMINI AI ─────────────────────────────────────────────────────
+def build_ai_context(c) -> str:
+    """Build a context string from the user's real DB data."""
+    parts = []
+
+    # Profile
+    row = c.execute("SELECT data FROM profile WHERE id=1").fetchone()
+    if row:
+        p = json.loads(row[0] or "{}")
+        if p:
+            parts.append("PERFIL DA UTILIZADORA:")
+            if p.get("name"): parts.append(f"- Nome: {p['name']}")
+            if p.get("goal"): parts.append(f"- Objectivo principal: {p['goal']}")
+            if p.get("area"): parts.append(f"- Área: {p['area']}")
+            if p.get("current_income"): parts.append(f"- Rendimento actual: R$ {p['current_income']}")
+            if p.get("target_income"): parts.append(f"- Meta de rendimento: R$ {p['target_income']}")
+
+    # Diagnostic answers
+    diag = c.execute("SELECT question_id, label FROM diagnostic").fetchall()
+    if diag:
+        parts.append("\nRESPOSTAS DO DIAGNÓSTICO:")
+        for qid, label in diag:
+            if label:
+                parts.append(f"- {qid}: {label}")
+
+    # Projects
+    projects = c.execute("SELECT data FROM projects ORDER BY created_at DESC LIMIT 10").fetchall()
+    if projects:
+        parts.append("\nPROJECTOS:")
+        for (pdata,) in projects:
+            p = json.loads(pdata or "{}")
+            status = p.get("status", "")
+            parts.append(f"- {p.get('name','?')} ({status}): {p.get('description','')[:80]}")
+
+    # Financial
+    row = c.execute("SELECT data FROM financial_data WHERE id=1").fetchone()
+    if row:
+        f = json.loads(row[0] or "{}")
+        if f.get("price_per_project"):
+            parts.append(f"\nFINANCEIRO: preço por projecto R$ {f.get('price_per_project')}, "
+                         f"horas/mês {f.get('hours_per_month')}, custos fixos R$ {f.get('fixed_costs',0)}")
+
+    return "\n".join(parts) if parts else "Ainda sem dados registados — peça à utilizadora para preencher o perfil e o diagnóstico."
+
+
+GEMINI_SYSTEM = """Você é a assistente estratégica pessoal de Débora Augusta, uma profissional brasileira de edição de vídeo e audiovisual.
+Você conhece os dados reais de Débora (perfil, diagnóstico, projectos, finanças) e usa-os para dar conselhos específicos e accionáveis.
+Responda sempre em português brasileiro. Seja directa, prática e estratégica.
+Não seja genérica — use os dados reais da Débora para personalizar cada resposta.
+Se ela perguntar sobre projectos, diga quais são os projectos dela. Se perguntar sobre estratégia, use as respostas do diagnóstico dela.
+Contexto actual dos dados de Débora:
+
+{context}"""
+
+
+@app.post("/api/ai/chat")
+async def ai_chat(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail="google-generativeai não instalado")
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="GEMINI_API_KEY não configurada")
+
+    body = await request.json()
+    message = body.get("message", "").strip()
+    session_id = body.get("session_id", "default")
+    if not message:
+        raise HTTPException(status_code=400, detail="Mensagem vazia")
+
+    with db() as c:
+        context = build_ai_context(c)
+        history = c.execute(
+            "SELECT role, content FROM ai_conversations WHERE session_id=? ORDER BY id DESC LIMIT 20",
+            (session_id,)
+        ).fetchall()
+        history = list(reversed(history))
+
+        # Save user message
+        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
+                  (session_id, "user", message))
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction=GEMINI_SYSTEM.format(context=context)
+        )
+        chat_history = [
+            {"role": role, "parts": [content]}
+            for role, content in history
+        ]
+        chat = model.start_chat(history=chat_history)
+        response = chat.send_message(message)
+        reply = response.text
+    except Exception as e:
+        log.error(f"Gemini error: {e}")
+        raise HTTPException(status_code=502, detail=f"Erro na IA: {str(e)}")
+
+    with db() as c:
+        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
+                  (session_id, "model", reply))
+
+    return {"reply": reply, "session_id": session_id}
+
+
+@app.get("/api/ai/conversations/{session_id}")
+async def get_ai_conversation(session_id: str):
+    with db() as c:
+        rows = c.execute(
+            "SELECT role, content, created_at FROM ai_conversations WHERE session_id=? ORDER BY id",
+            (session_id,)
+        ).fetchall()
+        return [{"role": r[0], "content": r[1], "created_at": r[2]} for r in rows]
+
+
+@app.delete("/api/ai/conversations/{session_id}")
+async def delete_ai_conversation(session_id: str):
+    with db() as c:
+        c.execute("DELETE FROM ai_conversations WHERE session_id=?", (session_id,))
+    return {"ok": True}
+
+
 # ── STATUS ────────────────────────────────────────────────────────
 @app.get("/api/status")
 async def status():
@@ -921,6 +1056,7 @@ async def status():
         "youtube_api": bool(os.environ.get("YOUTUBE_API_KEY")),
         "google_search_api": bool(os.environ.get("GOOGLE_CSE_KEY")),
         "google_calendar": bool(os.environ.get("GOOGLE_CLIENT_ID")),
+        "gemini": HAS_GEMINI and bool(os.environ.get("GEMINI_API_KEY")),
     }
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

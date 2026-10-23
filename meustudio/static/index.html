@@ -170,6 +170,14 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   .home-grid{grid-template-columns:1fr;}
   .card-grid{grid-template-columns:1fr;}
 }
+
+/* CHAT */
+.chat-msg{display:flex;max-width:80%;}
+.chat-msg-user{align-self:flex-end;flex-direction:row-reverse;}
+.chat-msg-ai{align-self:flex-start;}
+.chat-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap;}
+.chat-msg-user .chat-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.chat-msg-ai .chat-bubble{background:var(--surface-2);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--sep);}
 </style>
 
 <!-- SIDEBAR -->
@@ -187,6 +195,9 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   </div>
   <div class="nav-item" data-target="s-estrategia" onclick="nav(this)">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Estratégia
+  </div>
+  <div class="nav-item" data-target="s-assistente" onclick="nav(this)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a6 6 0 016 6c0 2.5-1.5 4.6-3.7 5.5L10 14H6l-.3-1.5C3.5 11.6 2 9.5 2 7a6 6 0 016-6z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>Assistente IA
   </div>
   <div class="nav-item" data-target="s-pesquisa" onclick="nav(this)">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Pesquisa
@@ -313,6 +324,27 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     <div id="estrategia-paths"></div>
     <div style="margin-top:16px;display:flex;gap:8px;">
       <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()">↻ Recalcular</button>
+    </div>
+  </section>
+
+  <!-- ═══ ASSISTENTE IA ══════════════════════════════════════════ -->
+  <section id="s-assistente" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <h1 class="page-title">Assistente IA</h1>
+      <button class="btn btn-ghost btn-sm" onclick="newChatSession()">+ Nova conversa</button>
+    </div>
+    <p class="page-sub">Converse com a IA sobre a sua carreira — ela conhece o seu perfil, projectos e diagnóstico.</p>
+    <div style="display:flex;flex-direction:column;height:calc(100vh - 220px);background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div id="chat-messages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;">
+        <div class="chat-msg chat-msg-ai">
+          <div class="chat-bubble">Olá! Sou a tua assistente estratégica. Conheço o teu perfil, projectos e diagnóstico. Como posso ajudar?</div>
+        </div>
+      </div>
+      <div id="chat-loading" style="display:none;padding:8px 20px;font-size:12px;color:var(--text-3);">A pensar…</div>
+      <div style="padding:12px 16px;border-top:1px solid var(--sep);display:flex;gap:8px;">
+        <input type="text" id="chat-input" placeholder="Escreve a tua mensagem…" style="flex:1;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+        <button class="btn btn-primary" onclick="sendChatMessage()">Enviar</button>
+      </div>
     </div>
   </section>
 
@@ -1429,6 +1461,53 @@ async function checkStatus(){
     document.getElementById('srv-dot').className='err';
     document.getElementById('srv-label').textContent='offline';
   }
+}
+
+// ── ASSISTENTE IA ─────────────────────────────────────────────────
+let chatSessionId = null;
+
+function getChatSessionId(){
+  if(!chatSessionId){
+    try{ chatSessionId=sessionStorage.getItem('ms_chat_session'); }catch(e){}
+    if(!chatSessionId){ chatSessionId=crypto.randomUUID(); try{ sessionStorage.setItem('ms_chat_session',chatSessionId); }catch(e){} }
+  }
+  return chatSessionId;
+}
+
+function appendChatMsg(role, content){
+  const container=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className='chat-msg '+(role==='user'?'chat-msg-user':'chat-msg-ai');
+  const bubble=document.createElement('div');
+  bubble.className='chat-bubble';
+  bubble.textContent=content;
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+}
+
+async function sendChatMessage(){
+  const input=document.getElementById('chat-input');
+  const message=input.value.trim();
+  if(!message) return;
+  input.value='';
+  appendChatMsg('user',message);
+  document.getElementById('chat-loading').style.display='block';
+  try{
+    const data=await api('/api/ai/chat',{method:'POST',body:JSON.stringify({message,session_id:getChatSessionId()})});
+    appendChatMsg('model',data.reply);
+  }catch(e){
+    appendChatMsg('model','Erro ao contactar a IA. Verifica se o servidor está a correr e a chave Gemini está configurada.');
+  }
+  document.getElementById('chat-loading').style.display='none';
+}
+
+function newChatSession(){
+  chatSessionId=crypto.randomUUID();
+  try{ sessionStorage.setItem('ms_chat_session',chatSessionId); }catch(e){}
+  const container=document.getElementById('chat-messages');
+  container.innerHTML='';
+  appendChatMsg('model','Nova conversa iniciada. Como posso ajudar?');
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
