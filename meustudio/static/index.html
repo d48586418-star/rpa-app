@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --blue:#007AFF; --green:#34C759; --orange:#FF9500; --purple:#5856D6;
+  --red:#FF3B30; --pink:#FF2D55; --teal:#32ADE6;
+  --bg:#F2F2F7; --bg-card:#fff; --bg-card2:#F2F2F7;
+  --text:#000; --text2:#3C3C43; --text3:#8E8E93;
+  --sep:#C6C6C8; --sep2:#E5E5EA;
+  --sidebar-w:232px;
+  --radius-sm:10px; --radius-md:14px; --radius-lg:20px;
+  --shadow:0 2px 16px rgba(0,0,0,.08);
+  --easing:cubic-bezier(.25,.46,.45,.94);
+}
+[data-theme="dark"],:root:not([data-theme="light"]) {
+  --bg:#000; --bg-card:#1C1C1E; --bg-card2:#2C2C2E;
+  --text:#fff; --text2:#EBEBF5; --text3:#8E8E93;
+  --sep:#38383A; --sep2:#2C2C2E;
+  --shadow:0 2px 16px rgba(0,0,0,.4);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000; --bg-card:#1C1C1E; --bg-card2:#2C2C2E;
+  --text:#fff; --text2:#EBEBF5; --text3:#8E8E93;
+  --sep:#38383A; --sep2:#2C2C2E;
+  --shadow:0 2px 16px rgba(0,0,0,.4);
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+/* Layout */
+#app{display:flex;min-height:100vh;}
+#sidebar{width:var(--sidebar-w);background:var(--bg-card);border-right:1px solid var(--sep2);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+#content{margin-left:var(--sidebar-w);flex:1;min-height:100vh;padding:0;}
+.page{display:none;padding:32px 28px;max-width:900px;}
+.page.active{display:block;}
+/* Sidebar */
+.sidebar-brand{padding:24px 16px 8px;font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--blue);}
+.sidebar-brand span{color:var(--text3);font-weight:400;font-size:13px;display:block;margin-top:2px;}
+.sidebar-status{display:flex;align-items:center;gap:6px;padding:6px 16px 16px;font-size:12px;color:var(--text3);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);}
+.status-dot.online{background:var(--green);}
+.status-dot.offline{background:var(--red);}
+nav{flex:1;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:var(--radius-sm);margin:1px 8px;transition:background .15s,color .15s;}
+.nav-item:hover{background:var(--bg-card2);}
+.nav-item.active{background:var(--blue);color:#fff;}
+.nav-item .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{padding:16px;border-top:1px solid var(--sep2);}
+.theme-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text3);padding:8px;border-radius:var(--radius-sm);}
+.theme-toggle:hover{background:var(--bg-card2);}
+/* Cards */
+.card{background:var(--bg-card);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.card h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.card p{font-size:14px;color:var(--text2);line-height:1.5;}
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+.stat-card{background:var(--bg-card);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow);}
+.stat-num{font-size:28px;font-weight:800;line-height:1;}
+.stat-label{font-size:12px;color:var(--text3);margin-top:4px;}
+/* Form elements */
+input[type=text],input[type=number],textarea,select{
+  width:100%;padding:12px 14px;border:1.5px solid var(--sep2);border-radius:var(--radius-sm);
+  background:var(--bg-card2);color:var(--text);font-family:inherit;font-size:14px;
+  transition:border .2s;outline:none;resize:vertical;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);}
+label{font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;}
+.form-group{margin-bottom:16px;}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--sep2);color:var(--text);}
+.btn-sm{padding:6px 12px;font-size:13px;}
+.btn:hover{opacity:.88;}
+/* Progress bar */
+.progress-wrap{background:var(--sep2);border-radius:99px;height:8px;overflow:hidden;margin:8px 0;}
+.progress-bar{height:100%;border-radius:99px;transition:width .8s var(--easing);}
+/* Tags / chips */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:13px;font-weight:500;background:var(--bg-card2);color:var(--text2);cursor:pointer;border:1.5px solid var(--sep2);}
+.chip.blue{background:rgba(0,122,255,.12);color:var(--blue);border-color:transparent;}
+.chip.active{background:var(--blue);color:#fff;border-color:transparent;}
+/* Section header */
+.section-header{margin-bottom:24px;}
+.section-header h1{font-size:26px;font-weight:800;}
+.section-header p{color:var(--text3);font-size:14px;margin-top:4px;}
+/* Loading */
+.loading{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:14px;padding:20px 0;}
+.spinner{width:18px;height:18px;border:2px solid var(--sep2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Alert */
+.alert{padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;margin-bottom:16px;}
+.alert-blue{background:rgba(0,122,255,.1);color:var(--blue);border:1px solid rgba(0,122,255,.2);}
+.alert-red{background:rgba(255,59,48,.1);color:var(--red);border:1px solid rgba(255,59,48,.2);}
+.alert-green{background:rgba(52,199,89,.1);color:var(--green);border:1px solid rgba(52,199,89,.2);}
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.timeline-item{display:flex;gap:16px;padding-bottom:20px;position:relative;}
+.timeline-item:last-child{padding-bottom:0;}
+.timeline-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;z-index:1;}
+.timeline-line{position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--sep2);}
+.timeline-item:last-child .timeline-line{display:none;}
+.timeline-content h4{font-size:14px;font-weight:700;margin-bottom:2px;}
+.timeline-content p{font-size:13px;color:var(--text3);}
+/* Quick actions */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
+.qa-btn{background:var(--bg-card);border-radius:var(--radius-md);padding:14px 10px;text-align:center;cursor:pointer;border:none;transition:background .15s;box-shadow:var(--shadow);}
+.qa-btn:hover{background:var(--bg-card2);}
+.qa-btn .qa-icon{font-size:22px;margin-bottom:4px;}
+.qa-btn span{font-size:12px;font-weight:600;color:var(--text2);display:block;}
+/* Chart container */
+.chart-wrap{position:relative;height:220px;margin-top:12px;}
+/* News feed */
+.news-item{padding:14px 0;border-bottom:1px solid var(--sep2);}
+.news-item:last-child{border-bottom:none;}
+.news-source{font-size:12px;font-weight:600;color:var(--blue);}
+.news-title{font-size:14px;font-weight:600;margin:4px 0;color:var(--text);}
+.news-title a{color:inherit;text-decoration:none;}
+.news-title a:hover{color:var(--blue);}
+.news-summary{font-size:13px;color:var(--text3);line-height:1.5;}
+.news-date{font-size:11px;color:var(--text3);margin-top:4px;}
+/* Quiz */
+#quiz-container .q-header{margin-bottom:24px;}
+#quiz-container .q-step{font-size:13px;color:var(--text3);margin-bottom:8px;}
+#quiz-container .q-text{font-size:18px;font-weight:700;line-height:1.4;}
+.q-options{display:flex;flex-direction:column;gap:10px;margin:20px 0;}
+.q-option{padding:14px 16px;border-radius:var(--radius-md);border:2px solid var(--sep2);cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;background:var(--bg-card);}
+.q-option:hover{border-color:var(--blue);}
+.q-option.selected{border-color:var(--blue);background:rgba(0,122,255,.08);color:var(--blue);}
+.q-nav{display:flex;gap:10px;justify-content:space-between;}
+/* Result bars */
+.result-bar-wrap{margin-bottom:14px;}
+.result-bar-label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;}
+/* Projeto card */
+.proj-card{background:var(--bg-card);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow);margin-bottom:12px;}
+.proj-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.proj-title{font-size:16px;font-weight:700;}
+.proj-badge{padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;}
+.proj-desc{font-size:13px;color:var(--text3);margin-bottom:10px;line-height:1.5;}
+.proj-next{font-size:12px;color:var(--text2);font-style:italic;}
+/* Checklist */
+.check-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep2);cursor:pointer;}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.check-box.done{background:var(--green);border-color:var(--green);color:#fff;}
+.check-label{font-size:14px;flex:1;}
+.check-label.done{text-decoration:line-through;color:var(--text3);}
+/* Color swatches */
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;}
+.swatch{width:36px;height:36px;border-radius:var(--radius-sm);cursor:pointer;border:3px solid transparent;transition:transform .15s,border-color .15s;}
+.swatch:hover{transform:scale(1.1);}
+.swatch.selected{border-color:var(--text);}
+/* Brand preview */
+#brand-preview{border-radius:var(--radius-md);padding:28px 24px;margin-top:16px;transition:background .3s;}
+#brand-preview .bp-name{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px;text-transform:uppercase;}
+#brand-preview .bp-tag{font-size:14px;color:rgba(255,255,255,.75);margin-top:6px;}
+/* Finance */
+.fin-source{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--sep2);}
+.fin-source:last-child{border-bottom:none;}
+.fin-source label{flex:1;font-size:14px;margin:0;}
+.fin-source input{width:140px;flex-shrink:0;}
+.fin-total{font-size:28px;font-weight:800;margin:8px 0;}
+/* Trends chips */
+.trend-chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+/* Two-col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+/* Tags input */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border:1.5px solid var(--sep2);border-radius:var(--radius-sm);background:var(--bg-card2);min-height:48px;cursor:text;}
+.tag-item{display:inline-flex;align-items:center;gap:4px;background:rgba(0,122,255,.12);color:var(--blue);padding:3px 8px;border-radius:99px;font-size:13px;font-weight:500;}
+.tag-item .tag-x{cursor:pointer;opacity:.6;}
+.tag-item .tag-x:hover{opacity:1;}
+.tags-input{border:none;background:transparent;outline:none;font-family:inherit;font-size:14px;color:var(--text);min-width:100px;flex:1;}
+.tag-sugs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+/* Pilares */
+.pilares{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.pilar-card{background:var(--bg-card);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow);text-align:center;}
+.pilar-icon{font-size:28px;margin-bottom:8px;}
+.pilar-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+/* Ideias list */
+.ideia-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--sep2);}
+.ideia-item:last-child{border-bottom:none;}
+.ideia-num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ideia-text{flex:1;font-size:14px;}
+.ideia-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;}
+/* Mobile bottom nav */
+#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--sep2);z-index:200;padding:0 0 env(safe-area-inset-bottom,0);}
+.bnav-items{display:flex;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 6px;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;gap:2px;transition:color .15s;}
+.bnav-item.active,.bnav-item:hover{color:var(--blue);}
+.bnav-icon{font-size:20px;}
+/* Responsive */
+@media(max-width:768px){
+  #sidebar{display:none;}
+  #content{margin-left:0;padding-bottom:100px;}
+  #bottom-nav{display:block;}
+  .page{padding:20px 16px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .quick-actions{grid-template-columns:repeat(2,1fr);}
+  .two-col{grid-template-columns:1fr;}
+  .pilares{grid-template-columns:1fr;}
+}
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:1fr;}
+}
+/* Divider */
+hr{border:none;border-top:1px solid var(--sep2);margin:20px 0;}
+/* Welcome card */
+#welcome-card{background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:var(--radius-lg);padding:24px;color:#fff;margin-bottom:16px;}
+#welcome-card h2{font-size:20px;font-weight:800;margin-bottom:8px;}
+#welcome-card p{opacity:.85;font-size:14px;margin-bottom:16px;}
+#welcome-card input{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--radius-sm);padding:10px 14px;font-family:inherit;font-size:14px;width:100%;outline:none;}
+#welcome-card input::placeholder{color:rgba(255,255,255,.6);}
+#welcome-card .btn{background:#fff;color:var(--blue);margin-top:10px;}
+/* Related queries */
+.rel-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sep2);}
+.rel-item:last-child{border-bottom:none;}
+.rel-val{font-size:12px;color:var(--text3);flex-shrink:0;}
+.rel-bar{flex:1;height:4px;background:var(--sep2);border-radius:99px;}
+.rel-bar-fill{height:100%;border-radius:99px;background:var(--blue);}
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:8px 10px;color:var(--text3);font-weight:600;border-bottom:2px solid var(--sep2);}
+td{padding:10px 10px;border-bottom:1px solid var(--sep2);}
+tr:last-child td{border-bottom:none;}
+/* Scroll */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--sep2);border-radius:99px;}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-brand">🎬 Meu Studio<span>Gestão Pessoal</span></div>
+  <div class="sidebar-status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">verificando...</span>
+  </div>
+  <nav>
+    <div class="nav-item active" data-page="home"><span class="icon">🏠</span> Início</div>
+    <div class="nav-item" data-page="tendencias"><span class="icon">📊</span> Tendências</div>
+    <div class="nav-item" data-page="quiz"><span class="icon">🧭</span> Descoberta</div>
+    <div class="nav-item" data-page="persona"><span class="icon">🎯</span> Persona</div>
+    <div class="nav-item" data-page="projetos"><span class="icon">📁</span> Projetos</div>
+    <div class="nav-item" data-page="youtube"><span class="icon">📺</span> YouTube</div>
+    <div class="nav-item" data-page="estrategia"><span class="icon">🗺️</span> Estratégia</div>
+    <div class="nav-item" data-page="identidade"><span class="icon">🎨</span> Identidade</div>
+    <div class="nav-item" data-page="financas"><span class="icon">💰</span> Finanças</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-label">Modo escuro</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav id="bottom-nav">
+  <div class="bnav-items">
+    <div class="bnav-item active" data-page="home"><div class="bnav-icon">🏠</div>Início</div>
+    <div class="bnav-item" data-page="tendencias"><div class="bnav-icon">📊</div>Trends</div>
+    <div class="bnav-item" data-page="projetos"><div class="bnav-icon">📁</div>Projetos</div>
+    <div class="bnav-item" data-page="youtube"><div class="bnav-icon">📺</div>YouTube</div>
+    <div class="bnav-item" data-page="financas"><div class="bnav-icon">💰</div>Finanças</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="content">
+
+<!-- ── HOME ─────────────────────────────────────────────── -->
+<section id="page-home" class="page active">
+  <div id="welcome-card" style="display:none">
+    <h2>Bem-vinda ao Meu Studio! 👋</h2>
+    <p>Seu painel pessoal de gestão criativa. Como posso te chamar?</p>
+    <input type="text" id="name-input" placeholder="Digite seu nome..." maxlength="40">
+    <button class="btn" onclick="saveName()">Começar →</button>
+  </div>
+  <div class="section-header" id="home-header">
+    <h1 id="home-greeting">Carregando...</h1>
+    <p>Seu studio criativo em um só lugar.</p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" style="color:var(--blue)" id="stat-proj">3</div><div class="stat-label">Projetos Ativos</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)" id="stat-meta">—</div><div class="stat-label">Meta Mensal</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--purple)" id="stat-dias">0</div><div class="stat-label">Dias de Inglês</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)" id="stat-trend">—</div><div class="stat-label">Mercado</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Foco do Dia</div>
+    <textarea id="foco-input" rows="3" placeholder="O que você vai focar hoje?"></textarea>
+    <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="saveFoco()">Salvar</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Jornada — Onde você está?</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:rgba(0,122,255,.15);color:var(--blue)">1</div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content"><h4>Descoberta</h4><p>Entender seus talentos e definir o caminho</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:rgba(88,86,214,.15);color:var(--purple)">2</div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content"><h4>Identidade</h4><p>Construir persona, voz e presença digital</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:rgba(52,199,89,.15);color:var(--green)">3</div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content"><h4>Ativar o que tem</h4><p>Lançar cartilha, simulador e primeiros produtos</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:rgba(255,149,0,.15);color:var(--orange)">4</div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content"><h4>Receita</h4><p>Monetizar conteúdo e diversificar fontes</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:rgba(255,45,85,.15);color:var(--pink)">5</div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content"><h4>Escalar</h4><p>Automatizar, contratar e crescer o negócio</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Acesso Rápido</div>
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="navigate('tendencias')"><div class="qa-icon">📊</div><span>Tendências</span></button>
+      <button class="qa-btn" onclick="navigate('projetos')"><div class="qa-icon">📁</div><span>Projetos</span></button>
+      <button class="qa-btn" onclick="navigate('quiz')"><div class="qa-icon">🧭</div><span>Descoberta</span></button>
+      <button class="qa-btn" onclick="navigate('financas')"><div class="qa-icon">💰</div><span>Finanças</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ── TENDÊNCIAS ────────────────────────────────────────── -->
+<section id="page-tendencias" class="page">
+  <div class="section-header">
+    <h1>📊 Tendências de Mercado</h1>
+    <p>Dados reais do Google Trends para o mercado audiovisual</p>
+  </div>
+  <div id="offline-alert" class="alert alert-red" style="display:none">
+    ⚠️ Servidor offline. Rode <code>python main.py</code> na pasta <code>meustudio/</code> para ativar os dados reais.
+  </div>
+  <div class="card">
+    <div class="card-title">Pesquisar Tendências</div>
+    <div style="display:flex;gap:10px">
+      <input type="text" id="kw-input" value="edição de vídeo,DaVinci Resolve,Adobe Premiere" style="flex:1">
+      <button class="btn btn-primary" onclick="loadTrends()">🔍 Pesquisar</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 Em Alta Agora no Brasil</div>
+    <div id="hoje-loading" class="loading"><div class="spinner"></div> Carregando...</div>
+    <div id="hoje-chips" class="trend-chips"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Google Trends — Últimas 12 Semanas (Brasil)</div>
+    <div id="trends-loading" class="loading"><div class="spinner"></div> Carregando dados...</div>
+    <div id="trends-error" class="alert alert-red" style="display:none"></div>
+    <div class="chart-wrap"><canvas id="chart-trends"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">YouTube Trends — Buscas no YouTube</div>
+    <div id="yt-loading" class="loading"><div class="spinner"></div> Carregando dados YouTube...</div>
+    <div class="chart-wrap"><canvas id="chart-yt"></canvas></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">📈 Em Alta</div>
+      <div id="rel-top-loading" class="loading"><div class="spinner"></div></div>
+      <div id="rel-top"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚀 Crescendo Rápido</div>
+      <div id="rel-loading" class="loading"><div class="spinner"></div></div>
+      <div id="rel-rising"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📰 Notícias do Setor</div>
+    <div id="news-loading" class="loading"><div class="spinner"></div> Buscando notícias...</div>
+    <div id="news-feed"></div>
+  </div>
+</section>
+
+<!-- ── QUIZ ──────────────────────────────────────────────── -->
+<section id="page-quiz" class="page">
+  <div class="section-header">
+    <h1>🧭 Descoberta Vocacional</h1>
+    <p>Descubra qual caminho se alinha ao seu perfil</p>
+  </div>
+  <div id="quiz-container" class="card">
+    <div class="q-header">
+      <div class="q-step" id="q-step">Pergunta 1 de 8</div>
+      <div class="progress-wrap"><div class="progress-bar" id="q-progress" style="background:var(--blue);width:12.5%"></div></div>
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div class="q-options" id="q-options"></div>
+    <div class="q-nav">
+      <button class="btn btn-outline" id="q-back" onclick="quizBack()" disabled>← Voltar</button>
+      <button class="btn btn-primary" id="q-next" onclick="quizNext()" disabled>Próxima →</button>
+    </div>
+  </div>
+  <div id="quiz-result" class="card" style="display:none">
+    <div id="result-profile"></div>
+    <hr>
+    <div class="card-title" style="margin-top:16px">Distribuição dos Perfis</div>
+    <div id="result-bars"></div>
+    <hr>
+    <div class="card-title" style="margin-top:16px">Próximos Passos</div>
+    <div id="result-actions"></div>
+    <button class="btn btn-outline btn-sm" style="margin-top:16px" onclick="resetQuiz()">↺ Refazer Quiz</button>
+  </div>
+</section>
+
+<!-- ── PERSONA ───────────────────────────────────────────── -->
+<section id="page-persona" class="page">
+  <div class="section-header">
+    <h1>🎯 Sua Persona</h1>
+    <p>Defina quem você é e quem você serve</p>
+  </div>
+  <div class="card">
+    <div class="form-group">
+      <label>Quem você é (em 1 frase)</label>
+      <input type="text" id="per-quem" placeholder="Ex: Editora de vídeo que ensina a linguagem audiovisual...">
+    </div>
+    <div class="form-group">
+      <label>Nicho Principal</label>
+      <select id="per-nicho">
+        <option value="">Selecione...</option>
+        <option value="edu">Educação em Edição de Vídeo</option>
+        <option value="cri">Conteúdo para Criadores Independentes</option>
+        <option value="com">Cinema Comunitário &amp; Projetos Sociais</option>
+        <option value="fre">Freelancer de Edição Audiovisual</option>
+        <option value="cur">Cursos e Produtos Digitais</option>
+        <option value="out">Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Proposta de Valor Única</label>
+      <textarea id="per-pvl" rows="3" placeholder="O que te torna único(a) e insubstituível para o seu público?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Público-alvo</label>
+      <input type="text" id="per-pub" placeholder="Ex: Iniciantes em edição de vídeo entre 18 e 35 anos...">
+    </div>
+    <div class="form-group">
+      <label>Dores que você resolve</label>
+      <textarea id="per-dores" rows="3" placeholder="Quais problemas reais seu público enfrenta?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Transformação que você promove</label>
+      <textarea id="per-sonhos" rows="3" placeholder="Como a vida do seu público muda depois de trabalhar com você?"></textarea>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Tom de Voz — Tags</div>
+    <div class="tags-wrap" id="tom-wrap" onclick="document.getElementById('tom-input').focus()">
+      <input type="text" id="tom-input" class="tags-input" placeholder="Digite e pressione Enter...">
+    </div>
+    <div class="tag-sugs" id="tom-sugs"></div>
+    <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="savePersona()">💾 Salvar Persona</button>
+  </div>
+</section>
+
+<!-- ── PROJETOS ───────────────────────────────────────────── -->
+<section id="page-projetos" class="page">
+  <div class="section-header">
+    <h1>📁 Projetos</h1>
+    <p>Acompanhe seus projetos ativos</p>
+  </div>
+  <div id="proj-list"></div>
+  <div class="card">
+    <div class="card-title">+ Novo Projeto</div>
+    <div class="form-group"><label>Nome</label><input type="text" id="np-nome" placeholder="Nome do projeto"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="np-desc" rows="2" placeholder="Descreva o projeto..."></textarea></div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="np-status">
+        <option value="Planejando">Planejando</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Funcional">Funcional</option>
+        <option value="Ativo">Ativo</option>
+        <option value="Concluído">Concluído</option>
+        <option value="Pausado">Pausado</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Progresso (0–100)</label><input type="number" id="np-prog" min="0" max="100" value="0"></div>
+    <button class="btn btn-primary" onclick="addProject()">Adicionar Projeto</button>
+  </div>
+</section>
+
+<!-- ── YOUTUBE ────────────────────────────────────────────── -->
+<section id="page-youtube" class="page">
+  <div class="section-header">
+    <h1>📺 Canal YouTube</h1>
+    <p>Planeje e estruture seu canal</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Conceito do Canal</div>
+    <div class="form-group"><label>Nome do Canal</label><input type="text" id="yt-n" placeholder="Ex: Franz Edita" oninput="updateBrandPreview()"></div>
+    <div class="form-group"><label>Tagline</label><input type="text" id="yt-tl" placeholder="Ex: Aprenda edição de vídeo do jeito certo" oninput="updateBrandPreview()"></div>
+    <div class="form-group"><label>Para quem é o canal?</label><textarea id="yt-pw" rows="2" placeholder="Descreva seu público ideal..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="card-title">3 Pilares de Conteúdo</div>
+    <div class="pilares">
+      <div class="pilar-card">
+        <div class="pilar-icon">🎓</div>
+        <div class="pilar-title">Ensinar</div>
+        <input type="text" id="yt-p1" placeholder="Ex: Técnicas de edição">
+      </div>
+      <div class="pilar-card">
+        <div class="pilar-icon">🌟</div>
+        <div class="pilar-title">Inspirar</div>
+        <input type="text" id="yt-p2" placeholder="Ex: Histórias de criadores">
+      </div>
+      <div class="pilar-card">
+        <div class="pilar-icon">💬</div>
+        <div class="pilar-title">Conectar</div>
+        <input type="text" id="yt-p3" placeholder="Ex: Comunidade audiovisual">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="saveYT()">💾 Salvar Conceito</button>
+  </div>
+  <div class="card">
+    <div class="card-title">💡 Ideias de Vídeos</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="ideia-input" placeholder="Nova ideia de vídeo...">
+      <button class="btn btn-primary btn-sm" onclick="addIdeia()">+</button>
+    </div>
+    <div id="ideias-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Checklist de Lançamento</div>
+    <div id="yt-checklist"></div>
+  </div>
+</section>
+
+<!-- ── ESTRATÉGIA ────────────────────────────────────────── -->
+<section id="page-estrategia" class="page">
+  <div class="section-header">
+    <h1>🗺️ Estratégia</h1>
+    <p>Defina sua presença e plano de conteúdo</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Canais Ativos</div>
+    <div id="canais-list"></div>
+  </div>
+  <div class="card">
+    <div class="two-col">
+      <div class="form-group">
+        <label>Frequência YouTube</label>
+        <select id="est-fyt">
+          <option value="1xsem">1x por semana</option>
+          <option value="2xsem">2x por semana</option>
+          <option value="quin">Quinzenal</option>
+          <option value="men">Mensal</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Frequência Instagram</label>
+        <select id="est-fig">
+          <option value="dia">Diário</option>
+          <option value="34sem">3–4x por semana</option>
+          <option value="12sem">1–2x por semana</option>
+          <option value="nao">Não prioritário</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Referências que você admira</label><textarea id="est-ref" rows="3" placeholder="Canais, criadores ou marcas de referência..."></textarea></div>
+    <div class="form-group"><label>Seus concorrentes / pares</label><textarea id="est-conc" rows="3" placeholder="Quem mais atua no seu nicho?"></textarea></div>
+    <div class="form-group"><label>Oportunidades que você enxerga</label><textarea id="est-op" rows="3" placeholder="Gaps de mercado, formatos pouco explorados..."></textarea></div>
+    <div class="form-group"><label>Meta de 90 Dias</label><textarea id="est-d90" rows="3" placeholder="O que você quer ter construído em 90 dias?"></textarea></div>
+    <button class="btn btn-primary" onclick="saveEstrategia()">💾 Salvar Estratégia</button>
+  </div>
+</section>
+
+<!-- ── IDENTIDADE ────────────────────────────────────────── -->
+<section id="page-identidade" class="page">
+  <div class="section-header">
+    <h1>🎨 Identidade Visual</h1>
+    <p>Construa a linguagem visual da sua marca</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Paleta de Cores</div>
+    <div class="swatches" id="color-swatches"></div>
+    <div id="color-name" style="font-size:13px;color:var(--text3);margin-top:4px"></div>
+  </div>
+  <div id="brand-preview">
+    <div class="bp-name" id="bp-name">MEU STUDIO</div>
+    <div class="bp-tag" id="bp-tag">Sua tagline aqui</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Palavras-chave da Marca</div>
+    <div class="form-group"><input type="text" id="id-kw1" placeholder="Ex: Acessível"></div>
+    <div class="form-group"><input type="text" id="id-kw2" placeholder="Ex: Técnica"></div>
+    <div class="form-group"><input type="text" id="id-kw3" placeholder="Ex: Inspiradora"></div>
+    <div class="form-group"><label>Notas de Referência Visual</label><textarea id="id-notas" rows="4" placeholder="Referências visuais, mood, estilos que te inspiram..."></textarea></div>
+    <button class="btn btn-primary" onclick="saveIdentidade()">💾 Salvar Identidade</button>
+  </div>
+</section>
+
+<!-- ── FINANÇAS ───────────────────────────────────────────── -->
+<section id="page-financas" class="page">
+  <div class="section-header">
+    <h1>💰 Finanças</h1>
+    <p>Planeje e projete sua receita</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Meta Financeira</div>
+    <div class="two-col">
+      <div class="form-group"><label>Meta Mensal (R$)</label><input type="number" id="fin-meta" placeholder="Ex: 3000" oninput="calcFinancas()"></div>
+      <div class="form-group"><label>Prazo</label>
+        <select id="fin-prazo">
+          <option value="3">3 meses</option>
+          <option value="6" selected>6 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Fontes de Receita — Projeção Mensal</div>
+    <div class="fin-source"><label>📚 Venda da Cartilha (PDF/iBook por R$29–97)</label><input type="number" id="fin-r1" placeholder="R$" oninput="calcFinancas()"></div>
+    <div class="fin-source"><label>🎮 Venda do Simulador</label><input type="number" id="fin-r2" placeholder="R$" oninput="calcFinancas()"></div>
+    <div class="fin-source"><label>✂️ Freela de Edição</label><input type="number" id="fin-r3" placeholder="R$" oninput="calcFinancas()"></div>
+    <div class="fin-source"><label>📺 YouTube AdSense</label><input type="number" id="fin-r4" placeholder="R$" oninput="calcFinancas()"></div>
+    <div class="fin-source"><label>🎓 Mentorias / Aulas</label><input type="number" id="fin-r5" placeholder="R$" oninput="calcFinancas()"></div>
+    <div class="fin-source"><label>🤝 Patrocínio</label><input type="number" id="fin-r6" placeholder="R$" oninput="calcFinancas()"></div>
+    <hr>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:13px;color:var(--text3)">Total Projetado</div>
+        <div class="fin-total" id="fin-total">R$ 0</div>
+      </div>
+      <div id="fin-feedback" style="font-size:14px;font-weight:600;color:var(--green);text-align:right"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="fin-bar" style="background:var(--green);width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Referência de Preços do Mercado</div>
+    <table>
+      <tr><th>Serviço / Produto</th><th>Faixa de Preço</th></tr>
+      <tr><td>Edição freela (vídeo curto)</td><td>R$ 150 – 500</td></tr>
+      <tr><td>Edição freela (vídeo longo)</td><td>R$ 500 – 2.000</td></tr>
+      <tr><td>E-book / PDF educacional</td><td>R$ 29 – 97</td></tr>
+      <tr><td>Mini-curso online</td><td>R$ 97 – 497</td></tr>
+      <tr><td>Curso completo</td><td>R$ 497 – 1.997</td></tr>
+      <tr><td>Mentoria individual (hora)</td><td>R$ 150 – 500</td></tr>
+      <tr><td>Workshop online</td><td>R$ 97 – 297</td></tr>
+      <tr><td>Patrocínio de vídeo</td><td>R$ 500 – 5.000</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="form-group"><label>Notas / Clientes em Perspectiva</label><textarea id="fin-notas" rows="4" placeholder="Anote clientes, parcerias ou oportunidades em aberto..."></textarea></div>
+    <button class="btn btn-primary" onclick="saveFinancas()">💾 Salvar</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────
+const API = 'http://localhost:8000';
+let serverOnline = false;
+let chartTrends = null, chartYT = null;
+let trendsLoaded = false;
+
+const COLORS = [
+  {hex:'#007AFF',name:'Azul Confiança'},
+  {hex:'#5856D6',name:'Roxo Criativo'},
+  {hex:'#FF2D55',name:'Rosa Ousado'},
+  {hex:'#FF9500',name:'Laranja Energia'},
+  {hex:'#34C759',name:'Verde Crescimento'},
+  {hex:'#1C1C1E',name:'Preto Sofisticado'},
+  {hex:'#32ADE6',name:'Teal Moderno'},
+  {hex:'#E91E63',name:'Pink Destaque'},
+];
+
+const CANAIS = ['YouTube','Instagram','TikTok','LinkedIn','WhatsApp/Telegram','Site'];
+
+const YT_CHECKLIST_ITEMS = [
+  'Câmera ou celular com boa câmera',
+  'Microfone externo (lapela ou condensador)',
+  'Iluminação básica (ring light ou luz natural)',
+  'Software de edição instalado',
+  'Arte do canal criada (banner + logo)',
+  'Descrição do canal escrita',
+  'Template de thumbnail criado',
+  'Primeiro vídeo roteirizado',
+  'Primeiro vídeo gravado e editado',
+  'Primeiro vídeo publicado 🎉',
+];
+
+// ── QUIZ DATA ──────────────────────────────────────────────────────
+const QUESTIONS = [
+  {text:'O que te dá mais energia ao trabalhar?',opts:[
+    {l:'Criar algo do zero e ver o resultado final',v:'C'},
+    {l:'Ensinar alguém e ver a transformação acontecer',v:'E'},
+    {l:'Resolver desafios técnicos com precisão',v:'F'},
+    {l:'Planejar estratégias e ver elas funcionarem',v:'P'},
+  ]},
+  {text:'Em 2 anos, qual resultado te faria sentir que valeu a pena?',opts:[
+    {l:'Um canal com muitos seguidores pelo meu conteúdo',v:'C'},
+    {l:'Alunos que transformaram suas carreiras comigo',v:'E'},
+    {l:'Carteira sólida de clientes fixos e renda estável',v:'F'},
+    {l:'Produto digital gerando receita recorrente',v:'P'},
+  ]},
+  {text:'O que você mais gosta na edição de vídeo?',opts:[
+    {l:'Contar histórias e criar emoção para o espectador',v:'C'},
+    {l:'Ensinar a técnica para outras pessoas',v:'E'},
+    {l:'A parte técnica — color, motion, efeitos',v:'F'},
+    {l:'Usar a edição dentro de um projeto maior',v:'P'},
+  ]},
+  {text:'Como você prefere trabalhar no dia a dia?',opts:[
+    {l:'De forma independente, criando conteúdo no meu ritmo',v:'C'},
+    {l:'Com uma comunidade, respondendo e interagindo',v:'E'},
+    {l:'Em projetos de clientes diferentes, com briefings',v:'F'},
+    {l:'Construindo e gerenciando meu próprio negócio',v:'P'},
+  ]},
+  {text:'Qual conteúdo você mais consome no YouTube?',opts:[
+    {l:'Vlogs, documentários, vídeos criativos',v:'C'},
+    {l:'Cursos, aulas, tutoriais passo a passo',v:'E'},
+    {l:'Tutoriais técnicos de software e workflows',v:'F'},
+    {l:'Negócios, empreendedorismo, estratégia',v:'P'},
+  ]},
+  {text:'Qual modelo de receita te parece mais atrativo?',opts:[
+    {l:'AdSense + patrocínio — monetizar meu canal',v:'C'},
+    {l:'Cursos, workshops, mentorias — vender conhecimento',v:'E'},
+    {l:'Freela — cobrar por projeto, vários clientes',v:'F'},
+    {l:'Produto digital escalável — venda automática',v:'P'},
+  ]},
+  {text:'Diante de um desafio profissional, o que você faz?',opts:[
+    {l:'Experimento, erro, ajusto — aprendo fazendo',v:'C'},
+    {l:'Pesquiso muito, estudo e formulo uma abordagem',v:'E'},
+    {l:'Busco a solução mais eficiente e entrego logo',v:'F'},
+    {l:'Penso no contexto maior e na estratégia',v:'P'},
+  ]},
+  {text:'Como você se imagina em 5 anos?',opts:[
+    {l:'Com comunidade engajada que me segue pelo conteúdo',v:'C'},
+    {l:'Ensinando — curso, mentoria, escola',v:'E'},
+    {l:'Fazendo edição para grandes produções como freela',v:'F'},
+    {l:'Comandando meu próprio negócio no audiovisual',v:'P'},
+  ]},
+];
+
+const PROFILES = {
+  C:{label:'Criadora de Conteúdo',color:'#5856D6',icon:'🎬',
+    desc:'Você tem o espírito de quem quer construir audiência e contar histórias. Seu lugar é criando conteúdo autoral.',
+    actions:['Lançar canal no YouTube','Criar perfil estético no Instagram','Desenvolver identidade visual forte','Construir portfólio público']},
+  E:{label:'Educadora & Mentora',color:'#34C759',icon:'🎓',
+    desc:'Você se realiza quando outras pessoas aprendem. Já provou isso com a cartilha! Seu caminho é transformar conhecimento em produtos.',
+    actions:['Finalizar e lançar a cartilha','Criar mini-curso online','Oferecer mentorias','Canal educacional no YouTube']},
+  F:{label:'Freelancer & Especialista',color:'#FF9500',icon:'✂️',
+    desc:'Você gosta de executar com qualidade para clientes. Seu diferencial é profundidade técnica e confiabilidade.',
+    actions:['Criar portfólio profissional','Definir nichos de clientes','Estruturar precificação','Divulgar no LinkedIn']},
+  P:{label:'Produtora & Empreendedora',color:'#FF2D55',icon:'🚀',
+    desc:'Você pensa grande e quer construir algo que vai além de um serviço ou canal.',
+    actions:['Lançar bundle cartilha + simulador','Programa de mentorias recorrente','Marca e presença digital fortes','Pensar em equipe e parceiros']},
+};
+
+const DEFAULT_PROJECTS = [
+  {id:'p1',emoji:'📚',name:'Cartilha de Edição de Vídeo',progress:75,status:'Em andamento',statusColor:'#FF9500',
+   desc:'Material educacional para o projeto de cinema na comunidade.',
+   next:'Revisar linguagem, adicionar glossário, definir plataforma de venda (Gumroad, Hotmart, Eduzz)'},
+  {id:'p2',emoji:'🎮',name:'Simulador de Edição',progress:60,status:'Funcional',statusColor:'#34C759',
+   desc:'Simulador interativo de aprendizado prático desenvolvido para o projeto.',
+   next:'Refinar UX, integrar com cartilha, pensar bundle de venda'},
+  {id:'p3',emoji:'📺',name:'Canal YouTube',progress:10,status:'Planejando',statusColor:'#007AFF',
+   desc:'Canal educativo sobre edição de vídeo. Tema e formato em definição.',
+   next:'Definir nicho, nome, identidade visual, primeiro vídeo'},
+  {id:'p4',emoji:'🌍',name:'Inglês',progress:null,status:'Ativo',statusColor:'#5856D6',
+   desc:'Consistência é a chave. Um dia de cada vez.',
+   next:'Manter a sequência diária'},
+];
+
+// ── UTILS ──────────────────────────────────────────────────────────
+const ls = {
+  get:(k,d=null)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+};
+
+const fmt = (n)=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0});
+
+function hide(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+function show(id,display='block'){const el=document.getElementById(id);if(el)el.style.display=display;}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.bnav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  document.querySelectorAll('[data-page="'+page+'"]').forEach(n=>n.classList.add('active'));
+  if(page==='tendencias'&&!trendsLoaded){trendsLoaded=true;initTendencias();}
+  if(page==='projetos') renderProjects();
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('[data-page]').forEach(el=>{
+  el.addEventListener('click',()=>navigate(el.dataset.page));
+});
+
+// ── THEME ──────────────────────────────────────────────────────────
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  ls.set('ms_theme',next);
+  updateThemeUI(next);
+}
+function updateThemeUI(t){
+  document.getElementById('theme-icon').textContent=t==='dark'?'☀️':'🌙';
+  document.getElementById('theme-label').textContent=t==='dark'?'Modo claro':'Modo escuro';
+}
+(()=>{
+  const t=ls.get('ms_theme','light');
+  document.documentElement.setAttribute('data-theme',t);
+  updateThemeUI(t);
+})();
+
+// ── SERVER STATUS ──────────────────────────────────────────────────
+async function checkStatus(){
+  try{
+    const r=await fetch(API+'/api/status',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      serverOnline=true;
+      document.getElementById('status-dot').className='status-dot online';
+      document.getElementById('status-text').textContent='Servidor online';
+      hide('offline-alert');
+      return true;
+    }
+  }catch{}
+  serverOnline=false;
+  document.getElementById('status-dot').className='status-dot offline';
+  document.getElementById('status-text').textContent='Servidor offline';
+  show('offline-alert');
+  return false;
+}
+setInterval(checkStatus,30000);
+checkStatus();
+
+// ── DATA SYNC ──────────────────────────────────────────────────────
+async function syncFromServer(){
+  if(!serverOnline)return;
+  try{
+    const r=await fetch(API+'/api/dados');
+    const data=await r.json();
+    Object.entries(data).forEach(([k,v])=>{
+      if(k.startsWith('ms_'))ls.set(k,v);
+    });
+    loadAllFields();
+  }catch{}
+}
+
+async function syncToServer(){
+  if(!serverOnline)return;
+  const payload={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith('ms_'))payload[k]=ls.get(k);
+  }
+  try{
+    await fetch(API+'/api/dados',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  }catch{}
+}
+setInterval(syncToServer,60000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)syncToServer();});
+
+// ── HOME ───────────────────────────────────────────────────────────
+function initHome(){
+  const name=ls.get('ms_name','');
+  if(!name){
+    show('welcome-card','block');
+  }else{
+    hide('welcome-card');
+    document.getElementById('home-greeting').textContent='Olá, '+name+' 👋';
+  }
+  const dias=ls.get('ms_dias',0);
+  document.getElementById('stat-dias').textContent=dias;
+  const fin=ls.get('ms_fin',{});
+  document.getElementById('stat-meta').textContent=fin.meta?fmt(Number(fin.meta)):'—';
+  const foco=ls.get('ms_foco','');
+  if(foco)document.getElementById('foco-input').value=foco;
+}
+
+function saveName(){
+  const n=document.getElementById('name-input').value.trim();
+  if(!n)return;
+  ls.set('ms_name',n);
+  hide('welcome-card');
+  document.getElementById('home-greeting').textContent='Olá, '+n+' 👋';
+  syncToServer();
+}
+
+function saveFoco(){
+  const v=document.getElementById('foco-input').value;
+  ls.set('ms_foco',v);
+  syncToServer();
+}
+
+document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveName();});
+
+// ── TENDÊNCIAS ─────────────────────────────────────────────────────
+const CHART_COLORS=['#007AFF','#FF9500','#34C759','#FF2D55','#5856D6'];
+
+function initTendencias(){
+  const online=serverOnline;
+  if(!online){show('offline-alert');return;}
+  loadHoje();
+  loadTrends();
+  loadNoticias();
+}
+
+async function loadHoje(){
+  show('hoje-loading','flex');
+  hide('hoje-chips');
+  try{
+    const r=await fetch(API+'/api/trends/hoje');
+    const data=await r.json();
+    hide('hoje-loading');
+    const wrap=document.getElementById('hoje-chips');
+    wrap.innerHTML='';
+    if(data.trending&&data.trending.length){
+      data.trending.forEach(t=>{
+        const c=document.createElement('div');
+        c.className='chip blue';
+        c.textContent=t;
+        c.onclick=()=>{
+          document.getElementById('kw-input').value=t;
+          loadTrends();
+        };
+        wrap.appendChild(c);
+      });
+      show('hoje-chips','flex');
+    }else{
+      wrap.innerHTML='<span style="color:var(--text3);font-size:13px">Nenhum dado disponível.</span>';
+      show('hoje-chips','flex');
+    }
+  }catch(e){
+    hide('hoje-loading');
+    document.getElementById('hoje-chips').innerHTML='<span style="color:var(--red);font-size:13px">Erro ao carregar trends.</span>';
+    show('hoje-chips','flex');
+  }
+}
+
+async function loadTrends(){
+  const kw=document.getElementById('kw-input').value||'edição de vídeo';
+  const kws=kw.split(',').map(k=>k.trim()).filter(Boolean);
+  const first=kws[0]||'edição de vídeo';
+
+  show('trends-loading','flex');
+  show('yt-loading','flex');
+  hide('trends-error');
+  hide('rel-top');
+  hide('rel-rising');
+  show('rel-top-loading','flex');
+  show('rel-loading','flex');
+
+  const [tRes,ytRes,relRes]=await Promise.allSettled([
+    fetch(API+'/api/trends?keywords='+encodeURIComponent(kw)).then(r=>r.json()),
+    fetch(API+'/api/trends/youtube?keywords='+encodeURIComponent(kw)).then(r=>r.json()),
+    fetch(API+'/api/trends/relacionados?keyword='+encodeURIComponent(first)).then(r=>r.json()),
+  ]);
+
+  // Main trends chart
+  hide('trends-loading');
+  if(tRes.status==='fulfilled'&&tRes.value.data?.length){
+    renderLineChart('chart-trends',tRes.value);
+  }else{
+    const err=document.getElementById('trends-error');
+    err.textContent='Não foi possível carregar os dados de tendências. '+(tRes.value?.error||'');
+    show('trends-error');
+  }
+
+  // YouTube chart
+  hide('yt-loading');
+  if(ytRes.status==='fulfilled'&&ytRes.value.data?.length){
+    renderLineChart('chart-yt',ytRes.value);
+  }
+
+  // Related
+  hide('rel-top-loading');
+  hide('rel-loading');
+  if(relRes.status==='fulfilled'){
+    const d=relRes.value;
+    renderRelated('rel-top',d.top||[]);
+    renderRelated('rel-rising',d.rising||[]);
+    show('rel-top');
+    show('rel-rising');
+  }
+}
+
+function renderLineChart(canvasId,data){
+  const ctx=document.getElementById(canvasId);
+  if(!ctx)return;
+  const existing=Chart.getChart(ctx);
+  if(existing)existing.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gridColor=isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)';
+  const textColor=isDark?'#8E8E93':'#8E8E93';
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:data.dates,
+      datasets:data.data.map((d,i)=>({
+        label:d.keyword,
+        data:d.values,
+        borderColor:CHART_COLORS[i%CHART_COLORS.length],
+        backgroundColor:CHART_COLORS[i%CHART_COLORS.length]+'22',
+        fill:true,
+        tension:.4,
+        pointRadius:3,
+      })),
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:textColor,font:{family:'Inter',size:12}}}},
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:textColor,font:{family:'Inter',size:11},maxTicksLimit:6}},
+        y:{min:0,max:100,grid:{color:gridColor},ticks:{color:textColor,font:{family:'Inter',size:11}}},
+      },
+    },
+  });
+}
+
+function renderRelated(id,items){
+  const el=document.getElementById(id);
+  if(!items.length){el.innerHTML='<p style="color:var(--text3);font-size:13px">Sem dados.</p>';return;}
+  el.innerHTML=items.map(i=>{
+    const pct=typeof i.value==='number'?Math.min(i.value,100):50;
+    return`<div class="rel-item"><span style="font-size:13px;flex:1">${i.query}</span><div class="rel-bar"><div class="rel-bar-fill" style="width:${pct}%"></div></div><span class="rel-val">${i.value}</span></div>`;
+  }).join('');
+}
+
+async function loadNoticias(){
+  show('news-loading','flex');
+  try{
+    const r=await fetch(API+'/api/noticias');
+    const data=await r.json();
+    hide('news-loading');
+    const feed=document.getElementById('news-feed');
+    if(!data.articles?.length){feed.innerHTML='<p style="color:var(--text3);font-size:14px">Nenhuma notícia disponível.</p>';return;}
+    feed.innerHTML=data.articles.map(a=>`
+      <div class="news-item">
+        <div class="news-source">${a.source}</div>
+        <div class="news-title"><a href="${a.link}" target="_blank" rel="noopener">${a.title}</a></div>
+        <div class="news-summary">${a.summary||''}</div>
+        <div class="news-date">${a.published||''}</div>
+      </div>`).join('');
+  }catch{hide('news-loading');document.getElementById('news-feed').innerHTML='<p style="color:var(--red);font-size:14px">Erro ao carregar notícias.</p>';}
+}
+
+// ── QUIZ ───────────────────────────────────────────────────────────
+let qIdx=0;
+let qAnswers=[];
+
+function initQuiz(){
+  const done=ls.get('ms_qd',false);
+  const saved=ls.get('ms_qa',[]);
+  if(done&&saved.length===8){
+    hide('quiz-container');
+    show('quiz-result');
+    showResult(saved);
+    return;
+  }
+  qAnswers=saved.length===8?[...saved]:new Array(8).fill(null);
+  qIdx=0;
+  renderQuestion();
+  show('quiz-container');
+  hide('quiz-result');
+}
+
+function renderQuestion(){
+  const q=QUESTIONS[qIdx];
+  document.getElementById('q-step').textContent=`Pergunta ${qIdx+1} de ${QUESTIONS.length}`;
+  document.getElementById('q-progress').style.width=((qIdx+1)/QUESTIONS.length*100)+'%';
+  document.getElementById('q-text').textContent=q.text;
+  const opts=document.getElementById('q-options');
+  opts.innerHTML=q.opts.map((o,i)=>`
+    <div class="q-option ${qAnswers[qIdx]===o.v?'selected':''}" onclick="selectOption('${o.v}',this)">${o.l}</div>
+  `).join('');
+  document.getElementById('q-back').disabled=qIdx===0;
+  document.getElementById('q-next').disabled=qAnswers[qIdx]===null;
+  document.getElementById('q-next').textContent=qIdx===QUESTIONS.length-1?'Ver Resultado ✓':'Próxima →';
+}
+
+function selectOption(v,el){
+  qAnswers[qIdx]=v;
+  document.querySelectorAll('.q-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('q-next').disabled=false;
+}
+
+function quizNext(){
+  if(qAnswers[qIdx]===null)return;
+  if(qIdx===QUESTIONS.length-1){
+    ls.set('ms_qa',qAnswers);
+    ls.set('ms_qd',true);
+    hide('quiz-container');
+    show('quiz-result');
+    showResult(qAnswers);
+    syncToServer();
+  }else{
+    qIdx++;
+    renderQuestion();
+  }
+}
+
+function quizBack(){
+  if(qIdx===0)return;
+  qIdx--;
+  renderQuestion();
+}
+
+function resetQuiz(){
+  ls.set('ms_qd',false);
+  ls.set('ms_qa',[]);
+  qAnswers=new Array(8).fill(null);
+  qIdx=0;
+  hide('quiz-result');
+  show('quiz-container');
+  renderQuestion();
+}
+
+function showResult(answers){
+  const counts={C:0,E:0,F:0,P:0};
+  answers.forEach(a=>{if(a&&counts[a]!==undefined)counts[a]++;});
+  const dominant=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+  const p=PROFILES[dominant];
+  const total=answers.length;
+
+  document.getElementById('result-profile').innerHTML=`
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:48px">${p.icon}</div>
+      <div style="font-size:22px;font-weight:800;color:${p.color};margin:8px 0">${p.label}</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.6">${p.desc}</p>
+    </div>`;
+
+  document.getElementById('result-bars').innerHTML=Object.entries(PROFILES).map(([k,pr])=>`
+    <div class="result-bar-wrap">
+      <div class="result-bar-label"><span>${pr.icon} ${pr.label}</span><span>${Math.round(counts[k]/total*100)}%</span></div>
+      <div class="progress-wrap"><div class="progress-bar" style="background:${pr.color};width:0%" data-w="${counts[k]/total*100}"></div></div>
+    </div>`).join('');
+
+  setTimeout(()=>{
+    document.querySelectorAll('#result-bars .progress-bar').forEach(b=>{
+      b.style.width=b.dataset.w+'%';
+    });
+  },100);
+
+  document.getElementById('result-actions').innerHTML=`
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+      ${p.actions.map(a=>`<li style="display:flex;align-items:center;gap:8px;font-size:14px"><span style="color:${p.color};font-size:16px">→</span>${a}</li>`).join('')}
+    </ul>`;
+}
+
+// ── PERSONA ────────────────────────────────────────────────────────
+const TOM_SUGS=['Acolhedora','Direta','Inspiradora','Técnica','Criativa','Autêntica','Empática','Descontraída'];
+let tomTags=[];
+
+function initPersona(){
+  const per=ls.get('ms_per',{});
+  const fields={quem:'per-quem',pvl:'per-pvl',pub:'per-pub',dores:'per-dores',sonhos:'per-sonhos'};
+  Object.entries(fields).forEach(([k,id])=>{if(per[k])document.getElementById(id).value=per[k];});
+  if(per.nicho){const s=document.getElementById('per-nicho');if(s)s.value=per.nicho;}
+  tomTags=ls.get('ms_tom',[])||[];
+  renderTomTags();
+  renderTomSugs();
+  ['per-quem','per-pvl','per-pub','per-dores','per-nicho','per-sonhos'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('change',savePersona);
+  });
+}
+
+function renderTomTags(){
+  const wrap=document.getElementById('tom-wrap');
+  const input=document.getElementById('tom-input');
+  Array.from(wrap.querySelectorAll('.tag-item')).forEach(t=>t.remove());
+  tomTags.forEach(tag=>{
+    const el=document.createElement('span');
+    el.className='tag-item';
+    el.innerHTML=tag+'<span class="tag-x" onclick="removeTag(\''+tag+'\')">✕</span>';
+    wrap.insertBefore(el,input);
+  });
+}
+
+function renderTomSugs(){
+  const sugs=document.getElementById('tom-sugs');
+  sugs.innerHTML=TOM_SUGS.filter(s=>!tomTags.includes(s)).map(s=>`<div class="chip" onclick="addTag('${s}')">${s}</div>`).join('');
+}
+
+function addTag(t){
+  if(!t||tomTags.includes(t))return;
+  tomTags.push(t);
+  ls.set('ms_tom',tomTags);
+  renderTomTags();
+  renderTomSugs();
+}
+
+function removeTag(t){
+  tomTags=tomTags.filter(x=>x!==t);
+  ls.set('ms_tom',tomTags);
+  renderTomTags();
+  renderTomSugs();
+}
+
+document.getElementById('tom-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const v=e.target.value.trim().replace(/,$/,'');
+    if(v){addTag(v);e.target.value='';}
+  }
+});
+
+function savePersona(){
+  const per={
+    quem:document.getElementById('per-quem').value,
+    nicho:document.getElementById('per-nicho').value,
+    pvl:document.getElementById('per-pvl').value,
+    pub:document.getElementById('per-pub').value,
+    dores:document.getElementById('per-dores').value,
+    sonhos:document.getElementById('per-sonhos').value,
+  };
+  ls.set('ms_per',per);
+  syncToServer();
+  showSaved();
+}
+
+// ── PROJECTS ───────────────────────────────────────────────────────
+function renderProjects(){
+  const custom=ls.get('ms_custom_projects',[]);
+  const dias=ls.get('ms_dias',0);
+  const projects=[...DEFAULT_PROJECTS,...custom];
+  const list=document.getElementById('proj-list');
+  list.innerHTML=projects.map(p=>{
+    const prog=p.id==='p4'?Math.round(dias/365*100):p.progress;
+    return`
+    <div class="proj-card">
+      <div class="proj-header">
+        <div class="proj-title">${p.emoji||'📌'} ${p.name}</div>
+        <span class="proj-badge" style="background:${p.statusColor}22;color:${p.statusColor}">${p.status}</span>
+      </div>
+      <p class="proj-desc">${p.desc||''}</p>
+      ${p.id==='p4'?`<button class="btn btn-outline btn-sm" style="margin-bottom:8px" onclick="markDia()">+ Marcar dia de estudo</button>`:''}
+      <div class="progress-wrap"><div class="progress-bar" style="background:${p.statusColor};width:0%" data-w="${prog}"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:12px;color:var(--text3)">${prog}% concluído</span>
+      </div>
+      ${p.next?`<div class="proj-next">Próximo: ${p.next}</div>`:''}
+    </div>`;
+  }).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('#proj-list .progress-bar').forEach(b=>{b.style.width=b.dataset.w+'%';});
+  },100);
+}
+
+function markDia(){
+  const d=(ls.get('ms_dias',0)||0)+1;
+  ls.set('ms_dias',d);
+  document.getElementById('stat-dias').textContent=d;
+  renderProjects();
+  syncToServer();
+}
+
+function addProject(){
+  const nome=document.getElementById('np-nome').value.trim();
+  if(!nome)return alert('Digite o nome do projeto.');
+  const proj={
+    id:'c'+Date.now(),emoji:'📌',
+    name:nome,
+    desc:document.getElementById('np-desc').value,
+    status:document.getElementById('np-status').value,
+    statusColor:statusColor(document.getElementById('np-status').value),
+    progress:parseInt(document.getElementById('np-prog').value)||0,
+  };
+  const list=ls.get('ms_custom_projects',[])||[];
+  list.push(proj);
+  ls.set('ms_custom_projects',list);
+  document.getElementById('np-nome').value='';
+  document.getElementById('np-desc').value='';
+  document.getElementById('np-prog').value='0';
+  renderProjects();
+  syncToServer();
+}
+
+function statusColor(s){
+  const m={Planejando:'#007AFF','Em andamento':'#FF9500',Funcional:'#34C759',Ativo:'#5856D6',Concluído:'#34C759',Pausado:'#8E8E93'};
+  return m[s]||'#007AFF';
+}
+
+// ── YOUTUBE ────────────────────────────────────────────────────────
+function initYT(){
+  const yt=ls.get('ms_yt',{});
+  ['n','tl','pw','p1','p2','p3'].forEach(k=>{
+    const el=document.getElementById('yt-'+k);
+    if(el&&yt[k])el.value=yt[k];
+  });
+  renderIdeias();
+  renderYTChecklist();
+  updateBrandPreview();
+}
+
+function saveYT(){
+  const yt={};
+  ['n','tl','pw','p1','p2','p3'].forEach(k=>{
+    const el=document.getElementById('yt-'+k);
+    if(el)yt[k]=el.value;
+  });
+  ls.set('ms_yt',yt);
+  syncToServer();
+  showSaved();
+  updateBrandPreview();
+}
+
+function renderIdeias(){
+  const list=ls.get('ms_ytid',[])||[];
+  const el=document.getElementById('ideias-list');
+  if(!list.length){el.innerHTML='<p style="color:var(--text3);font-size:13px">Nenhuma ideia ainda. Adicione a primeira!</p>';return;}
+  el.innerHTML=list.map((id,i)=>`
+    <div class="ideia-item">
+      <div class="ideia-num">${i+1}</div>
+      <div class="ideia-text">${id}</div>
+      <button class="ideia-del" onclick="delIdeia(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addIdeia(){
+  const inp=document.getElementById('ideia-input');
+  const v=inp.value.trim();
+  if(!v)return;
+  const list=ls.get('ms_ytid',[])||[];
+  list.push(v);
+  ls.set('ms_ytid',list);
+  inp.value='';
+  renderIdeias();
+  syncToServer();
+}
+
+document.getElementById('ideia-input').addEventListener('keydown',e=>{if(e.key==='Enter')addIdeia();});
+
+function delIdeia(i){
+  const list=ls.get('ms_ytid',[])||[];
+  list.splice(i,1);
+  ls.set('ms_ytid',list);
+  renderIdeias();
+}
+
+function renderYTChecklist(){
+  const el=document.getElementById('yt-checklist');
+  el.innerHTML=YT_CHECKLIST_ITEMS.map((item,i)=>{
+    const done=ls.get('ms_chk_yt'+i,false);
+    return`<div class="check-item" onclick="toggleCheck('yt${i}',this)">
+      <div class="check-box${done?' done':''}">${done?'✓':''}</div>
+      <span class="check-label${done?' done':''}">${item}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleCheck(key,row){
+  const cur=ls.get('ms_chk_'+key,false);
+  const next=!cur;
+  ls.set('ms_chk_'+key,next);
+  const box=row.querySelector('.check-box');
+  const label=row.querySelector('.check-label');
+  box.className='check-box'+(next?' done':'');
+  box.textContent=next?'✓':'';
+  label.className='check-label'+(next?' done':'');
+  syncToServer();
+}
+
+// ── ESTRATÉGIA ─────────────────────────────────────────────────────
+function initEstrategia(){
+  const est=ls.get('ms_est',{});
+  const canaisAtivos=est.canais||[];
+  const wrap=document.getElementById('canais-list');
+  wrap.innerHTML=CANAIS.map(c=>{
+    const on=canaisAtivos.includes(c);
+    return`<div class="check-item" onclick="toggleCanal('${c}',this)">
+      <div class="check-box${on?' done':''}">${on?'✓':''}</div>
+      <span class="check-label">${c}</span>
+    </div>`;
+  }).join('');
+  ['ref','conc','op','d90'].forEach(k=>{
+    const el=document.getElementById('est-'+k);
+    if(el&&est[k])el.value=est[k];
+  });
+  ['fyt','fig'].forEach(k=>{
+    const el=document.getElementById('est-'+k);
+    if(el&&est[k])el.value=est[k];
+  });
+}
+
+function toggleCanal(canal,row){
+  const est=ls.get('ms_est',{});
+  const canais=est.canais||[];
+  const idx=canais.indexOf(canal);
+  if(idx>-1)canais.splice(idx,1); else canais.push(canal);
+  est.canais=canais;
+  ls.set('ms_est',est);
+  const box=row.querySelector('.check-box');
+  const on=canais.includes(canal);
+  box.className='check-box'+(on?' done':'');
+  box.textContent=on?'✓':'';
+  syncToServer();
+}
+
+function saveEstrategia(){
+  const est=ls.get('ms_est',{});
+  ['ref','conc','op','d90'].forEach(k=>{
+    const el=document.getElementById('est-'+k);
+    if(el)est[k]=el.value;
+  });
+  ['fyt','fig'].forEach(k=>{
+    const el=document.getElementById('est-'+k);
+    if(el)est[k]=el.value;
+  });
+  ls.set('ms_est',est);
+  syncToServer();
+  showSaved();
+}
+
+// ── IDENTIDADE ─────────────────────────────────────────────────────
+function initIdentidade(){
+  const swatches=document.getElementById('color-swatches');
+  const selected=ls.get('ms_color','#007AFF');
+  swatches.innerHTML=COLORS.map(c=>`
+    <div class="swatch${c.hex===selected?' selected':''}" style="background:${c.hex}"
+      title="${c.name}" onclick="selectColor('${c.hex}','${c.name}',this)"></div>
+  `).join('');
+  document.getElementById('color-name').textContent=COLORS.find(c=>c.hex===selected)?.name||'';
+  document.getElementById('brand-preview').style.background=selected;
+  const id=ls.get('ms_id',{});
+  ['kw1','kw2','kw3','notas'].forEach(k=>{
+    const el=document.getElementById('id-'+k);
+    if(el&&id[k])el.value=id[k];
+  });
+  updateBrandPreview();
+}
+
+function selectColor(hex,name,el){
+  ls.set('ms_color',hex);
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('color-name').textContent=name;
+  document.getElementById('brand-preview').style.background=hex;
+  syncToServer();
+}
+
+function saveIdentidade(){
+  const id={};
+  ['kw1','kw2','kw3','notas'].forEach(k=>{
+    const el=document.getElementById('id-'+k);
+    if(el)id[k]=el.value;
+  });
+  ls.set('ms_id',id);
+  syncToServer();
+  showSaved();
+}
+
+function updateBrandPreview(){
+  const n=document.getElementById('yt-n')?.value||ls.get('ms_name','')||'Meu Studio';
+  const tl=document.getElementById('yt-tl')?.value||'Sua tagline aqui';
+  const el=document.getElementById('bp-name');
+  const el2=document.getElementById('bp-tag');
+  if(el)el.textContent=n.toUpperCase();
+  if(el2)el2.textContent=tl;
+  const color=ls.get('ms_color','#007AFF');
+  const preview=document.getElementById('brand-preview');
+  if(preview)preview.style.background=color;
+}
+
+// ── FINANÇAS ───────────────────────────────────────────────────────
+function initFinancas(){
+  const fin=ls.get('ms_fin',{});
+  ['meta','prazo','r1','r2','r3','r4','r5','r6','notas'].forEach(k=>{
+    const el=document.getElementById('fin-'+k);
+    if(el&&fin[k]!==undefined)el.value=fin[k];
+  });
+  calcFinancas();
+}
+
+function calcFinancas(){
+  const vals=['r1','r2','r3','r4','r5','r6'].map(k=>{
+    const el=document.getElementById('fin-'+k);
+    return el?parseFloat(el.value)||0:0;
+  });
+  const total=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('fin-total').textContent=fmt(total);
+  const meta=parseFloat(document.getElementById('fin-meta')?.value)||0;
+  const bar=document.getElementById('fin-bar');
+  const fb=document.getElementById('fin-feedback');
+  if(meta>0){
+    const pct=Math.min(total/meta*100,100);
+    if(bar)bar.style.width=pct+'%';
+    if(fb){
+      if(total>=meta){
+        fb.style.color='var(--green)';
+        fb.textContent=`✅ Você atingiu ${Math.round(pct)}% da meta!`;
+        if(bar)bar.style.background='var(--green)';
+      }else{
+        const falta=meta-total;
+        fb.style.color='var(--orange)';
+        fb.textContent=`📈 ${Math.round(pct)}% da meta — faltam ${fmt(falta)}/mês`;
+        if(bar)bar.style.background='var(--orange)';
+      }
+    }
+  }else{
+    if(bar)bar.style.width='0%';
+    if(fb)fb.textContent='';
+  }
+}
+
+function saveFinancas(){
+  const fin={};
+  ['meta','prazo','r1','r2','r3','r4','r5','r6','notas'].forEach(k=>{
+    const el=document.getElementById('fin-'+k);
+    if(el)fin[k]=el.value;
+  });
+  ls.set('ms_fin',fin);
+  document.getElementById('stat-meta').textContent=fin.meta?fmt(Number(fin.meta)):'—';
+  syncToServer();
+  showSaved();
+}
+
+// ── FEEDBACK ───────────────────────────────────────────────────────
+function showSaved(){
+  const msg=document.createElement('div');
+  msg.className='alert alert-green';
+  msg.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;max-width:280px;animation:fadeIn .2s';
+  msg.textContent='✅ Salvo com sucesso!';
+  document.body.appendChild(msg);
+  setTimeout(()=>msg.remove(),2000);
+}
+
+// ── LOAD ALL FIELDS ────────────────────────────────────────────────
+function loadAllFields(){
+  initHome();
+  initPersona();
+  initYT();
+  initEstrategia();
+  initIdentidade();
+  initFinancas();
+  initQuiz();
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+loadAllFields();
+syncFromServer();
+
+// Fade animation for saved toast
+const style=document.createElement('style');
+style.textContent='@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
