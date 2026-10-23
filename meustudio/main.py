@@ -5,11 +5,21 @@ FastAPI + SQLite + Motor de Análise + Integrações Externas
 from fastapi import FastAPI, Request, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 import json, time, os, logging, sqlite3
 from pathlib import Path
 from contextlib import contextmanager
 import feedparser, requests
 from bs4 import BeautifulSoup
+
+try:
+    from google_auth_oauthlib.flow import Flow
+    from googleapiclient.discovery import build
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request as GRequest
+    HAS_GOOGLE_OAUTH = True
+except ImportError:
+    HAS_GOOGLE_OAUTH = False
 
 try:
     from pytrends.request import TrendReq
@@ -94,6 +104,11 @@ def init_db():
             cache_key TEXT PRIMARY KEY,
             data TEXT NOT NULL,
             expires_at REAL NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS oauth_tokens (
+            service TEXT PRIMARY KEY,
+            token_data TEXT NOT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         INSERT OR IGNORE INTO profile (id, data) VALUES (1, '{}');
         INSERT OR IGNORE INTO financial_data (id, data) VALUES (1, '{}');
@@ -757,6 +772,128 @@ async def google_search(
     return cached(cache_key, fetch, ttl=3600)
 
 
+# ── GOOGLE CALENDAR OAUTH ─────────────────────────────────────────
+GCAL_SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+GCAL_REDIRECT = os.environ.get("GCAL_REDIRECT_URI", "http://localhost:8000/api/calendar/callback")
+
+def _gcal_client_config():
+    cid = os.environ.get("GOOGLE_CLIENT_ID", "")
+    csec = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+    if not cid or not csec:
+        return None
+    return {
+        "web": {
+            "client_id": cid,
+            "client_secret": csec,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [GCAL_REDIRECT],
+        }
+    }
+
+def _gcal_credentials():
+    with db() as c:
+        row = c.execute("SELECT token_data FROM oauth_tokens WHERE service='gcal'").fetchone()
+    if not row:
+        return None
+    data = json.loads(row["token_data"])
+    creds = Credentials(
+        token=data.get("token"),
+        refresh_token=data.get("refresh_token"),
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=os.environ.get("GOOGLE_CLIENT_ID", ""),
+        client_secret=os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+        scopes=GCAL_SCOPES,
+    )
+    if creds.expired and creds.refresh_token:
+        try:
+            creds.refresh(GRequest())
+            _save_gcal_token(creds)
+        except Exception:
+            return None
+    return creds
+
+def _save_gcal_token(creds):
+    data = json.dumps({
+        "token": creds.token,
+        "refresh_token": creds.refresh_token,
+        "expiry": creds.expiry.isoformat() if creds.expiry else None,
+    })
+    with db() as c:
+        c.execute("INSERT OR REPLACE INTO oauth_tokens (service, token_data) VALUES ('gcal', ?)", (data,))
+
+@app.get("/api/calendar/auth")
+async def gcal_auth():
+    if not HAS_GOOGLE_OAUTH:
+        raise HTTPException(501, "google-auth-oauthlib não instalado")
+    cfg = _gcal_client_config()
+    if not cfg:
+        raise HTTPException(400, "GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET não configurados")
+    flow = Flow.from_client_config(cfg, scopes=GCAL_SCOPES, redirect_uri=GCAL_REDIRECT)
+    auth_url, _ = flow.authorization_url(access_type="offline", prompt="consent")
+    return RedirectResponse(auth_url)
+
+@app.get("/api/calendar/callback")
+async def gcal_callback(code: str = "", error: str = ""):
+    if error:
+        return RedirectResponse(f"/?gcal_error={error}")
+    if not code:
+        raise HTTPException(400, "Código de autorização ausente")
+    cfg = _gcal_client_config()
+    flow = Flow.from_client_config(cfg, scopes=GCAL_SCOPES, redirect_uri=GCAL_REDIRECT)
+    flow.fetch_token(code=code)
+    _save_gcal_token(flow.credentials)
+    return RedirectResponse("/?gcal_connected=1")
+
+@app.get("/api/calendar/status")
+async def gcal_status():
+    if not HAS_GOOGLE_OAUTH:
+        return {"connected": False, "reason": "library_missing"}
+    if not _gcal_client_config():
+        return {"connected": False, "reason": "no_credentials"}
+    creds = _gcal_credentials()
+    return {"connected": bool(creds and creds.valid)}
+
+@app.get("/api/calendar/events")
+async def gcal_events(days: int = 30):
+    if not HAS_GOOGLE_OAUTH:
+        return {"status": "needs_setup", "events": [], "message": "Biblioteca não instalada."}
+    if not _gcal_client_config():
+        return {"status": "needs_setup", "events": [], "message": "Configure GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET."}
+    creds = _gcal_credentials()
+    if not creds or not creds.valid:
+        return {"status": "needs_auth", "events": [], "message": "Conecte sua conta Google em Configurações."}
+    try:
+        service = build("calendar", "v3", credentials=creds)
+        now = time.strftime("%Y-%m-%dT00:00:00Z")
+        end = time.strftime("%Y-%m-%dT23:59:59Z", time.gmtime(time.time() + days * 86400))
+        result = service.events().list(
+            calendarId="primary", timeMin=now, timeMax=end,
+            maxResults=50, singleEvents=True, orderBy="startTime"
+        ).execute()
+        events = []
+        for item in result.get("items", []):
+            start = item["start"].get("dateTime", item["start"].get("date", ""))
+            events.append({
+                "id": item["id"],
+                "title": item.get("summary", "(sem título)"),
+                "start": start,
+                "end": item["end"].get("dateTime", item["end"].get("date", "")),
+                "location": item.get("location", ""),
+                "description": (item.get("description", "") or "")[:200],
+                "url": item.get("htmlLink", ""),
+            })
+        return {"status": "ok", "events": events}
+    except Exception as e:
+        return {"status": "error", "events": [], "message": str(e)}
+
+@app.delete("/api/calendar/disconnect")
+async def gcal_disconnect():
+    with db() as c:
+        c.execute("DELETE FROM oauth_tokens WHERE service='gcal'")
+    return {"ok": True}
+
+
 # ── STATUS ────────────────────────────────────────────────────────
 @app.get("/api/status")
 async def status():
@@ -767,6 +904,7 @@ async def status():
         "pytrends": HAS_PYTRENDS,
         "youtube_api": bool(os.environ.get("YOUTUBE_API_KEY")),
         "google_search_api": bool(os.environ.get("GOOGLE_CSE_KEY")),
+        "google_calendar": bool(os.environ.get("GOOGLE_CLIENT_ID")),
     }
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
