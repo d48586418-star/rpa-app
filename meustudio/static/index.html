@@ -1,18 +1,19 @@
 <title>Meu Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Layout: dark sidebar 220px + light content area */
+/* Layout: dark sidebar 224px + light content area */
 :root {
-  --font-ui:'Plus Jakarta Sans',-apple-system,sans-serif;
-  --sidebar:#111110; --sidebar-hover:#1F1E1C; --sidebar-active:#080808;
-  --bg:#F5F5F5; --surface:#FFFFFF; --surface-2:#F0F0EF;
-  --text:#111111; --text-2:#777777; --text-3:#A8A5A0;
-  --sep:#EAEAEA; --accent:#4A7C5E; --accent-dim:rgba(74,124,94,.12);
-  --green:#2E7D52; --red:#C0392B; --sidebar-w:220px; --top-h:56px;
-  --radius:10px; --radius-md:16px; --radius-lg:22px; color-scheme:light;
-  --shadow-sm:0 2px 8px rgba(0,0,0,.06); --shadow-md:0 8px 30px rgba(0,0,0,.045);
+  --font-ui:'Inter',-apple-system,sans-serif;
+  --sidebar:#111111; --sidebar-hover:#1F1F1F; --sidebar-active:#E8C000; --sidebar-active-text:#111111;
+  --bg:#FAFAFA; --surface:#FFFFFF; --surface-2:#F4F4F4;
+  --text:#111111; --text-2:#6B6B6B; --text-3:#A0A0A0;
+  --sep:#E5E5E5; --accent:#E8C000; --accent-dim:rgba(232,192,0,.1); --accent-hover:#D4AF00;
+  --green:#1A7A45; --red:#C0392B; --sidebar-w:224px; --top-h:52px;
+  --radius-sm:6px; --radius:10px; --radius-md:14px; --radius-lg:20px; color-scheme:light;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06); --shadow-md:0 4px 20px rgba(0,0,0,.08); --shadow-lg:0 8px 40px rgba(0,0,0,.1);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#1A1917; --surface:#232220; --surface-2:#2A2927;
@@ -36,9 +37,9 @@ body{display:flex;overflow:hidden;padding-left:max(0px,env(safe-area-inset-left,
 .sb-section{padding:16px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);}
 .nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;margin:1px 6px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;transition:all .15s;user-select:none;}
 .nav-item:hover{background:var(--sidebar-hover);color:#fff;}
-.nav-item.active{background:var(--sidebar-active);color:#fff;}
+.nav-item.active{background:var(--sidebar-active);color:var(--sidebar-active-text);}
 .nav-item svg{flex-shrink:0;opacity:.7;}
-.nav-item.active svg{opacity:1;}
+.nav-item.active svg{opacity:1;color:var(--sidebar-active-text);}
 
 /* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
@@ -58,7 +59,7 @@ body{display:flex;overflow:hidden;padding-left:max(0px,env(safe-area-inset-left,
 #backdrop.show{display:block;}
 
 /* TYPOGRAPHY */
-.page-title{font-family:var(--font-ui);font-size:26px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.15;letter-spacing:-.045em;}
+.page-title{font-family:var(--font-ui);font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.15;letter-spacing:-.04em;}
 .page-sub{font-size:14px;color:var(--text-2);margin-bottom:28px;}
 .section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:10px;}
 
@@ -73,8 +74,8 @@ body{display:flex;overflow:hidden;padding-left:max(0px,env(safe-area-inset-left,
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:inherit;}
 .btn:active{transform:scale(.98);}
-.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn-primary:hover{background:#3D6B4F;}
+.btn-primary{background:var(--accent);color:#111111;border-color:var(--accent);}
+.btn-primary:hover{background:var(--accent-hover);}
 .btn-ghost{background:transparent;color:var(--text-2);border-color:var(--sep);}
 .btn-ghost:hover{background:var(--surface-2);color:var(--text);}
 .btn-danger{background:transparent;color:var(--red);border-color:var(--sep);}
@@ -176,7 +177,7 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 .chat-msg-user{align-self:flex-end;flex-direction:row-reverse;}
 .chat-msg-ai{align-self:flex-start;}
 .chat-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap;}
-.chat-msg-user .chat-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.chat-msg-user .chat-bubble{background:var(--accent);color:#111111;border-bottom-right-radius:4px;}
 .chat-msg-ai .chat-bubble{background:var(--surface-2);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--sep);}
 </style>
 
@@ -233,6 +234,9 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
     </button>
     <span id="topbar-title">Visão Geral</span>
+    <button id="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema" style="background:none;border:1px solid var(--sep);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text-2);font-size:12px;display:flex;align-items:center;gap:4px;transition:all .15s;" title="Alternar modo escuro">
+      <svg id="theme-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
     <div id="srv-dot"></div>
     <span id="srv-label">servidor</span>
   </header>
@@ -722,6 +726,21 @@ function nav(el, targetId){
 }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+function toggleTheme(){
+  const root=document.documentElement;
+  const cur=root.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  root.setAttribute('data-theme',next);
+  try{localStorage.setItem('ms_theme',next);}catch(e){}
+  updateThemeIcon(next);
+}
+function updateThemeIcon(theme){
+  const btn=document.getElementById('theme-toggle');
+  if(!btn)return;
+  btn.innerHTML=theme==='dark'
+    ?'<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
+    :'<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13.5 10A5.5 5.5 0 016 2.5a5.5 5.5 0 100 11 5.5 5.5 0 007.5-3.5z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>';
+}
 
 // ── Tabs ─────────────────────────────────────────────────────────
 function switchTab(section,tab,el){
@@ -1038,7 +1057,7 @@ async function loadTrends(){
       type:'line',
       data:{labels:data.dates||[],datasets:data.data.map((d,i)=>({
         label:d.keyword,data:d.values,
-        borderColor:['#4A7C5E','#5A8FC4','#9A5AC4','#C45050','#C4904A'][i%5],
+        borderColor:['#E8C000','#5A8FC4','#9A5AC4','#C45050','#C4904A'][i%5],
         tension:.4,fill:false,pointRadius:3
       }))},
       options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}
@@ -1285,7 +1304,7 @@ function renderFinChart(projection){
     data:{labels:projection.map(p=>`Mês ${p.month}`),datasets:[{
       label:'Receita Projetada',
       data:projection.map(p=>p.projected_revenue),
-      borderColor:'#4A7C5E',backgroundColor:'rgba(74,124,94,.1)',fill:true,tension:.4,pointRadius:3
+      borderColor:'#E8C000',backgroundColor:'rgba(232,192,0,.1)',fill:true,tension:.4,pointRadius:3
     }]},
     options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}
   });
@@ -1570,6 +1589,9 @@ function newChatSession(){
 
 // ── INIT ─────────────────────────────────────────────────────────
 async function init(){
+  // Restore saved theme preference
+  try{const t=localStorage.getItem('ms_theme');if(t){document.documentElement.setAttribute('data-theme',t);updateThemeIcon(t);}}catch(e){}
+
   // Handle gcal callback params
   const params=new URLSearchParams(window.location.search);
   if(params.get('gcal_connected')) alert('✓ Google Calendar conectado!');
