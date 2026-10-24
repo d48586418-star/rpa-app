@@ -10,3 +10,6 @@ web-build/
 __pycache__/
 *.pyc
 *.pyo
+*.db
+*.db-shm
+*.db-wal
