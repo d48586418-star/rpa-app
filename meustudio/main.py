@@ -49,7 +49,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 DB_PATH = Path("studio.db")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-GEMINI_FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
+GEMINI_FALLBACK_MODELS = [m.strip() for m in os.environ.get("GEMINI_FALLBACK_MODELS", "").split(",") if m.strip()]
 GEMINI_RETRY_ERRORS = {429, 500, 503, 504}
 AI_DAILY_BUDGET = int(os.environ.get("AI_DAILY_BUDGET", "15"))
 HOST = os.environ.get("HOST", "127.0.0.1")
@@ -1424,11 +1424,15 @@ Contexto actual dos dados de Débora:
 
 
 async def call_gemini(contents, system_instruction: str) -> str:
+    import random
     client = genai_client.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
     models_to_try = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
     last_err = None
     for model in models_to_try:
-        for attempt in range(2):
+        skip_retry = False
+        for attempt in range(3):
+            if skip_retry and attempt > 0:
+                break
             try:
                 response = await client.aio.models.generate_content(
                     model=model,
@@ -1438,22 +1442,37 @@ async def call_gemini(contents, system_instruction: str) -> str:
                         max_output_tokens=4096,
                     )
                 )
+                if not response.text or not response.text.strip():
+                    last_err = ValueError("Resposta vazia da IA")
+                    break
                 return response.text
             except Exception as e:
                 last_err = e
                 code = getattr(e, "status_code", None) or getattr(e, "code", None)
-                if code in GEMINI_RETRY_ERRORS and attempt == 0:
+                if code in (400, 401, 403, 404):
+                    raise
+                if code == 429:
+                    # RPD: daily quota exhausted — no retry, try next model once
+                    if "PerDay" in str(e):
+                        skip_retry = True
+                        break
+                    # RPM/TPM: rate limit — exponential backoff + jitter
+                    if attempt < 2:
+                        await asyncio.sleep((2 ** attempt) * 1.5 + random.uniform(0, 0.5))
+                        continue
+                    break
+                if code in (500, 503, 504) and attempt < 2:
                     await asyncio.sleep(1.5 * (attempt + 1))
                     continue
                 break
     log.error(f"Gemini falhou em todos os modelos: {last_err}")
-    raise last_err
+    raise last_err if last_err else RuntimeError("IA indisponível")
 
 
 @app.post("/api/ai/chat")
 async def ai_chat(request: Request):
     if not HAS_GEMINI:
-        raise HTTPException(status_code=503, detail="google-generativeai não instalado")
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
 
     body = await request.json()
     message = body.get("message", "").strip()
@@ -1487,7 +1506,7 @@ async def ai_chat(request: Request):
         reply = await call_gemini(contents, GEMINI_SYSTEM.format(context=context))
     except Exception as e:
         log.error(f"Gemini error: {e}")
-        raise HTTPException(status_code=502, detail=f"Erro na IA: {str(e)}")
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
 
     with db() as c:
         c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
