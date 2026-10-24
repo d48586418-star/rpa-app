@@ -640,26 +640,54 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   <!-- ═══ ESTRATÉGIA ═════════════════════════════════════════════ -->
   <section id="s-estrategia" class="section">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-      <div><h1 class="page-title">Estratégia de Carreira</h1><p class="page-sub">Caminhos recomendados com base no seu perfil.</p></div>
-      <button class="btn btn-primary btn-sm" id="btn-gerar-estrategia" onclick="generateEstrategia()">✨ Gerar análise com IA</button>
-    </div>
-    <div id="estrategia-cta" class="card" style="display:none;">
-      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Complete o diagnóstico para ver seus caminhos de carreira.</p>
-      <button class="btn btn-primary btn-sm" onclick="nav(null,'s-perfil')">Iniciar Diagnóstico →</button>
-    </div>
-    <div id="estrategia-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> Analisando perfil…</div>
-    <div id="estrategia-paths"></div>
-    <div style="margin-top:16px;display:flex;gap:8px;">
-      <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()">↻ Recalcular caminhos</button>
-    </div>
-    <!-- Análise IA -->
-    <div id="estrategia-ai-card" class="card" style="margin-top:20px;display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <span style="font-size:13px;font-weight:600;">Análise da IA</span>
-        <button class="btn btn-ghost btn-sm" onclick="generateEstrategia(true)" style="font-size:11px;">↻ Regenerar</button>
+      <div><h1 class="page-title">Estratégia de Carreira</h1><p class="page-sub">Visão, prioridades e próximos passos para os próximos 12 meses.</p></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="btn-salvar-estrategia" onclick="salvarEstrategiaV2()" style="display:none;">Salvar</button>
+        <button class="btn btn-primary btn-sm" id="btn-gerar-estrategia-v2" onclick="gerarEstrategiaV2()">✨ Gerar com IA</button>
       </div>
-      <div id="estrategia-ai-text" style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;"></div>
     </div>
+    <div id="estrategia-v2-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> A elaborar estratégia…</div>
+    <!-- Campos estruturados -->
+    <div id="estrategia-v2-form">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="section-label">Visão de 1 ano</div>
+        <textarea id="est-visao" rows="3" placeholder="Onde você quer estar em 12 meses? Que tipo de trabalho está fazendo, com quem, em que condições…" oninput="estrategiaMarkDirty()"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="section-label">3 Prioridades estratégicas</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="text" id="est-p1" placeholder="Prioridade 1" oninput="estrategiaMarkDirty()">
+          <input type="text" id="est-p2" placeholder="Prioridade 2" oninput="estrategiaMarkDirty()">
+          <input type="text" id="est-p3" placeholder="Prioridade 3" oninput="estrategiaMarkDirty()">
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="section-label">Posicionamento atual</div>
+        <textarea id="est-posicionamento" rows="2" placeholder="Como você se posiciona hoje no mercado? Vem do diagnóstico…" oninput="estrategiaMarkDirty()"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card">
+          <div class="section-label">Riscos e desafios</div>
+          <textarea id="est-riscos" rows="4" placeholder="Um risco por linha…" oninput="estrategiaMarkDirty()"></textarea>
+        </div>
+        <div class="card">
+          <div class="section-label">Próximos passos</div>
+          <textarea id="est-passos" rows="4" placeholder="Um passo por linha…" oninput="estrategiaMarkDirty()"></textarea>
+        </div>
+      </div>
+      <div id="est-empty-msg" style="display:none;padding:32px 0;text-align:center;color:var(--text-2);">
+        <div style="font-size:32px;margin-bottom:12px;">📋</div>
+        <div style="font-size:14px;margin-bottom:16px;">A estratégia ainda não foi elaborada.</div>
+        <button class="btn btn-primary" onclick="gerarEstrategiaV2()">✨ Gerar estratégia com IA</button>
+      </div>
+    </div>
+    <!-- Caminhos de carreira (legado) -->
+    <details style="margin-top:20px;">
+      <summary style="cursor:pointer;font-size:12px;color:var(--text-3);user-select:none;">↓ Ver análise de caminhos de carreira</summary>
+      <div id="estrategia-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> Analisando perfil…</div>
+      <div id="estrategia-paths" style="margin-top:12px;"></div>
+      <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()" style="margin-top:8px;">↻ Recalcular</button>
+    </details>
   </section>
 
   <!-- ═══ ASSISTENTE IA ══════════════════════════════════════════ -->
@@ -973,14 +1001,15 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 
   <!-- ═══ CONTEÚDO E YOUTUBE ═══════════════════════════════════════ -->
   <section id="s-conteudo" class="section">
-    <h1 class="page-title">Conteúdo e YouTube</h1>
-    <p class="page-sub">Estratégia editorial, pesquisa de referências e biblioteca de vídeos.</p>
+    <h1 class="page-title">Conteúdo</h1>
+    <p class="page-sub">Tom de voz, ideias de pauta, roteiros e referências.</p>
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('conteudo','estrategia',this)">Estratégia</div>
+      <div class="tab active" onclick="switchTab('conteudo','editorial',this)">Tom & Pilares</div>
+      <div class="tab" onclick="switchTab('conteudo','pautas',this);loadPautas()">Ideias de Pauta</div>
       <div class="tab" onclick="switchTab('conteudo','youtube',this)">Busca YouTube</div>
       <div class="tab" onclick="switchTab('conteudo','biblioteca',this)">Biblioteca</div>
     </div>
-    <div id="conteudo-estrategia" class="tab-panel active">
+    <div id="conteudo-editorial" class="tab-panel active">
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div class="section-label" style="margin:0;">Posicionamento Editorial</div>
@@ -994,9 +1023,27 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         <div class="field"><label>Temas principais (separados por vírgula)</label><input type="text" id="ct-temas" placeholder="ex: DaVinci Resolve, edição de vídeo, freelance"></div>
         <div class="field"><label>Formatos preferidos</label><input type="text" id="ct-formatos" placeholder="ex: tutoriais, vlogs, shorts"></div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn btn-primary" onclick="saveConteudo()">Salvar Estratégia</button>
+          <button class="btn btn-primary" onclick="saveConteudo()">Salvar</button>
           <span id="ct-saved" style="display:none;font-size:12px;color:var(--green);">✓ Salvo</span>
         </div>
+      </div>
+    </div>
+    <div id="conteudo-pautas" class="tab-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="section-label" style="margin:0;">Ideias de Pauta</div>
+        <button class="btn btn-primary btn-sm" id="btn-gerar-pautas" onclick="gerarPautas()">✨ Gerar 10 ideias</button>
+      </div>
+      <div id="pautas-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> A gerar ideias…</div>
+      <div id="pautas-pilares" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
+      <div id="pautas-list"></div>
+      <!-- Roteiro -->
+      <div id="roteiro-card" style="display:none;margin-top:20px;" class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="section-label" style="margin:0;">Roteiro gerado</div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('roteiro-card').style.display='none'">×</button>
+        </div>
+        <div id="roteiro-loading" style="display:none;padding:10px 0;"><span class="spinner"></span> A criar roteiro…</div>
+        <div id="roteiro-content"></div>
       </div>
     </div>
     <div id="conteudo-youtube" class="tab-panel">
@@ -1025,7 +1072,7 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   <!-- ═══ OPORTUNIDADES ════════════════════════════════════════════ -->
   <section id="s-oportunidades" class="section">
     <h1 class="page-title">Oportunidades</h1>
-    <p class="page-sub">Empregos, editais, bolsas, clientes e residências.</p>
+    <p class="page-sub">Editais, festivais, bolsas, residências e clientes.</p>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <select id="opp-filter-status" onchange="loadOportunidades()" style="width:auto;padding:6px 10px;">
         <option value="">Todas</option>
@@ -1034,7 +1081,18 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         <option value="aprovada">Aprovadas</option>
         <option value="rejeitada">Rejeitadas</option>
       </select>
-      <button class="btn btn-primary" onclick="document.getElementById('opp-form').style.display='block'">+ Nova Oportunidade</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="btn-buscar-opp-ia" onclick="buscarOportunidadesIA()">✨ Buscar com IA</button>
+        <button class="btn btn-primary" onclick="document.getElementById('opp-form').style.display='block'">+ Nova</button>
+      </div>
+    </div>
+    <div id="opp-ia-loading" style="display:none;padding:12px 0;"><span class="spinner"></span> A buscar oportunidades…</div>
+    <div id="opp-ia-results" style="display:none;margin-bottom:16px;" class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-label" style="margin:0;">Sugestões da IA</div>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('opp-ia-results').style.display='none'">×</button>
+      </div>
+      <div id="opp-ia-list"></div>
     </div>
     <div id="opp-form" class="card" style="display:none;margin-bottom:16px;">
       <input type="hidden" id="opp-edit-id">
@@ -1272,15 +1330,15 @@ function nav(el, targetId){
   // Hide/show floating chat button
   const fcBtn = document.getElementById('float-chat-btn');
   if (fcBtn) fcBtn.style.display = id === 's-assistente' ? 'none' : 'flex';
-  if(id==='s-estrategia'){ runCareerAnalysis(); generateEstrategia(); }
+  if(id==='s-estrategia'){ runCareerAnalysis(); loadEstrategiaV2(); }
   if(id==='s-calendario') renderCalendar();
   if(id==='s-identidade') loadIdentidade();
   if(id==='s-pesquisa') loadTrends();
   if(id==='s-revisoes'){ loadDecisions(); loadResults(); }
   if(id==='s-config') loadConnectorStatus();
-  if(id==='s-conteudo'){ loadConteudo(); generateConteudo(); }
+  if(id==='s-conteudo') loadConteudo();
   if(id==='s-oportunidades') loadOportunidades();
-  if(id==='s-aprendizado'){ loadLearning(); generateAprendizado(); }
+  if(id==='s-aprendizado') loadLearning();
   if(id==='s-ideias') loadIdeias();
   if(id==='s-relatorios') loadRelatorios();
   if(id==='s-assistente'){ loadConversations(); loadAiActions(); }
@@ -2626,7 +2684,8 @@ async function loadOportunidades(){
           </div>
           ${o.notes?`<div style="font-size:12px;color:var(--text-2);margin-top:6px;">${escHtml(o.notes)}</div>`:''}
         </div>
-        <div style="display:flex;gap:6px;flex-shrink:0;">
+        <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
+          ${o.deadline?`<button class="btn btn-ghost btn-sm" onclick="oppAddToCalendar('${o.id}','${escHtml(o.title).replace(/'/g,'\\\'')}')" title="Adicionar ao calendário">📅</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="editOportunidade('${o.id}')">Editar</button>
           <button class="btn btn-danger btn-sm" onclick="deleteOportunidade('${o.id}')">×</button>
         </div>
@@ -2665,6 +2724,23 @@ function cancelOppForm(){
   ['opp-title','opp-org','opp-deadline','opp-country','opp-url','opp-lang','opp-notes'].forEach(id=>{ const el=document.getElementById(id);if(el)el.value=''; });
 }
 async function deleteOportunidade(id){ if(!confirm('Remover?')) return; try{ await api('/api/opportunities/'+id,'DELETE'); loadOportunidades(); }catch(e){} }
+
+async function oppAddToCalendar(id, title) {
+  const data = await api('/api/opportunities');
+  const o = data.find(x => x.id === id); if (!o || !o.deadline) return;
+  try {
+    await api('/api/events', 'POST', {
+      title: 'Prazo: ' + (o.title || title),
+      date: o.deadline,
+      type: 'oportunidade',
+      project_id: null,
+      notes: o.url ? 'Link: ' + o.url : ''
+    });
+    toast('Adicionado ao calendário!');
+  } catch(e) {
+    toast('Erro ao adicionar ao calendário.', true);
+  }
+}
 
 // ── APRENDIZADO ──────────────────────────────────────────────────
 async function loadLearning(){
@@ -3288,36 +3364,201 @@ function toast(msg, err=false) {
 
 // ── FASE 3 — GERAR COM IA (por aba) ──────────────────────────────
 
-async function generateEstrategia(force=false) {
-  const card = document.getElementById('estrategia-ai-card');
-  const textEl = document.getElementById('estrategia-ai-text');
-  const btn = document.getElementById('btn-gerar-estrategia');
+// Legacy function kept for backward compat (no longer called on nav)
+async function generateEstrategia(force=false) {}
 
-  if (!force && textEl.textContent.trim()) {
-    if (!confirm('Já existe uma análise. Regenerar?')) return;
+// ── FASE 5 — ESTRATÉGIA V2 ────────────────────────────────────────
+
+let _estrategiaDirty = false;
+
+function estrategiaMarkDirty() {
+  _estrategiaDirty = true;
+  document.getElementById('btn-salvar-estrategia').style.display = 'inline-flex';
+}
+
+function _fillEstrategiaForm(d) {
+  if (d.visao)            document.getElementById('est-visao').value = d.visao;
+  if (d.prioridades?.length) {
+    document.getElementById('est-p1').value = d.prioridades[0] || '';
+    document.getElementById('est-p2').value = d.prioridades[1] || '';
+    document.getElementById('est-p3').value = d.prioridades[2] || '';
   }
+  if (d.posicionamento_atual) document.getElementById('est-posicionamento').value = d.posicionamento_atual;
+  if (d.riscos?.length)       document.getElementById('est-riscos').value = d.riscos.join('\n');
+  if (d.proximos_passos?.length) document.getElementById('est-passos').value = d.proximos_passos.join('\n');
+  document.getElementById('est-empty-msg').style.display = 'none';
+  document.getElementById('btn-salvar-estrategia').style.display = 'none';
+  _estrategiaDirty = false;
+}
 
-  btn.disabled = true;
-  btn.textContent = '⏳ A gerar…';
-
+async function loadEstrategiaV2() {
+  // Check persisted edits first, then AI cache
   try {
-    // First try cache if not forced
-    if (!force) {
-      const cached = await api('/api/ai/estrategia');
-      if (cached.text) {
-        textEl.textContent = cached.text;
-        card.style.display = 'block';
-        return;
-      }
-    }
-    const data = await api('/api/ai/estrategia', 'POST');
-    textEl.textContent = data.text || '';
-    card.style.display = data.text ? 'block' : 'none';
+    const saved = await api('/api/estrategia');
+    const keys = Object.keys(saved.data || {});
+    if (keys.length) { _fillEstrategiaForm(saved.data); return; }
+    // Try AI cache
+    const cached = await api('/api/ai/estrategia-v2');
+    if (cached.data) { _fillEstrategiaForm(cached.data); return; }
+  } catch(e) {}
+  document.getElementById('est-empty-msg').style.display = 'block';
+}
+
+async function gerarEstrategiaV2() {
+  if (_estrategiaDirty && !confirm('Tem conteúdo editado. A IA vai sobrescrever. Continuar?')) return;
+  const btn = document.getElementById('btn-gerar-estrategia-v2');
+  const loading = document.getElementById('estrategia-v2-loading');
+  btn.disabled = true; btn.textContent = '⏳ A gerar…';
+  loading.style.display = 'block';
+  document.getElementById('est-empty-msg').style.display = 'none';
+  try {
+    const data = await api('/api/ai/estrategia-v2', 'POST');
+    if (data.data) _fillEstrategiaForm(data.data);
+    toast('Estratégia gerada! Edite e salve.');
   } catch(e) {
-    toast('Erro ao gerar análise.', true);
+    toast((e.message||'Erro ao gerar estratégia.'), true);
   } finally {
-    btn.disabled = false;
-    btn.textContent = '✨ Gerar análise com IA';
+    btn.disabled = false; btn.textContent = '✨ Gerar com IA';
+    loading.style.display = 'none';
+  }
+}
+
+async function salvarEstrategiaV2() {
+  const payload = {
+    visao: document.getElementById('est-visao').value.trim(),
+    prioridades: [
+      document.getElementById('est-p1').value.trim(),
+      document.getElementById('est-p2').value.trim(),
+      document.getElementById('est-p3').value.trim()
+    ].filter(Boolean),
+    posicionamento_atual: document.getElementById('est-posicionamento').value.trim(),
+    riscos: document.getElementById('est-riscos').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    proximos_passos: document.getElementById('est-passos').value.split('\n').map(s=>s.trim()).filter(Boolean)
+  };
+  try {
+    await api('/api/estrategia', 'PUT', payload);
+    document.getElementById('btn-salvar-estrategia').style.display = 'none';
+    _estrategiaDirty = false;
+    toast('Estratégia guardada!');
+  } catch(e) {
+    toast('Erro ao salvar estratégia.', true);
+  }
+}
+
+// ── FASE 5 — PAUTAS & ROTEIRO ─────────────────────────────────────
+
+async function loadPautas() {
+  try {
+    const data = await api('/api/ai/pauta');
+    if (data.data) _renderPautas(data.data);
+    else {
+      document.getElementById('pautas-list').innerHTML = '<div style="font-size:13px;color:var(--text-2);padding:16px 0;">Ainda não há ideias. Clique em "Gerar 10 ideias".</div>';
+    }
+  } catch(e) {}
+}
+
+async function gerarPautas() {
+  const btn = document.getElementById('btn-gerar-pautas');
+  const loading = document.getElementById('pautas-loading');
+  btn.disabled = true; btn.textContent = '⏳ A gerar…';
+  loading.style.display = 'block';
+  try {
+    const data = await api('/api/ai/pauta', 'POST');
+    if (data.data) _renderPautas(data.data);
+    toast('10 ideias geradas! Clique numa para criar o roteiro.');
+  } catch(e) {
+    toast((e.message||'Erro ao gerar pautas.'), true);
+  } finally {
+    btn.disabled = false; btn.textContent = '✨ Gerar 10 ideias';
+    loading.style.display = 'none';
+  }
+}
+
+function _renderPautas(d) {
+  const pilares = d.pilares || [];
+  const ideias = d.ideias || [];
+  document.getElementById('pautas-pilares').innerHTML = pilares.map(p =>
+    `<span style="padding:4px 10px;border-radius:12px;background:var(--surface-2);font-size:12px;border:1px solid var(--sep);">${escHtml(p)}</span>`
+  ).join('');
+  document.getElementById('pautas-list').innerHTML = ideias.length
+    ? ideias.map((it,i) => `<div style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);margin-bottom:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${escHtml(it.titulo||it)}</div>
+          ${it.formato?`<span style="font-size:11px;color:var(--text-3);">${escHtml(it.formato)}</span>`:''}
+          ${it.gancho?`<div style="font-size:12px;color:var(--text-2);margin-top:4px;font-style:italic;">"${escHtml(it.gancho)}"</div>`:''}
+        </div>
+        <button class="btn btn-ghost btn-sm" style="white-space:nowrap;" onclick='gerarRoteiro(${JSON.stringify(it.titulo||it)},${JSON.stringify(it.formato||"")})'>✍ Roteiro</button>
+      </div>`).join('')
+    : '<div style="font-size:13px;color:var(--text-2);">Nenhuma ideia gerada.</div>';
+}
+
+async function gerarRoteiro(ideia, formato) {
+  const card = document.getElementById('roteiro-card');
+  const loading = document.getElementById('roteiro-loading');
+  const content = document.getElementById('roteiro-content');
+  card.style.display = 'block';
+  loading.style.display = 'block';
+  content.innerHTML = '';
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+  try {
+    const data = await api('/api/ai/roteiro', 'POST', {ideia, formato});
+    const r = data.data;
+    content.innerHTML = `
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">${escHtml(r.titulo||ideia)}</div>
+      <div style="display:grid;gap:10px;">
+        <div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Gancho (0–5s)</div><div style="font-size:13px;background:var(--surface-2);padding:8px;border-radius:6px;">${escHtml(r.gancho||'')}</div></div>
+        <div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Desenvolvimento</div><div style="font-size:13px;background:var(--surface-2);padding:8px;border-radius:6px;white-space:pre-wrap;">${escHtml(r.desenvolvimento||'')}</div></div>
+        <div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">CTA</div><div style="font-size:13px;background:var(--surface-2);padding:8px;border-radius:6px;">${escHtml(r.cta||'')}</div></div>
+        ${r.duracao_estimada?`<div style="font-size:12px;color:var(--text-3);">Duração estimada: ${escHtml(r.duracao_estimada)}</div>`:''}
+      </div>`;
+  } catch(e) {
+    content.innerHTML = `<div style="color:var(--red);font-size:13px;">${e.message||'Erro ao gerar roteiro.'}</div>`;
+  } finally {
+    loading.style.display = 'none';
+  }
+}
+
+// ── FASE 5 — BUSCAR OPORTUNIDADES COM IA ─────────────────────────
+
+async function buscarOportunidadesIA() {
+  const btn = document.getElementById('btn-buscar-opp-ia');
+  const loading = document.getElementById('opp-ia-loading');
+  const results = document.getElementById('opp-ia-results');
+  const list = document.getElementById('opp-ia-list');
+  btn.disabled = true; btn.textContent = '⏳ A buscar…';
+  loading.style.display = 'block';
+  results.style.display = 'none';
+  try {
+    const data = await api('/api/ai/oportunidades-busca', 'POST');
+    const items = data.items || [];
+    if (!items.length) { toast('Nenhuma oportunidade encontrada.', true); return; }
+    list.innerHTML = items.map(it => `<div style="padding:10px 0;border-bottom:1px solid var(--sep);">
+      <div style="font-size:13px;font-weight:600;">${escHtml(it.title)}</div>
+      <div style="font-size:12px;color:var(--text-2);margin:2px 0;">${escHtml(it.organization||'')} ${it.country?'· '+escHtml(it.country):''}</div>
+      ${it.notes?`<div style="font-size:12px;color:var(--text-2);margin-top:4px;">${escHtml(it.notes)}</div>`:''}
+      <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick='_importarOpp(${JSON.stringify(it)})'>+ Adicionar</button>
+    </div>`).join('');
+    results.style.display = 'block';
+    toast(`${items.length} oportunidades encontradas!`);
+  } catch(e) {
+    toast((e.message||'Erro na busca.'), true);
+  } finally {
+    btn.disabled = false; btn.textContent = '✨ Buscar com IA';
+    loading.style.display = 'none';
+  }
+}
+
+async function _importarOpp(it) {
+  try {
+    await api('/api/opportunities', 'POST', {
+      title: it.title, organization: it.organization||'', category: it.category||'',
+      url: it.url||'', deadline: it.deadline||'', country: it.country||'',
+      language: '', notes: it.notes||'', status: 'identificada', source: 'ia'
+    });
+    loadOportunidades();
+    toast('Oportunidade adicionada!');
+  } catch(e) {
+    toast('Erro ao adicionar.', true);
   }
 }
 

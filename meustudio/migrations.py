@@ -247,12 +247,25 @@ def migration_005(conn: sqlite3.Connection) -> None:
     """)
 
 
+def migration_006(conn: sqlite3.Connection) -> None:
+    """Fase 5 — Estratégia de carreira estruturada e pautas de conteúdo."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS estrategia_data (
+            id         INTEGER PRIMARY KEY DEFAULT 1,
+            data       TEXT NOT NULL DEFAULT '{}',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.execute("INSERT OR IGNORE INTO estrategia_data (id, data) VALUES (1, '{}')")
+
+
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_001,
     migration_002,
     migration_003,
     migration_004,
     migration_005,
+    migration_006,
 ]
 
 

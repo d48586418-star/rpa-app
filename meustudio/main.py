@@ -995,6 +995,31 @@ async def delete_opportunity(oid: str):
     return {"ok": True}
 
 
+# ── ESTRATÉGIA DATA ───────────────────────────────────────────────
+@app.get("/api/estrategia")
+async def get_estrategia():
+    with db() as c:
+        row = c.execute("SELECT data FROM estrategia_data WHERE id=1").fetchone()
+    if not row:
+        return {"ok": True, "data": {}}
+    try:
+        return {"ok": True, "data": json.loads(row["data"] or "{}")}
+    except Exception:
+        return {"ok": True, "data": {}}
+
+
+@app.put("/api/estrategia")
+async def put_estrategia(request: Request):
+    payload = await request.json()
+    with db() as c:
+        c.execute(
+            "INSERT INTO estrategia_data (id, data, updated_at) VALUES (1,?,CURRENT_TIMESTAMP) "
+            "ON CONFLICT(id) DO UPDATE SET data=excluded.data, updated_at=CURRENT_TIMESTAMP",
+            (json.dumps(payload),)
+        )
+    return {"ok": True}
+
+
 # ── LEARNING GOALS ────────────────────────────────────────────────
 @app.get("/api/learning")
 async def get_learning():
@@ -1821,6 +1846,146 @@ async def generate_ai_aprendizado():
             pass
     _set_ai_cache("aprendizado", raw)
     return {"ok": True, "suggestions": [], "cached": False}
+
+
+@app.post("/api/ai/estrategia-v2")
+async def generate_ai_estrategia_v2():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        "Com base no perfil completo de Débora Augusta (projectos, diagnóstico, persona, posicionamento), "
+        "gera uma estratégia de carreira estruturada para os próximos 12 meses. "
+        "Responde APENAS com JSON válido, sem texto extra:\n"
+        '{"visao":"visão clara de onde ela quer estar em 1 ano (2-3 frases)",'
+        '"prioridades":["prioridade estratégica 1","prioridade estratégica 2","prioridade estratégica 3"],'
+        '"posicionamento_atual":"resumo do posicionamento actual com base no diagnóstico (1-2 frases)",'
+        '"riscos":["risco ou desafio 1","risco ou desafio 2","risco ou desafio 3"],'
+        '"proximos_passos":["passo concreto e accionável 1","passo 2","passo 3","passo 4","passo 5"]}'
+    )
+    try:
+        import re as _re
+        raw = await ai_generate("estrategia_v2", instrucao)
+        m = _re.search(r'\{[\s\S]*\}', raw)
+        if m:
+            data = json.loads(m.group())
+            _set_ai_cache("estrategia_v2", json.dumps(data))
+            return {"ok": True, "data": data}
+    except Exception as e:
+        log.error("ai_generate estrategia_v2: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_INVALID", "message": "Resposta inválida da IA, tente novamente"})
+
+
+@app.get("/api/ai/estrategia-v2")
+async def get_ai_estrategia_v2():
+    cached = _get_ai_cache("estrategia_v2")
+    if cached:
+        try:
+            return {"ok": True, "data": json.loads(cached["resposta"]), "cached": True}
+        except Exception:
+            pass
+    return {"ok": True, "data": None, "cached": False}
+
+
+@app.post("/api/ai/pauta")
+async def generate_ai_pauta():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        "Com base no tom de voz, persona e posicionamento de Débora Augusta, "
+        "gera pilares e ideias de pauta para o seu conteúdo nas redes sociais. "
+        "Responde APENAS com JSON válido, sem texto extra:\n"
+        '{"pilares":["pilar temático 1","pilar 2","pilar 3","pilar 4"],'
+        '"ideias":['
+        '{"titulo":"título da ideia de pauta 1","formato":"ex: Reels, Carrossel, Story","pilar":"pilar relacionado","gancho":"primeira frase de impacto"},'
+        '... (total de 10 ideias)'
+        ']}'
+    )
+    try:
+        import re as _re
+        raw = await ai_generate("pauta", instrucao)
+        m = _re.search(r'\{[\s\S]*\}', raw)
+        if m:
+            data = json.loads(m.group())
+            _set_ai_cache("pauta", json.dumps(data))
+            return {"ok": True, "data": data}
+    except Exception as e:
+        log.error("ai_generate pauta: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_INVALID", "message": "Resposta inválida da IA, tente novamente"})
+
+
+@app.get("/api/ai/pauta")
+async def get_ai_pauta():
+    cached = _get_ai_cache("pauta")
+    if cached:
+        try:
+            return {"ok": True, "data": json.loads(cached["resposta"]), "cached": True}
+        except Exception:
+            pass
+    return {"ok": True, "data": None, "cached": False}
+
+
+@app.post("/api/ai/roteiro")
+async def generate_ai_roteiro(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    ideia = body.get("ideia", "")
+    formato = body.get("formato", "")
+    if not ideia:
+        raise HTTPException(status_code=400, detail={"ok": False, "code": "MISSING_IDEA", "message": "Escolha uma ideia de pauta primeiro"})
+    instrucao = (
+        f"Cria um roteiro curto e prático para o seguinte conteúdo de Débora Augusta:\n"
+        f"Ideia: {ideia}\nFormato: {formato or 'Reels/vídeo curto'}\n\n"
+        "Responde APENAS com JSON válido, sem texto extra:\n"
+        '{"titulo":"título final do vídeo",'
+        '"gancho":"primeiros 5 segundos — o que dizer para prender a atenção",'
+        '"desenvolvimento":"corpo do vídeo em tópicos curtos (máx. 5 pontos)",'
+        '"cta":"call-to-action final (o que pedir ao espectador)",'
+        '"duracao_estimada":"ex: 30-60 segundos"}'
+    )
+    try:
+        import re as _re
+        raw = await ai_generate("roteiro", instrucao)
+        m = _re.search(r'\{[\s\S]*\}', raw)
+        if m:
+            data = json.loads(m.group())
+            return {"ok": True, "data": data}
+    except Exception as e:
+        log.error("ai_generate roteiro: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_INVALID", "message": "Resposta inválida da IA, tente novamente"})
+
+
+@app.post("/api/ai/oportunidades-busca")
+async def ai_busca_oportunidades():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        "Com base no perfil e posicionamento de Débora Augusta (cineasta/editora, Bahia, Brasil), "
+        "sugere 5 oportunidades concretas e reais: editais, festivais, bolsas, residências artísticas ou "
+        "chamadas abertas relevantes para profissionais de audiovisual e documentário no Brasil e internacionalmente. "
+        "Para cada uma, inclui informações realistas (pode ser exemplos de edições anteriores se não souberes a edição actual). "
+        "Responde APENAS com JSON válido, sem texto extra:\n"
+        '[{"title":"nome da oportunidade","organization":"organização responsável",'
+        '"category":"edital|festival|bolsa|residencia|chamada",'
+        '"url":"URL oficial se conhecida ou string vazia",'
+        '"deadline":"data estimada ou string vazia",'
+        '"country":"Brasil ou país",'
+        '"notes":"por que é relevante para Débora em 1-2 frases"}]'
+    )
+    try:
+        import re as _re
+        raw = await ai_generate("oportunidades_busca", instrucao)
+        m = _re.search(r'\[[\s\S]*\]', raw)
+        if m:
+            items = json.loads(m.group())
+            return {"ok": True, "items": items}
+    except Exception as e:
+        log.error("ai_generate oportunidades_busca: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_INVALID", "message": "Resposta inválida da IA, tente novamente"})
 
 
 @app.get("/api/ai/actions")
