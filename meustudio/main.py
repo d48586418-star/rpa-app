@@ -44,8 +44,39 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("meustudio")
 
+# B7 — log rotativo em arquivo além do console
+try:
+    from logging.handlers import RotatingFileHandler as _RFH
+    from pathlib import Path as _P
+    _log_dir = _P(__file__).parent / "data" / "logs"
+    _log_dir.mkdir(parents=True, exist_ok=True)
+    _fh = _RFH(_log_dir / "app.log", maxBytes=1_048_576, backupCount=3)
+    _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    logging.getLogger().addHandler(_fh)
+except Exception:
+    pass
+
 app = FastAPI(title="Meu Studio API v3")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# B4 — handlers globais de erro (sem stack trace no corpo)
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+
+@app.exception_handler(RequestValidationError)
+async def _validation_handler(request, exc):
+    return JSONResponse(status_code=422,
+        content={"ok": False, "code": "VALIDATION_ERROR",
+                 "message": "Dados inválidos na requisição."})
+
+@app.exception_handler(Exception)
+async def _generic_handler(request, exc):
+    log.error("Erro interno: %s", exc)
+    if isinstance(exc, HTTPException):
+        raise exc
+    return JSONResponse(status_code=500,
+        content={"ok": False, "code": "INTERNAL_ERROR",
+                 "message": "Erro interno do servidor."})
 
 DB_PATH = Path("studio.db")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
@@ -216,6 +247,14 @@ def init_db():
                     pass
 
     log.info("DB initialised at %s", DB_PATH)
+
+    # B2 — migrações numeradas após init legacy
+    try:
+        from migrations import run_migrations
+        from config import BACKUP_DIR
+        run_migrations(DB_PATH, BACKUP_DIR)
+    except Exception as _me:
+        log.error("Falha nas migrações: %s", _me)
 
 init_db()
 
@@ -1423,50 +1462,8 @@ Contexto actual dos dados de Débora:
 {context}"""
 
 
-async def call_gemini(contents, system_instruction: str) -> str:
-    import random
-    client = genai_client.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
-    models_to_try = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
-    last_err = None
-    for model in models_to_try:
-        skip_retry = False
-        for attempt in range(3):
-            if skip_retry and attempt > 0:
-                break
-            try:
-                response = await client.aio.models.generate_content(
-                    model=model,
-                    contents=contents,
-                    config=genai_types.GenerateContentConfig(
-                        system_instruction=system_instruction,
-                        max_output_tokens=4096,
-                    )
-                )
-                if not response.text or not response.text.strip():
-                    last_err = ValueError("Resposta vazia da IA")
-                    break
-                return response.text
-            except Exception as e:
-                last_err = e
-                code = getattr(e, "status_code", None) or getattr(e, "code", None)
-                if code in (400, 401, 403, 404):
-                    raise
-                if code == 429:
-                    # RPD: daily quota exhausted — no retry, try next model once
-                    if "PerDay" in str(e):
-                        skip_retry = True
-                        break
-                    # RPM/TPM: rate limit — exponential backoff + jitter
-                    if attempt < 2:
-                        await asyncio.sleep((2 ** attempt) * 1.5 + random.uniform(0, 0.5))
-                        continue
-                    break
-                if code in (500, 503, 504) and attempt < 2:
-                    await asyncio.sleep(1.5 * (attempt + 1))
-                    continue
-                break
-    log.error(f"Gemini falhou em todos os modelos: {last_err}")
-    raise last_err if last_err else RuntimeError("IA indisponível")
+# B3 — call_gemini movido para ai.py; importar aqui para compatibilidade
+from ai import call_gemini
 
 
 @app.post("/api/ai/chat")
@@ -1537,20 +1534,38 @@ async def delete_ai_conversation(session_id: str):
 # ── STATUS ────────────────────────────────────────────────────────
 @app.get("/api/status")
 async def status():
+    try:
+        with db() as c:
+            schema_v = c.execute("PRAGMA user_version").fetchone()[0]
+            db_ok = True
+    except Exception:
+        schema_v, db_ok = 0, False
+    from config import GEMINI_MODEL as _gm, GEMINI_API_KEY as _gk
     return {
-        "status": "ok",
-        "version": "3.0",
-        "db": str(DB_PATH),
+        "ok": True,
+        "version": "4.0",
+        "db_ok": db_ok,
+        "schema_version": schema_v,
+        "model_active": _gm,
+        "gemini": HAS_GEMINI and bool(_gk),
         "pytrends": HAS_PYTRENDS,
         "youtube_api": bool(os.environ.get("YOUTUBE_API_KEY")),
         "google_search_api": bool(os.environ.get("GOOGLE_CSE_KEY")),
         "google_calendar": bool(os.environ.get("GOOGLE_CLIENT_ID")),
-        "gemini": HAS_GEMINI and bool(os.environ.get("GEMINI_API_KEY")),
     }
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    print(f"\n Meu Studio v4 em http://{HOST}:{PORT}\n")
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    from config import HOST as _HOST, PORT as _PORT, RELOAD as _RELOAD, log_startup
+    log_startup(log)
+    print(f"\n Meu Studio v4 em http://{_HOST}:{_PORT}\n")
+    uvicorn.run(
+        "main:app",
+        host=_HOST,
+        port=_PORT,
+        reload=_RELOAD,
+        reload_includes=["*.py", "*.html", "*.css", "*.js"] if _RELOAD else None,
+        reload_excludes=["data/*"] if _RELOAD else None,
+    )

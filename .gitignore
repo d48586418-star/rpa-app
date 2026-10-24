@@ -13,3 +13,6 @@ __pycache__/
 *.db
 *.db-shm
 *.db-wal
+meustudio/data/
+meustudio/.venv/
+*.bak
