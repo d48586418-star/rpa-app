@@ -49,7 +49,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 DB_PATH = Path("studio.db")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-GEMINI_FALLBACK_MODELS = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+GEMINI_FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
 GEMINI_RETRY_ERRORS = {429, 500, 503, 504}
 
 # ── DATABASE ───────────────────────────────────────────────────────
