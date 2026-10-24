@@ -315,12 +315,76 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   <!-- ═══ PERFIL / DIAGNÓSTICO ═══════════════════════════════════ -->
   <section id="s-perfil" class="section">
     <h1 class="page-title">Meu Perfil</h1>
-    <p class="page-sub">Diagnóstico adaptativo para mapear sua carreira.</p>
+    <p class="page-sub">Dados pessoais, diagnóstico adaptativo e síntese de carreira.</p>
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('perfil','diagnostico',this)">Diagnóstico</div>
-      <div class="tab" onclick="switchTab('perfil','sintese',this)">Síntese de Perfil</div>
+      <div class="tab active" onclick="switchTab('perfil','dados',this);loadProfileForm()">Dados</div>
+      <div class="tab" onclick="switchTab('perfil','diagnostico',this)">Diagnóstico</div>
+      <div class="tab" onclick="switchTab('perfil','sintese',this)">Síntese</div>
     </div>
-    <div id="perfil-tab-diagnostico" class="tab-panel active">
+
+    <!-- TAB: DADOS -->
+    <div id="perfil-tab-dados" class="tab-panel active">
+      <div class="card" style="display:flex;flex-direction:column;gap:20px;">
+        <!-- Foto -->
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="position:relative;width:80px;height:80px;flex-shrink:0;">
+            <img id="profile-photo" src="" alt="Foto de perfil"
+              style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--sep);display:none;">
+            <div id="profile-photo-placeholder"
+              style="width:80px;height:80px;border-radius:50%;background:var(--sep);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--text-3);">👤</div>
+          </div>
+          <div>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+              Alterar foto
+              <input type="file" id="profile-photo-input" accept="image/jpeg,image/png,image/webp"
+                style="display:none;" onchange="uploadProfilePhoto(this)">
+            </label>
+            <div id="profile-photo-status" style="font-size:12px;color:var(--text-3);margin-top:4px;"></div>
+          </div>
+        </div>
+        <!-- Campos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);">Nome</label>
+            <input type="text" id="pf-name" placeholder="Seu nome" onblur="saveProfileField('name',this.value)">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);">Cidade</label>
+            <input type="text" id="pf-cidade" placeholder="Ex: Salvador, BA" onblur="saveProfileField('cidade',this.value)">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);">Bio curta</label>
+          <textarea id="pf-bio" rows="2" placeholder="Quem você é em 2–3 frases…" onblur="saveProfileField('bio',this.value)" style="resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);">Áreas de atuação</label>
+          <input type="text" id="pf-areas" placeholder="Ex: edição, documentário, videoclipe" onblur="saveProfileField('areas',this.value)">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);">Rendimento atual (R$)</label>
+            <input type="number" id="pf-income" placeholder="0" onblur="saveProfileField('current_income',this.value)">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);">Meta de rendimento (R$)</label>
+            <input type="number" id="pf-target" placeholder="0" onblur="saveProfileField('target_income',this.value)">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);">Links (portfólio, redes)</label>
+          <input type="text" id="pf-links" placeholder="https://…" onblur="saveProfileField('links',this.value)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-2);">Notas livres</label>
+          <textarea id="pf-notas" rows="3" placeholder="Qualquer informação que queira guardar sobre si…" onblur="saveProfileField('notas_livres',this.value)" style="resize:vertical;"></textarea>
+        </div>
+        <div id="pf-save-status" style="font-size:12px;color:var(--text-3);"></div>
+      </div>
+    </div>
+
+    <!-- TAB: DIAGNÓSTICO -->
+    <div id="perfil-tab-diagnostico" class="tab-panel">
       <div id="diag-complete" style="display:none;" class="card">
         <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">✓ Diagnóstico completo</div>
         <p style="font-size:13px;color:var(--text-2);margin-bottom:16px;">Seu perfil foi mapeado. Acesse Estratégia para ver os caminhos recomendados.</p>
@@ -341,6 +405,8 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         </div>
       </div>
     </div>
+
+    <!-- TAB: SÍNTESE -->
     <div id="perfil-tab-sintese" class="tab-panel">
       <div id="sintese-content" style="color:var(--text-2);font-size:13px;">Complete o diagnóstico para ver a síntese.</div>
     </div>
@@ -365,21 +431,47 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   <section id="s-assistente" class="section">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
       <h1 class="page-title">Assistente IA</h1>
-      <button class="btn btn-ghost btn-sm" onclick="newChatSession()">+ Nova conversa</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="toggleMemoryPanel()">🧠 Memória</button>
+        <button class="btn btn-primary btn-sm" onclick="startNewConversation()">+ Nova conversa</button>
+      </div>
     </div>
     <p class="page-sub">Converse com a IA sobre a sua carreira — ela conhece o seu perfil, projectos e diagnóstico.</p>
-    <div style="display:flex;flex-direction:column;height:calc(100vh - 220px);background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);">
-      <div id="chat-messages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;">
-        <div class="chat-msg chat-msg-ai">
-          <div class="chat-bubble">Olá! Sou a tua assistente estratégica. Conheço o teu perfil, projectos e diagnóstico. Como posso ajudar?</div>
-        </div>
+
+    <!-- Painel de memória (colapsável) -->
+    <div id="memory-panel" style="display:none;margin-bottom:12px;" class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">Memória da assistente</span>
+        <button class="btn btn-ghost btn-sm" onclick="addMemoryFact()" style="font-size:12px;">+ Adicionar facto</button>
       </div>
-      <div id="chat-loading" style="display:none;padding:8px 20px;font-size:12px;color:var(--text-3);">A pensar…</div>
-      <div style="padding:12px 16px;border-top:1px solid var(--sep);display:flex;gap:8px;">
-        <input type="text" id="chat-input" placeholder="Escreve a tua mensagem…" style="flex:1;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
-        <button class="btn btn-primary" onclick="sendChatMessage()">Enviar</button>
+      <div id="memory-list" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:12px;color:var(--text-3);">A carregar…</div>
       </div>
     </div>
+
+    <!-- Layout duas colunas: lista de conversas + chat -->
+    <div style="display:flex;gap:12px;height:calc(100vh - 260px);min-height:400px;">
+      <!-- Sidebar de conversas -->
+      <div id="conv-sidebar" style="width:200px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;overflow-y:auto;background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:8px;">
+        <div id="conv-list" style="display:flex;flex-direction:column;gap:2px;">
+          <div style="font-size:12px;color:var(--text-3);padding:4px 8px;">A carregar…</div>
+        </div>
+      </div>
+      <!-- Área de chat -->
+      <div style="flex:1;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);overflow:hidden;min-width:0;">
+        <div id="chat-messages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;">
+          <div class="chat-msg chat-msg-ai">
+            <div class="chat-bubble">Olá! Sou a tua assistente estratégica. Conheço o teu perfil, projectos e diagnóstico. Como posso ajudar?</div>
+          </div>
+        </div>
+        <div id="chat-loading" style="display:none;padding:8px 20px;font-size:12px;color:var(--text-3);">A pensar…</div>
+        <div style="padding:12px 16px;border-top:1px solid var(--sep);display:flex;gap:8px;">
+          <input type="text" id="chat-input" placeholder="Escreve a tua mensagem…" style="flex:1;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+          <button class="btn btn-primary" onclick="sendChatMessage()">Enviar</button>
+        </div>
+      </div>
+    </div>
+    <div id="chat-conv-title" style="font-size:12px;color:var(--text-3);margin-top:4px;text-align:right;"></div>
   </section>
 
   <!-- ═══ PESQUISA ═══════════════════════════════════════════════ -->
@@ -931,6 +1023,8 @@ function nav(el, targetId){
   if(id==='s-aprendizado') loadLearning();
   if(id==='s-ideias') loadIdeias();
   if(id==='s-relatorios') loadRelatorios();
+  if(id==='s-assistente') loadConversations();
+  if(id==='s-perfil') loadProfileForm();
 }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
@@ -2208,16 +2302,6 @@ async function checkStatus(){
 }
 
 // ── ASSISTENTE IA ─────────────────────────────────────────────────
-let chatSessionId = null;
-
-function getChatSessionId(){
-  if(!chatSessionId){
-    try{ chatSessionId=sessionStorage.getItem('ms_chat_session'); }catch(e){}
-    if(!chatSessionId){ chatSessionId=crypto.randomUUID(); try{ sessionStorage.setItem('ms_chat_session',chatSessionId); }catch(e){} }
-  }
-  return chatSessionId;
-}
-
 function appendChatMsg(role, content){
   const container=document.getElementById('chat-messages');
   const div=document.createElement('div');
@@ -2230,6 +2314,91 @@ function appendChatMsg(role, content){
   container.scrollTop=container.scrollHeight;
 }
 
+// ── CONVERSAS ─────────────────────────────────────────────────────
+let currentConvId = null;
+
+async function loadConversations(){
+  const list = document.getElementById('conv-list');
+  try{
+    const convs = await api('/api/conversations');
+    if(!convs.length){
+      list.innerHTML='<div style="font-size:12px;color:var(--text-3);padding:4px 8px;">Ainda sem conversas.<br>Inicie uma!</div>';
+      if(!currentConvId) await startNewConversation();
+      return;
+    }
+    list.innerHTML='';
+    convs.forEach(c=>{
+      const el=document.createElement('div');
+      el.dataset.cid=c.id;
+      el.style.cssText='display:flex;align-items:center;gap:4px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;transition:background .15s;';
+      el.style.background = c.id===currentConvId ? 'var(--accent-pill,#CFE88B)' : '';
+      el.style.color = c.id===currentConvId ? 'var(--text)' : 'var(--text-2)';
+      const title=document.createElement('span');
+      title.textContent=c.title;
+      title.style.cssText='flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      el.appendChild(title);
+      const del=document.createElement('span');
+      del.textContent='×';
+      del.title='Eliminar conversa';
+      del.style.cssText='opacity:0;padding:0 2px;font-size:14px;flex-shrink:0;';
+      el.addEventListener('mouseenter',()=>del.style.opacity='1');
+      el.addEventListener('mouseleave',()=>del.style.opacity='0');
+      del.addEventListener('click',async(e)=>{e.stopPropagation();await deleteConversation(c.id);});
+      el.appendChild(del);
+      el.addEventListener('click',()=>selectConversation(c.id,c.title));
+      list.appendChild(el);
+    });
+    // Auto-select first if none selected
+    if(!currentConvId) await selectConversation(convs[0].id, convs[0].title);
+  }catch(e){
+    list.innerHTML='<div style="font-size:12px;color:var(--text-3);padding:4px 8px;">Erro ao carregar.</div>';
+  }
+}
+
+async function selectConversation(cid, title){
+  currentConvId = cid;
+  const container = document.getElementById('chat-messages');
+  const titleEl = document.getElementById('chat-conv-title');
+  if(titleEl) titleEl.textContent = title || '';
+  container.innerHTML='';
+  // Highlight in sidebar
+  document.querySelectorAll('#conv-list [data-cid]').forEach(el=>{
+    const active = parseInt(el.dataset.cid)===cid;
+    el.style.background = active ? 'var(--accent-pill,#CFE88B)' : '';
+    el.style.color = active ? 'var(--text)' : 'var(--text-2)';
+  });
+  try{
+    const msgs = await api(`/api/conversations/${cid}/messages`);
+    if(!msgs.length){
+      appendChatMsg('model','Nova conversa. Como posso ajudar?');
+    } else {
+      msgs.forEach(m=>appendChatMsg(m.role,m.content));
+    }
+  }catch(e){
+    appendChatMsg('model','Erro ao carregar histórico.');
+  }
+}
+
+async function startNewConversation(){
+  try{
+    const conv = await api('/api/conversations',{method:'POST',body:JSON.stringify({title:'Nova conversa'})});
+    currentConvId = conv.id;
+    await loadConversations();
+    await selectConversation(conv.id,'Nova conversa');
+  }catch(e){
+    const container=document.getElementById('chat-messages');
+    container.innerHTML='';
+    appendChatMsg('model','Olá! Como posso ajudar?');
+  }
+}
+
+async function deleteConversation(cid){
+  if(!confirm('Eliminar esta conversa?')) return;
+  try{ await api(`/api/conversations/${cid}`,{method:'DELETE'}); }catch(e){}
+  if(currentConvId===cid) currentConvId=null;
+  await loadConversations();
+}
+
 async function sendChatMessage(){
   const input=document.getElementById('chat-input');
   const message=input.value.trim();
@@ -2238,20 +2407,117 @@ async function sendChatMessage(){
   appendChatMsg('user',message);
   document.getElementById('chat-loading').style.display='block';
   try{
-    const data=await api('/api/ai/chat',{method:'POST',body:JSON.stringify({message,session_id:getChatSessionId()})});
+    const data=await api('/api/ai/chat',{method:'POST',body:JSON.stringify({message,conversation_id:currentConvId})});
     appendChatMsg('model',data.reply);
+    if(data.conversation_id && data.conversation_id!==currentConvId){
+      currentConvId=data.conversation_id;
+    }
+    // Refresh sidebar titles (first message auto-titles conversation)
+    loadConversations();
   }catch(e){
     appendChatMsg('model','Erro ao contactar a IA. Verifica se o servidor está a correr e a chave Gemini está configurada.');
   }
   document.getElementById('chat-loading').style.display='none';
 }
 
-function newChatSession(){
-  chatSessionId=crypto.randomUUID();
-  try{ sessionStorage.setItem('ms_chat_session',chatSessionId); }catch(e){}
-  const container=document.getElementById('chat-messages');
-  container.innerHTML='';
-  appendChatMsg('model','Nova conversa iniciada. Como posso ajudar?');
+// ── MEMÓRIA ────────────────────────────────────────────────────────
+function toggleMemoryPanel(){
+  const p=document.getElementById('memory-panel');
+  if(p.style.display==='none'){ p.style.display='block'; loadMemory(); }
+  else p.style.display='none';
+}
+
+async function loadMemory(){
+  const list=document.getElementById('memory-list');
+  try{
+    const facts=await api('/api/ai/memory');
+    if(!facts.length){
+      list.innerHTML='<div style="font-size:12px;color:var(--text-3);">Ainda sem factos guardados. Adicione informações que a assistente deve lembrar sempre.</div>';
+      return;
+    }
+    list.innerHTML='';
+    facts.forEach(f=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:var(--bg-page,#F4F4EF);border-radius:6px;font-size:12px;';
+      const txt=document.createElement('span');
+      txt.textContent=f.fact;
+      txt.style.flex='1';
+      const del=document.createElement('button');
+      del.textContent='×';
+      del.className='btn btn-ghost btn-sm';
+      del.style.cssText='padding:0 6px;font-size:14px;min-width:0;flex-shrink:0;';
+      del.onclick=async()=>{ await api(`/api/ai/memory/${f.id}`,{method:'DELETE'}); loadMemory(); };
+      row.appendChild(txt);
+      row.appendChild(del);
+      list.appendChild(row);
+    });
+  }catch(e){
+    list.innerHTML='<div style="font-size:12px;color:var(--text-3);">Erro ao carregar.</div>';
+  }
+}
+
+async function addMemoryFact(){
+  const fact=prompt('Que facto devo lembrar sempre?');
+  if(!fact||!fact.trim()) return;
+  try{ await api('/api/ai/memory',{method:'POST',body:JSON.stringify({fact:fact.trim()})}); loadMemory(); }
+  catch(e){ alert('Erro ao guardar.'); }
+}
+
+// ── PERFIL — DADOS ─────────────────────────────────────────────────
+async function loadProfileForm(){
+  try{
+    const prof=await api('/api/profile');
+    const set=(id,v)=>{ const el=document.getElementById(id); if(el&&v!=null) el.value=v; };
+    set('pf-name', prof.name||'');
+    set('pf-cidade', prof.cidade||'');
+    set('pf-bio', prof.bio||'');
+    set('pf-areas', prof.areas||'');
+    set('pf-income', prof.current_income||'');
+    set('pf-target', prof.target_income||'');
+    set('pf-links', prof.links||'');
+    set('pf-notas', prof.notas_livres||'');
+    if(prof.photo_url){
+      const img=document.getElementById('profile-photo');
+      const ph=document.getElementById('profile-photo-placeholder');
+      if(img){ img.src=prof.photo_url; img.style.display='block'; }
+      if(ph) ph.style.display='none';
+    }
+  }catch(e){}
+}
+
+async function saveProfileField(key, value){
+  const status=document.getElementById('pf-save-status');
+  try{
+    const prof=await api('/api/profile');
+    const updated={...prof};
+    updated[key]=value;
+    await api('/api/profile','POST',updated);
+    if(status){ status.textContent='✓ Guardado'; setTimeout(()=>status.textContent='',2000); }
+  }catch(e){
+    if(status) status.textContent='Erro ao guardar.';
+  }
+}
+
+async function uploadProfilePhoto(input){
+  const file=input.files[0];
+  if(!file) return;
+  const status=document.getElementById('profile-photo-status');
+  if(status) status.textContent='A enviar…';
+  const form=new FormData();
+  form.append('file',file);
+  try{
+    const resp=await fetch('/api/profile/photo',{method:'POST',body:form});
+    const data=await resp.json();
+    if(!resp.ok) throw new Error(data.detail||'Erro');
+    const img=document.getElementById('profile-photo');
+    const ph=document.getElementById('profile-photo-placeholder');
+    if(img){ img.src=data.url+'?t='+Date.now(); img.style.display='block'; }
+    if(ph) ph.style.display='none';
+    if(status) status.textContent='✓ Foto actualizada';
+    setTimeout(()=>{ if(status) status.textContent=''; },3000);
+  }catch(e){
+    if(status) status.textContent='Erro: '+e.message;
+  }
 }
 
 // ── INIT ─────────────────────────────────────────────────────────

@@ -6,11 +6,12 @@ from fastapi import FastAPI, Request, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-import json, time, os, logging, sqlite3, asyncio
+import json, time, os, logging, sqlite3, asyncio, shutil, uuid, mimetypes
 from pathlib import Path
 from contextlib import contextmanager
 import feedparser, requests
 from bs4 import BeautifulSoup
+from fastapi import UploadFile, File
 
 # Load .env if present (local dev)
 try:
@@ -79,6 +80,8 @@ async def _generic_handler(request, exc):
                  "message": "Erro interno do servidor."})
 
 DB_PATH = Path("studio.db")
+UPLOADS_DIR = Path("data/uploads")
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_FALLBACK_MODELS = [m.strip() for m in os.environ.get("GEMINI_FALLBACK_MODELS", "").split(",") if m.strip()]
 GEMINI_RETRY_ERRORS = {429, 500, 503, 504}
@@ -1397,10 +1400,21 @@ def build_ai_context(c) -> str:
         if p:
             parts.append("PERFIL DA UTILIZADORA:")
             if p.get("name"): parts.append(f"- Nome: {p['name']}")
+            if p.get("bio"): parts.append(f"- Bio: {p['bio'][:200]}")
+            if p.get("cidade"): parts.append(f"- Cidade: {p['cidade']}")
+            if p.get("areas"): parts.append(f"- Áreas: {p['areas']}")
             if p.get("goal"): parts.append(f"- Objectivo principal: {p['goal']}")
             if p.get("area"): parts.append(f"- Área: {p['area']}")
             if p.get("current_income"): parts.append(f"- Rendimento actual: R$ {p['current_income']}")
             if p.get("target_income"): parts.append(f"- Meta de rendimento: R$ {p['target_income']}")
+            if p.get("notas_livres"): parts.append(f"- Notas pessoais: {p['notas_livres'][:200]}")
+
+    # AI Memory facts
+    memory = c.execute("SELECT fact FROM ai_memory ORDER BY id DESC LIMIT 20").fetchall()
+    if memory:
+        parts.append("\nMEMÓRIA EXPLÍCITA DA ASSISTENTE:")
+        for (fact,) in memory:
+            parts.append(f"- {fact}")
 
     # Diagnostic answers
     diag = c.execute("SELECT question_id, label FROM diagnostic").fetchall()
@@ -1473,7 +1487,7 @@ async def ai_chat(request: Request):
 
     body = await request.json()
     message = body.get("message", "").strip()
-    session_id = body.get("session_id", "default")
+    conversation_id = body.get("conversation_id")
     if not message:
         raise HTTPException(status_code=400, detail="Mensagem vazia")
 
@@ -1484,13 +1498,23 @@ async def ai_chat(request: Request):
             (today,)
         ).fetchone()[0]
     if used_today >= AI_DAILY_BUDGET:
-        raise HTTPException(status_code=429, detail=f"Limite diário de {AI_DAILY_BUDGET} respostas atingido.")
+        raise HTTPException(status_code=429, detail={"ok": False, "code": "AI_BUDGET_EXCEEDED", "message": f"Limite diário de {AI_DAILY_BUDGET} respostas atingido."})
+
+    # Ensure conversation exists
+    with db() as c:
+        if conversation_id:
+            row = c.execute("SELECT id FROM conversations WHERE id=?", (conversation_id,)).fetchone()
+            if not row:
+                conversation_id = None
+        if not conversation_id:
+            c.execute("INSERT INTO conversations (title) VALUES ('Nova conversa')")
+            conversation_id = c.execute("SELECT last_insert_rowid()").fetchone()[0]
 
     with db() as c:
         context = build_ai_context(c)
         history = c.execute(
-            "SELECT role, content FROM ai_conversations WHERE session_id=? ORDER BY id DESC LIMIT 20",
-            (session_id,)
+            "SELECT role, content FROM ai_conversations WHERE conversation_id=? ORDER BY id DESC LIMIT 20",
+            (conversation_id,)
         ).fetchall()
         history = list(reversed(history))
 
@@ -1506,12 +1530,32 @@ async def ai_chat(request: Request):
         raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
 
     with db() as c:
-        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
-                  (session_id, "user", message))
-        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
-                  (session_id, "model", reply))
+        c.execute(
+            "INSERT INTO ai_conversations (session_id, conversation_id, role, content) VALUES (?,?,?,?)",
+            (str(conversation_id), conversation_id, "user", message)
+        )
+        c.execute(
+            "INSERT INTO ai_conversations (session_id, conversation_id, role, content) VALUES (?,?,?,?)",
+            (str(conversation_id), conversation_id, "model", reply)
+        )
+        # Auto-title: set title from first user message (truncated)
+        msg_count = c.execute(
+            "SELECT COUNT(*) FROM ai_conversations WHERE conversation_id=? AND role='user'",
+            (conversation_id,)
+        ).fetchone()[0]
+        if msg_count == 1:
+            auto_title = message[:60]
+            c.execute(
+                "UPDATE conversations SET title=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+                (auto_title, conversation_id)
+            )
+        else:
+            c.execute(
+                "UPDATE conversations SET updated_at=CURRENT_TIMESTAMP WHERE id=?",
+                (conversation_id,)
+            )
 
-    return {"reply": reply, "session_id": session_id}
+    return {"reply": reply, "conversation_id": conversation_id}
 
 
 @app.get("/api/ai/conversations/{session_id}")
@@ -1529,6 +1573,139 @@ async def delete_ai_conversation(session_id: str):
     with db() as c:
         c.execute("DELETE FROM ai_conversations WHERE session_id=?", (session_id,))
     return {"ok": True}
+
+
+# ── FASE 1 — CONVERSAS NOMEADAS ───────────────────────────────────
+@app.get("/api/conversations")
+async def list_conversations():
+    with db() as c:
+        rows = c.execute(
+            "SELECT id, title, created_at, updated_at FROM conversations ORDER BY updated_at DESC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+@app.post("/api/conversations")
+async def create_conversation(request: Request):
+    body = await request.json()
+    title = body.get("title", "Nova conversa").strip() or "Nova conversa"
+    with db() as c:
+        c.execute("INSERT INTO conversations (title) VALUES (?)", (title,))
+        cid = c.execute("SELECT last_insert_rowid()").fetchone()[0]
+        row = c.execute("SELECT id, title, created_at, updated_at FROM conversations WHERE id=?", (cid,)).fetchone()
+    return dict(row)
+
+
+@app.patch("/api/conversations/{cid}")
+async def rename_conversation(cid: int, request: Request):
+    body = await request.json()
+    title = body.get("title", "").strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="Título não pode ser vazio")
+    with db() as c:
+        c.execute(
+            "UPDATE conversations SET title=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+            (title, cid)
+        )
+    return {"ok": True}
+
+
+@app.delete("/api/conversations/{cid}")
+async def delete_conversation(cid: int):
+    with db() as c:
+        c.execute("DELETE FROM ai_conversations WHERE conversation_id=?", (cid,))
+        c.execute("DELETE FROM conversations WHERE id=?", (cid,))
+    return {"ok": True}
+
+
+@app.get("/api/conversations/{cid}/messages")
+async def get_conversation_messages(cid: int):
+    with db() as c:
+        rows = c.execute(
+            "SELECT role, content, created_at FROM ai_conversations WHERE conversation_id=? ORDER BY id",
+            (cid,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ── FASE 1 — MEMÓRIA DA IA ────────────────────────────────────────
+@app.get("/api/ai/memory")
+async def list_memory():
+    with db() as c:
+        rows = c.execute("SELECT id, fact, created_at FROM ai_memory ORDER BY id DESC").fetchall()
+    return [dict(r) for r in rows]
+
+
+@app.post("/api/ai/memory")
+async def add_memory(request: Request):
+    body = await request.json()
+    fact = body.get("fact", "").strip()
+    if not fact:
+        raise HTTPException(status_code=400, detail="Facto não pode ser vazio")
+    with db() as c:
+        c.execute("INSERT INTO ai_memory (fact) VALUES (?)", (fact,))
+        rid = c.execute("SELECT last_insert_rowid()").fetchone()[0]
+        row = c.execute("SELECT id, fact, created_at FROM ai_memory WHERE id=?", (rid,)).fetchone()
+    return dict(row)
+
+
+@app.delete("/api/ai/memory/{mid}")
+async def delete_memory(mid: int):
+    with db() as c:
+        c.execute("DELETE FROM ai_memory WHERE id=?", (mid,))
+    return {"ok": True}
+
+
+@app.patch("/api/ai/memory/{mid}")
+async def update_memory(mid: int, request: Request):
+    body = await request.json()
+    fact = body.get("fact", "").strip()
+    if not fact:
+        raise HTTPException(status_code=400, detail="Facto não pode ser vazio")
+    with db() as c:
+        c.execute("UPDATE ai_memory SET fact=? WHERE id=?", (fact, mid))
+    return {"ok": True}
+
+
+# ── FASE 1 — FOTO DE PERFIL ───────────────────────────────────────
+_ALLOWED_PHOTO_TYPES = {"image/jpeg", "image/png", "image/webp"}
+_MAX_PHOTO_BYTES = 5 * 1024 * 1024  # 5 MB
+
+
+@app.post("/api/profile/photo")
+async def upload_profile_photo(file: UploadFile = File(...)):
+    content_type = file.content_type or ""
+    if content_type not in _ALLOWED_PHOTO_TYPES:
+        raise HTTPException(status_code=400, detail="Tipo de ficheiro não suportado. Use JPEG, PNG ou WebP.")
+    data = await file.read()
+    if len(data) > _MAX_PHOTO_BYTES:
+        raise HTTPException(status_code=400, detail="Imagem demasiado grande (máximo 5 MB).")
+    ext = mimetypes.guess_extension(content_type) or ".jpg"
+    if ext == ".jpeg":
+        ext = ".jpg"
+    filename = f"{uuid.uuid4().hex}{ext}"
+    dest = UPLOADS_DIR / filename
+    dest.write_bytes(data)
+    url = f"/uploads/{filename}"
+    # Persist URL in profile JSON
+    with db() as c:
+        row = c.execute("SELECT data FROM profile WHERE id=1").fetchone()
+        pdata = json.loads(row[0] or "{}") if row else {}
+        # Delete old photo file if any
+        old_url = pdata.get("photo_url", "")
+        if old_url and old_url.startswith("/uploads/"):
+            old_file = UPLOADS_DIR / Path(old_url).name
+            try:
+                if old_file.exists():
+                    old_file.unlink()
+            except Exception:
+                pass
+        pdata["photo_url"] = url
+        c.execute(
+            "UPDATE profile SET data=?, updated_at=CURRENT_TIMESTAMP WHERE id=1",
+            (json.dumps(pdata),)
+        )
+    return {"ok": True, "url": url}
 
 
 # ── STATUS ────────────────────────────────────────────────────────
@@ -1554,6 +1731,7 @@ async def status():
         "google_calendar": bool(os.environ.get("GOOGLE_CLIENT_ID")),
     }
 
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":

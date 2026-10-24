@@ -183,9 +183,50 @@ def migration_002(conn: sqlite3.Connection) -> None:
     """)
 
 
+def migration_003(conn: sqlite3.Connection) -> None:
+    """Fase 1 — Histórico de conversas, memória da IA, campos de perfil expandido."""
+    # Tabela de conversas nomeadas
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS conversations (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            title      TEXT NOT NULL DEFAULT 'Nova conversa',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    # Memória explícita da assistente
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS ai_memory (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            fact       TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    # Adicionar conversation_id a ai_conversations (se ainda não existe)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(ai_conversations)").fetchall()]
+    if "conversation_id" not in cols:
+        conn.execute(
+            "ALTER TABLE ai_conversations ADD COLUMN conversation_id INTEGER REFERENCES conversations(id)"
+        )
+    # Migrar mensagens órfãs para uma conversa "Conversa anterior"
+    orphans = conn.execute(
+        "SELECT COUNT(*) FROM ai_conversations WHERE conversation_id IS NULL"
+    ).fetchone()[0]
+    if orphans:
+        conn.execute(
+            "INSERT INTO conversations (title) VALUES ('Conversa anterior')"
+        )
+        cid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        conn.execute(
+            "UPDATE ai_conversations SET conversation_id=? WHERE conversation_id IS NULL",
+            (cid,)
+        )
+
+
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_001,
     migration_002,
+    migration_003,
 ]
 
 
