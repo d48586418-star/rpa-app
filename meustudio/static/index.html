@@ -754,7 +754,8 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
       <div class="tab" onclick="switchTab('pesquisa','hoje',this);loadHoje()">Hoje</div>
       <div class="tab" onclick="switchTab('pesquisa','noticias',this);loadNoticias()">Notícias</div>
       <div class="tab" onclick="switchTab('pesquisa','youtube',this)">YouTube</div>
-      <div class="tab" onclick="switchTab('pesquisa','busca',this)">Busca</div>
+      <div class="tab" onclick="switchTab('pesquisa','gemini',this)">Busca IA</div>
+      <div class="tab" onclick="switchTab('pesquisa','busca',this)">Busca Web</div>
     </div>
     <div id="pesquisa-tab-tendencias" class="tab-panel active">
       <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -774,7 +775,8 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     </div>
     <div id="pesquisa-tab-youtube" class="tab-panel">
       <div id="yt-needs-key" style="display:none;" class="card">
-        <p style="font-size:13px;color:var(--text-2);margin-bottom:10px;">Configure sua YouTube API Key em <strong>Configurações → Conectores</strong> para usar esta funcionalidade.</p>
+        <p style="font-size:13px;font-weight:600;margin-bottom:10px;">YOUTUBE_API_KEY não configurada</p>
+        <div id="yt-needs-key-msg" style="font-size:13px;color:var(--text-2);white-space:pre-wrap;line-height:1.7;margin-bottom:12px;"></div>
         <button class="btn btn-ghost btn-sm" onclick="nav(null,'s-config')">Ir para Configurações</button>
       </div>
       <div id="yt-search-ui">
@@ -785,6 +787,17 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         <div id="yt-status"></div>
         <div id="yt-results" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
       </div>
+    </div>
+    <div id="pesquisa-tab-gemini" class="tab-panel">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Pesquisa via Gemini com acesso ao Google Search — mostra fontes usadas na resposta.</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="gemini-search-input" placeholder="O que deseja pesquisar?" style="flex:1;" onkeydown="if(event.key==='Enter')searchGemini()">
+          <button class="btn btn-primary btn-sm" onclick="searchGemini()">Buscar</button>
+        </div>
+      </div>
+      <div id="gemini-search-loading" style="display:none;padding:16px 0;"><span class="spinner"></span> A pesquisar…</div>
+      <div id="gemini-search-results"></div>
     </div>
     <div id="pesquisa-tab-busca" class="tab-panel">
       <div id="gcs-needs-key" style="display:none;" class="card">
@@ -2194,22 +2207,62 @@ async function loadNoticias(){
 }
 async function searchYoutube(){
   const q=document.getElementById('yt-input').value.trim(); if(!q) return;
-  const key=ls('ms_cfg_yt_key');
-  if(!key){document.getElementById('yt-needs-key').style.display='block';document.getElementById('yt-search-ui').style.display='none';return;}
   const st=document.getElementById('yt-status'),res=document.getElementById('yt-results');
   st.innerHTML='<span class="spinner"></span>';res.innerHTML='';
   try{
     const data=await api(`/api/research/youtube?q=${encodeURIComponent(q)}`);
     st.innerHTML='';
-    if(data.status==='needs_api_key'){document.getElementById('yt-needs-key').style.display='block';document.getElementById('yt-search-ui').style.display='none';return;}
-    if(data.status==='error'){st.innerHTML=`<p style="color:var(--red);font-size:13px;">${data.message}</p>`;return;}
-    res.innerHTML=(data.results||[]).map(v=>`<div class="card" style="padding:0;overflow:hidden;">
+    if(data.status==='needs_api_key'){
+      document.getElementById('yt-needs-key-msg').textContent=data.message||'';
+      document.getElementById('yt-needs-key').style.display='block';
+      document.getElementById('yt-search-ui').style.display='none';
+      return;
+    }
+    if(data.status==='error'){st.innerHTML=`<p style="color:var(--red);font-size:13px;">${escHtml(data.message||'Erro')}</p>`;return;}
+    if(!data.results?.length){st.innerHTML='<p style="font-size:13px;color:var(--text-2);">Nenhum resultado.</p>';return;}
+    res.innerHTML=data.results.map(v=>`<div class="card" style="padding:0;overflow:hidden;">
       ${v.thumbnail?`<img src="${v.thumbnail}" style="width:100%;aspect-ratio:16/9;object-fit:cover;" loading="lazy">`:''}
       <div style="padding:12px;">
-        <a href="${v.url}" target="_blank" style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">${v.title}</a>
-        <div style="font-size:12px;color:var(--text-3);">${v.channel} · ${v.published}</div>
+        <a href="${v.url}" target="_blank" style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">${escHtml(v.title)}</a>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">${escHtml(v.channel)} · ${v.published}</div>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick='_enviarParaIdeias(${JSON.stringify(v.title+' ('+v.url+')')})'>Enviar para Ideias</button>
       </div></div>`).join('');
   }catch(e){st.innerHTML='<p style="font-size:13px;color:var(--text-2);">Erro na busca. Verifique sua API key.</p>';}
+}
+
+async function searchGemini(){
+  const q=document.getElementById('gemini-search-input').value.trim(); if(!q) return;
+  const loading=document.getElementById('gemini-search-loading');
+  const results=document.getElementById('gemini-search-results');
+  loading.style.display='block'; results.innerHTML='';
+  try{
+    const data=await api('/api/research/gemini-search','POST',{query:q});
+    loading.style.display='none';
+    const text=data.text||'';
+    const sources=data.sources||[];
+    results.innerHTML=`
+      <div class="card" style="margin-bottom:12px;">
+        <div style="font-size:13px;line-height:1.7;white-space:pre-wrap;">${escHtml(text)}</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick='_enviarParaIdeias(${JSON.stringify(text.slice(0,500))})'>Enviar resumo para Ideias</button>
+        </div>
+      </div>
+      ${sources.length?`<div class="section-label">Fontes</div>`+sources.map(s=>`<div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--sep);">
+        <a href="${s.url}" target="_blank" style="color:var(--accent);">${escHtml(s.title||s.url)}</a>
+      </div>`).join(''):''}`;
+  }catch(e){
+    loading.style.display='none';
+    results.innerHTML=`<div class="card" style="color:var(--red);font-size:13px;">${e.message||'Erro na pesquisa.'}</div>`;
+  }
+}
+
+async function _enviarParaIdeias(texto) {
+  try {
+    await api('/api/ideas', 'POST', {content: texto, type: 'pesquisa', tags: JSON.stringify(['pesquisa'])});
+    toast('Enviado para Notas e Ideias!');
+  } catch(e) {
+    toast('Erro ao enviar.', true);
+  }
 }
 async function searchGoogle(){
   const q=document.getElementById('gcs-input').value.trim(); if(!q) return;

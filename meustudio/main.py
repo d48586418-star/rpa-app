@@ -1214,7 +1214,16 @@ async def youtube_search(
     if not api_key:
         return {
             "status": "needs_api_key",
-            "message": "Configure sua YouTube Data API v3 key em Configurações → Conectores.",
+            "message": (
+                "A variável YOUTUBE_API_KEY não está configurada. "
+                "Passos para obter a chave:\n"
+                "1. Acesse console.cloud.google.com e crie um projeto (ou use um existente).\n"
+                "2. No menu lateral, vá em 'APIs e Serviços' → 'Biblioteca'.\n"
+                "3. Procure por 'YouTube Data API v3' e clique em 'Ativar'.\n"
+                "4. Vá em 'APIs e Serviços' → 'Credenciais' → 'Criar credenciais' → 'Chave de API'.\n"
+                "5. Copie a chave e adicione no arquivo .env como: YOUTUBE_API_KEY=sua_chave_aqui\n"
+                "6. Reinicie o servidor."
+            ),
             "results": [],
         }
     cache_key = f"yt_{q[:50]}"
@@ -1289,6 +1298,64 @@ async def google_search(
         except Exception as e:
             return {"status": "error", "message": str(e), "results": []}
     return cached(cache_key, fetch, ttl=3600)
+
+
+@app.post("/api/research/gemini-search")
+async def gemini_grounding_search(request: Request):
+    """Pesquisa web via Gemini com grounding no Google Search."""
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    q = (body.get("query") or "").strip()
+    if not q:
+        raise HTTPException(status_code=400, detail={"ok": False, "code": "MISSING_QUERY", "message": "Consulta vazia"})
+
+    # Check cache
+    import hashlib
+    cache_key = "gemini_search_" + hashlib.md5(q.encode()).hexdigest()[:12]
+    cached_result = _get_ai_cache(cache_key)
+    if cached_result and not body.get("force"):
+        try:
+            return {"ok": True, "cached": True, **json.loads(cached_result["resposta"])}
+        except Exception:
+            pass
+
+    from config import GEMINI_API_KEY, GEMINI_MODEL, AI_MAX_OUTPUT_TOKENS
+    client = genai_client.Client(api_key=GEMINI_API_KEY)
+    try:
+        response = await client.aio.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=q,
+            config=genai_types.GenerateContentConfig(
+                tools=[genai_types.Tool(google_search=genai_types.GoogleSearch())],
+                max_output_tokens=AI_MAX_OUTPUT_TOKENS,
+            ),
+        )
+    except Exception as e:
+        log.error("gemini_grounding_search: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+
+    text = ""
+    sources: list = []
+    if response.text:
+        text = response.text
+
+    # Extract grounding sources
+    try:
+        candidate = response.candidates[0] if response.candidates else None
+        if candidate and candidate.grounding_metadata:
+            gm = candidate.grounding_metadata
+            chunks = getattr(gm, "grounding_chunks", None) or []
+            for chunk in chunks:
+                web = getattr(chunk, "web", None)
+                if web and getattr(web, "uri", None):
+                    sources.append({"title": getattr(web, "title", "") or web.uri, "url": web.uri})
+    except Exception:
+        pass
+
+    result = {"text": text, "sources": sources, "query": q}
+    _set_ai_cache(cache_key, json.dumps(result))
+    return {"ok": True, "cached": False, **result}
 
 
 # ── GOOGLE CALENDAR OAUTH ─────────────────────────────────────────
