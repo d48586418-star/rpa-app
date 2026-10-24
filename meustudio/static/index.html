@@ -112,7 +112,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
-/* DIAGNOSTIC */
+/* DIAGNOSTIC (legacy — kept for data compat) */
 .diag-question{font-size:16px;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
 .diag-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .diag-opt{padding:12px 14px;background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text-2);transition:all .15s;text-align:left;}
@@ -120,6 +120,16 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 .diag-opt.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--text);}
 .diag-progress-text{font-size:12px;color:var(--text-3);margin-bottom:12px;}
 .diag-nav{display:flex;gap:8px;margin-top:20px;}
+/* DIAGNOSTIC 4 — 3-step flow */
+.diag4-steps-bar{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:8px;}
+.diag4-step-ind{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;color:var(--text-3);background:var(--surface-2);border:1px solid var(--sep);transition:all .2s;white-space:nowrap;}
+.diag4-step-ind.active{background:var(--accent);color:#111;border-color:var(--accent);}
+.diag4-step-ind.done{background:var(--green);color:#fff;border-color:var(--green);}
+.diag4-arrow{padding:0 6px;font-size:12px;color:var(--text-3);}
+.persona-card{padding:14px;background:var(--surface-2);border:2px solid var(--sep);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px;}
+.persona-card:hover{border-color:var(--accent);}
+.persona-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.diag4-cronograma-item{padding:10px 14px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:6px;}
 
 /* PATH CARDS */
 .path-card{background:var(--surface);border:1px solid var(--sep);border-radius:var(--radius);padding:18px;margin-bottom:10px;}
@@ -487,23 +497,136 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 
     <!-- TAB: DIAGNÓSTICO -->
     <div id="perfil-tab-diagnostico" class="tab-panel">
-      <div id="diag-complete" style="display:none;" class="card">
-        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">✓ Diagnóstico completo</div>
-        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px;">Seu perfil foi mapeado. Acesse Estratégia para ver os caminhos recomendados.</p>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-primary btn-sm" onclick="nav(null,'s-estrategia')">Ver Estratégia →</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetDiag()">Reiniciar Diagnóstico</button>
+      <!-- Barra de progresso -->
+      <div style="margin-bottom:20px;">
+        <div class="diag4-steps-bar">
+          <div class="diag4-step-ind" id="diag4-ind-1">1. Persona</div>
+          <div class="diag4-arrow">→</div>
+          <div class="diag4-step-ind" id="diag4-ind-2">2. Posicionamento</div>
+          <div class="diag4-arrow">→</div>
+          <div class="diag4-step-ind" id="diag4-ind-3">3. Marketing</div>
+        </div>
+        <div class="progress" style="margin-top:8px;"><div class="progress-fill" id="diag4-prog-bar" style="width:0%;transition:width .4s;"></div></div>
+      </div>
+
+      <!-- ETAPA 1: PERSONA -->
+      <div id="diag4-step-1" class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;">Etapa 1 — Persona</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Defina o seu cliente ideal para personalizar toda a estratégia.</div>
+          </div>
+          <span id="diag4-s1-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--accent-dim);color:var(--text);">✓ Salvo</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Quem é o seu público ideal?</label>
+            <textarea id="d4-publico" rows="2" placeholder="Ex: diretores e produtoras independentes de médio porte…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Quais são as principais dores deste público?</label>
+            <textarea id="d4-dores" rows="2" placeholder="Ex: dificuldade em encontrar editoras de confiança, prazo curto…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Onde este público está? (redes, eventos, comunidades)</label>
+            <textarea id="d4-onde" rows="2" placeholder="Ex: Instagram, festivais de cinema, comunidades do Facebook…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">O que este público consome de conteúdo?</label>
+            <textarea id="d4-consome" rows="2" placeholder="Ex: tutoriais de pós-produção, bastidores, cases de projetos…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Quais as principais objeções para contratar você?</label>
+            <textarea id="d4-objecoes" rows="2" placeholder="Ex: preço alto, não conhece meu trabalho, prefere editores locais…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+        </div>
+        <div id="diag4-personas-loading" style="display:none;padding:10px 0;"><span class="spinner"></span> Gerando personas…</div>
+        <div id="diag4-personas-cards" style="display:none;margin-top:14px;"></div>
+        <div id="diag4-s1-falta" style="font-size:12px;color:var(--text-3);margin-top:10px;"></div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="diag4GenPersonas()">✨ Propor personas com IA</button>
+          <button class="btn btn-primary btn-sm" onclick="diag4SaveStep1()">Salvar Persona</button>
         </div>
       </div>
-      <div id="diag-ui">
-        <div class="diag-progress-text" id="diag-progress-text">Pergunta 1</div>
-        <div class="progress" style="margin-bottom:24px;"><div class="progress-fill" id="diag-prog-bar" style="width:0%"></div></div>
-        <div class="diag-question" id="diag-question-text">Carregando…</div>
-        <div class="diag-options" id="diag-options"></div>
-        <div class="diag-nav">
-          <button class="btn btn-ghost btn-sm" id="diag-back" onclick="diagBack()">← Voltar</button>
-          <span style="flex:1"></span>
-          <span style="font-size:12px;color:var(--text-3);align-self:center;" id="diag-skip-hint"></span>
+
+      <!-- ETAPA 2: POSICIONAMENTO -->
+      <div id="diag4-step-2" class="card" style="margin-top:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;">Etapa 2 — Posicionamento</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Proposta de valor, diferenciais e frase de posicionamento.</div>
+          </div>
+          <span id="diag4-s2-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--accent-dim);color:var(--text);">✓ Salvo</span>
+        </div>
+        <div id="diag4-s2-lock" style="font-size:13px;color:var(--text-3);padding:8px 0;">🔒 Complete e salve a Etapa 1 para desbloquear.</div>
+        <div id="diag4-s2-content" style="display:none;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Proposta de valor</label>
+            <textarea id="d4-proposta" rows="2" placeholder="O que você entrega, para quem e qual o resultado…" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Diferenciais (um por linha)</label>
+            <textarea id="d4-diferenciais" rows="3" placeholder="Ex: especialista em documentários&#10;entrega em 48h&#10;experiência com festivais" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Tom de voz</label>
+            <input type="text" id="d4-tom" placeholder="Ex: direto, técnico, com calor humano — nunca corporativo" style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Frase de posicionamento</label>
+            <input type="text" id="d4-frase" placeholder="Ex: Editora que transforma cenas em emoção para cineastas independentes" style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Concorrentes / referências (separados por vírgula)</label>
+            <input type="text" id="d4-concorrentes" placeholder="Ex: Studio X, Editora Y" style="width:100%;">
+          </div>
+          <div id="diag4-pos-loading" style="display:none;"><span class="spinner"></span> Gerando posicionamento…</div>
+          <div id="diag4-s2-falta" style="font-size:12px;color:var(--text-3);"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="diag4GenPositioning()">✨ Gerar com IA</button>
+            <button class="btn btn-primary btn-sm" onclick="diag4SaveStep2()">Salvar Posicionamento</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ETAPA 3: PLANO DE MARKETING -->
+      <div id="diag4-step-3" class="card" style="margin-top:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;">Etapa 3 — Plano de Marketing</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Objetivos, canais, cronograma 90 dias e métricas.</div>
+          </div>
+          <span id="diag4-s3-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--accent-dim);color:var(--text);">✓ Salvo</span>
+        </div>
+        <div id="diag4-s3-lock" style="font-size:13px;color:var(--text-3);padding:8px 0;">🔒 Complete e salve a Etapa 2 para desbloquear.</div>
+        <div id="diag4-s3-content" style="display:none;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">3 Metas mensuráveis (uma por linha)</label>
+            <textarea id="d4-objetivos" rows="3" placeholder="Ex: Fechar 2 novos clientes em 30 dias&#10;Crescer 500 seguidores em 60 dias&#10;Lançar 1 produto em 90 dias" style="resize:vertical;width:100%;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Canais prioritários (separados por vírgula)</label>
+            <input type="text" id="d4-canais" placeholder="Ex: Instagram, LinkedIn, WhatsApp" style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Pilares de conteúdo (separados por vírgula)</label>
+            <input type="text" id="d4-pilares" placeholder="Ex: Bastidores de projetos, Tutoriais técnicos, Resultados de clientes" style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Frequência de publicação</label>
+            <input type="text" id="d4-frequencia" placeholder="Ex: 3 posts/semana + 1 story diário" style="width:100%;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">Métricas de sucesso (separadas por vírgula)</label>
+            <input type="text" id="d4-metricas" placeholder="Ex: Taxa de resposta DM, novos seguidores/mês, contratos fechados" style="width:100%;">
+          </div>
+          <div id="diag4-cronograma" style="display:none;"></div>
+          <div id="diag4-mkt-loading" style="display:none;"><span class="spinner"></span> Gerando plano…</div>
+          <div id="diag4-s3-falta" style="font-size:12px;color:var(--text-3);"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="diag4GenMarketing()">✨ Gerar com IA</button>
+            <button class="btn btn-primary btn-sm" onclick="diag4SaveStep3()">Salvar Plano</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1188,48 +1311,270 @@ function switchTab(section,tab,el){
   document.querySelectorAll(`[id^="${section}-tab-"]`).forEach(p=>p.classList.remove('active'));
   document.getElementById(`${section}-tab-${tab}`).classList.add('active');
   if(section==='perfil'&&tab==='sintese') renderSintese();
+  if(section==='perfil'&&tab==='diagnostico') loadDiag4();
 }
 
 function renderSintese(){
   const el = document.getElementById('sintese-content');
-  const answered = Object.keys(diagAnswers).length;
-  if(answered===0){
-    el.innerHTML='<p style="color:var(--text-2);">Complete o diagnóstico para ver a síntese.</p>';
+  const s1 = diag4Steps.persona || {};
+  const s2 = diag4Steps.positioning || {};
+  const s3 = diag4Steps.marketing || {};
+  const hasAny = s1.publico || s2.proposta || s3.objetivos?.length;
+  if(!hasAny){
+    el.innerHTML='<p style="color:var(--text-2);">Complete o diagnóstico em 3 etapas para ver a síntese.</p>';
     return;
   }
-  const labels = {
-    a1:{executar:'Execução de projetos',ensinar:'Ensino e mentoria',criar:'Criação de conteúdo próprio',estrategia:'Estratégia e gestão'},
-    a2:{edicao_video:'Edição de vídeo',motion_graphics:'Motion graphics / VFX',direcao:'Direção e produção',multiplas:'Múltiplas áreas'},
-    a3:{clt:'CLT / Empregada',freelancer:'Freelancer',propria_empresa:'Empresa própria',transicao:'Em transição'},
-    anos_exp:{menos_2:'Menos de 2 anos','2_5':'2 a 5 anos','5_10':'5 a 10 anos',mais_10:'Mais de 10 anos'},
-    b4:{fluente:'Fluente / Avançado',intermediario:'Intermediário',basico:'Básico',nao:'Não falo inglês'},
-    c1:{sim:'Sim',nao:'Não',em_construcao:'Em construção'},
-    d2:{muito:'Muito interesse',talvez:'Talvez',nao:'Não tenho interesse'},
-    e1:{urgente:'Urgente — 3 meses',medio:'6 a 12 meses',longo:'Mais de 1 ano'},
-    e2:{baixo:'Menos de R$ 3 mil',medio:'R$ 3–6 mil',alto:'R$ 6–12 mil',muito_alto:'Acima de R$ 12 mil'},
-  };
-  const rows = [
-    ['Energia principal', labels.a1?.[diagAnswers.a1]],
-    ['Área de atuação', labels.a2?.[diagAnswers.a2]],
-    ['Situação actual', labels.a3?.[diagAnswers.a3]],
-    ['Experiência', labels.anos_exp?.[diagAnswers.anos_exp]],
-    ['Nível de inglês', labels.b4?.[diagAnswers.b4]],
-    ['Portfólio online', labels.c1?.[diagAnswers.c1]],
-    ['Interesse em ensinar', labels.d2?.[diagAnswers.d2]],
-    ['Urgência de renda', labels.e1?.[diagAnswers.e1]],
-    ['Meta de renda mensal', labels.e2?.[diagAnswers.e2]],
-  ].filter(r=>r[1]);
+  const row = (k,v)=>v?`<div style="padding:10px 14px;background:var(--surface-2);border-radius:var(--radius);font-size:13px;margin-bottom:6px;">
+    <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:2px;">${escHtml(k)}</div>
+    <div style="color:var(--text);">${escHtml(Array.isArray(v)?v.join(' · '):String(v))}</div>
+  </div>`:'';
   el.innerHTML=`
-    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;color:var(--text-2);">${answered} de ${TOTAL_Q} perguntas respondidas</span>
-      <div class="progress" style="flex:1;max-width:160px;"><div class="progress-fill" style="width:${Math.round(answered/TOTAL_Q*100)}%"></div></div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:12px;">
+      Etapas concluídas: ${[s1.publico?'Persona':'',s2.proposta?'Posicionamento':'',s3.objetivos?.length?'Marketing':''].filter(Boolean).join(', ')||'Nenhuma'}
     </div>
-    <div style="display:grid;gap:8px;">
-      ${rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius);font-size:13px;"><span style="color:var(--text-2);">${k}</span><span style="font-weight:600;color:var(--text);">${v}</span></div>`).join('')}
-    </div>`;
+    ${s1.publico?`<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin:14px 0 6px;">Persona</div>
+      ${row('Público ideal', s1.publico)}
+      ${row('Persona escolhida', s1.persona_escolhida?.nome && s1.persona_escolhida?.descricao ? s1.persona_escolhida.nome+' — '+s1.persona_escolhida.descricao : s1.persona_escolhida?.nome)}
+    `:''}
+    ${s2.proposta?`<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin:14px 0 6px;">Posicionamento</div>
+      ${row('Proposta de valor', s2.proposta)}
+      ${row('Frase de posicionamento', s2.frase_posicionamento)}
+      ${row('Tom de voz', s2.tom_voz)}
+      ${row('Diferenciais', s2.diferenciais)}
+    `:''}
+    ${s3.objetivos?.length?`<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin:14px 0 6px;">Plano de Marketing</div>
+      ${row('Metas', s3.objetivos)}
+      ${row('Canais', s3.canais)}
+      ${row('Frequência', s3.frequencia)}
+    `:''}
+  `;
 }
 
-// ── DIAGNOSTIC ───────────────────────────────────────────────────
+// ── DIAGNOSTIC 4 — 3 ETAPAS ─────────────────────────────────────
+let diag4Steps = {};
+let diag4SelectedPersona = null;
+
+async function loadDiag4(){
+  try{ diag4Steps = await api('/api/diag/steps'); }catch(e){ diag4Steps = {}; }
+  diag4Render();
+}
+
+function diag4Render(){
+  const s1 = diag4Steps.persona || {};
+  const s2 = diag4Steps.positioning || {};
+  const s3 = diag4Steps.marketing || {};
+  const s1done = s1.publico && s1.publico.trim().length > 0;
+  const s2done = s2.proposta && s2.proposta.trim().length > 0;
+  const s3done = s3.objetivos && (Array.isArray(s3.objetivos) ? s3.objetivos.length : s3.objetivos.length) > 0;
+
+  // Progress bar
+  const pct = s3done ? 100 : s2done ? 66 : s1done ? 33 : 0;
+  const pb = document.getElementById('diag4-prog-bar');
+  if(pb) pb.style.width = pct + '%';
+
+  // Step indicators
+  const ind = (id, state) => {
+    const el = document.getElementById(id); if(!el) return;
+    el.className = 'diag4-step-ind' + (state === 'done' ? ' done' : state === 'active' ? ' active' : '');
+  };
+  ind('diag4-ind-1', s1done ? 'done' : 'active');
+  ind('diag4-ind-2', s2done ? 'done' : s1done ? 'active' : '');
+  ind('diag4-ind-3', s3done ? 'done' : s2done ? 'active' : '');
+
+  // Badge visibility
+  const badge = (id, show) => { const el = document.getElementById(id); if(el) el.style.display = show ? 'inline-block' : 'none'; };
+  badge('diag4-s1-badge', s1done);
+  badge('diag4-s2-badge', s2done);
+  badge('diag4-s3-badge', s3done);
+
+  // Fill step 1 form
+  const f = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+  f('d4-publico', s1.publico);
+  f('d4-dores', s1.dores);
+  f('d4-onde', s1.onde);
+  f('d4-consome', s1.consome);
+  f('d4-objecoes', s1.objecoes);
+  diag4SelectedPersona = s1.persona_escolhida || null;
+
+  // S1 "O que falta"
+  const falta1 = document.getElementById('diag4-s1-falta');
+  if(falta1) falta1.textContent = s1done ? '✓ Persona salva. Avance para o Posicionamento.' : 'Preencha pelo menos o campo "Público ideal" e clique em Salvar.';
+
+  // Step 2 lock/unlock
+  const lock2 = document.getElementById('diag4-s2-lock');
+  const cont2 = document.getElementById('diag4-s2-content');
+  if(lock2) lock2.style.display = s1done ? 'none' : 'block';
+  if(cont2) cont2.style.display = s1done ? 'flex' : 'none';
+
+  if(s1done){
+    f('d4-proposta', s2.proposta);
+    f('d4-diferenciais', Array.isArray(s2.diferenciais) ? s2.diferenciais.join('\n') : s2.diferenciais);
+    f('d4-tom', s2.tom_voz);
+    f('d4-frase', s2.frase_posicionamento);
+    f('d4-concorrentes', Array.isArray(s2.concorrentes) ? s2.concorrentes.join(', ') : s2.concorrentes);
+    const falta2 = document.getElementById('diag4-s2-falta');
+    if(falta2) falta2.textContent = s2done ? '✓ Posicionamento salvo. Avance para o Plano de Marketing.' : 'Preencha a proposta de valor e clique em Salvar.';
+  }
+
+  // Step 3 lock/unlock
+  const lock3 = document.getElementById('diag4-s3-lock');
+  const cont3 = document.getElementById('diag4-s3-content');
+  if(lock3) lock3.style.display = s2done ? 'none' : 'block';
+  if(cont3) cont3.style.display = s2done ? 'flex' : 'none';
+
+  if(s2done){
+    f('d4-objetivos', Array.isArray(s3.objetivos) ? s3.objetivos.map(o=>o.meta||o).join('\n') : s3.objetivos);
+    f('d4-canais', Array.isArray(s3.canais) ? s3.canais.join(', ') : s3.canais);
+    f('d4-pilares', Array.isArray(s3.pilares) ? s3.pilares.join(', ') : s3.pilares);
+    f('d4-frequencia', s3.frequencia);
+    f('d4-metricas', Array.isArray(s3.metricas) ? s3.metricas.join(', ') : s3.metricas);
+    if(s3.cronograma) _renderCronograma4(s3.cronograma);
+    const falta3 = document.getElementById('diag4-s3-falta');
+    if(falta3) falta3.textContent = s3done ? '✓ Plano de marketing completo!' : 'Preencha as metas e clique em Salvar Plano.';
+  }
+}
+
+async function diag4GenPersonas(){
+  const answers = {
+    publico: document.getElementById('d4-publico').value,
+    dores: document.getElementById('d4-dores').value,
+    onde: document.getElementById('d4-onde').value,
+    consome: document.getElementById('d4-consome').value,
+    objecoes: document.getElementById('d4-objecoes').value,
+  };
+  if(!answers.publico.trim()){toast('Preencha o campo "Público ideal" antes de gerar personas.',true);return;}
+  document.getElementById('diag4-personas-loading').style.display='block';
+  document.getElementById('diag4-personas-cards').style.display='none';
+  try{
+    const r = await api('/api/ai/diag-personas','POST',{answers});
+    _renderPersonaCards4(r.personas||[]);
+  }catch(e){toast('Erro ao gerar personas. Tente de novo.',true);}
+  finally{document.getElementById('diag4-personas-loading').style.display='none';}
+}
+
+function _renderPersonaCards4(personas){
+  window._diag4Personas = personas;
+  const el = document.getElementById('diag4-personas-cards');
+  el.innerHTML = `<div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;">Personas sugeridas — escolha uma:</div>` +
+    personas.map((p,i)=>`
+      <div class="persona-card" onclick="diag4SelectPersona(${i})" data-idx="${i}">
+        <div style="font-size:13px;font-weight:700;">${escHtml(p.nome||'')}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:4px;">${escHtml(p.cargo||'')}</div>
+        <div style="font-size:12px;color:var(--text-2);">${escHtml(p.descricao||'')}</div>
+        ${p.dores?.length?`<div style="font-size:11px;color:var(--text-3);margin-top:4px;"><strong>Dores:</strong> ${p.dores.map(d=>escHtml(d)).join(' · ')}</div>`:''}
+        ${p.match?`<div style="font-size:11px;color:var(--green);margin-top:4px;">✓ ${escHtml(p.match)}</div>`:''}
+      </div>`).join('');
+  el.style.display='block';
+}
+
+function diag4SelectPersona(idx){
+  diag4SelectedPersona = (window._diag4Personas||[])[idx];
+  document.querySelectorAll('.persona-card').forEach((c,i)=>c.classList.toggle('selected',i===idx));
+}
+
+async function diag4SaveStep1(){
+  const data = {
+    publico: document.getElementById('d4-publico').value.trim(),
+    dores: document.getElementById('d4-dores').value.trim(),
+    onde: document.getElementById('d4-onde').value.trim(),
+    consome: document.getElementById('d4-consome').value.trim(),
+    objecoes: document.getElementById('d4-objecoes').value.trim(),
+    persona_escolhida: diag4SelectedPersona || null,
+  };
+  if(!data.publico){toast('Preencha o campo "Público ideal".',true);return;}
+  try{
+    await api('/api/diag/steps/persona','PUT',data);
+    diag4Steps.persona = data;
+    toast('Etapa 1 salva!');
+    diag4Render();
+    updateHomeMetrics();
+  }catch(e){toast('Erro ao salvar. Tente de novo.',true);}
+}
+
+async function diag4GenPositioning(){
+  const persona = diag4Steps.persona?.persona_escolhida || diag4Steps.persona || {};
+  document.getElementById('diag4-pos-loading').style.display='block';
+  try{
+    const r = await api('/api/ai/diag-positioning','POST',{persona});
+    const p = r.positioning||{};
+    const f = (id,val)=>{const el=document.getElementById(id);if(el&&val)el.value=val;};
+    f('d4-proposta', p.proposta_valor);
+    f('d4-diferenciais', Array.isArray(p.diferenciais)?p.diferenciais.join('\n'):p.diferenciais);
+    f('d4-tom', p.tom_voz);
+    f('d4-frase', p.frase_posicionamento);
+    f('d4-concorrentes', Array.isArray(p.concorrentes)?p.concorrentes.join(', '):p.concorrentes);
+    toast('Posicionamento gerado! Revise e salve.');
+  }catch(e){toast('Erro ao gerar posicionamento.',true);}
+  finally{document.getElementById('diag4-pos-loading').style.display='none';}
+}
+
+async function diag4SaveStep2(){
+  const data = {
+    proposta: document.getElementById('d4-proposta').value.trim(),
+    diferenciais: document.getElementById('d4-diferenciais').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    tom_voz: document.getElementById('d4-tom').value.trim(),
+    frase_posicionamento: document.getElementById('d4-frase').value.trim(),
+    concorrentes: document.getElementById('d4-concorrentes').value.split(',').map(s=>s.trim()).filter(Boolean),
+  };
+  if(!data.proposta){toast('Preencha a proposta de valor.',true);return;}
+  try{
+    await api('/api/diag/steps/positioning','PUT',data);
+    diag4Steps.positioning = data;
+    toast('Etapa 2 salva!');
+    diag4Render();
+  }catch(e){toast('Erro ao salvar.',true);}
+}
+
+async function diag4GenMarketing(){
+  document.getElementById('diag4-mkt-loading').style.display='block';
+  try{
+    const r = await api('/api/ai/diag-marketing','POST',{});
+    const plan = r.plan||{};
+    window._diag4Plan = plan;
+    const f = (id,val)=>{const el=document.getElementById(id);if(el&&val)el.value=val;};
+    f('d4-objetivos', Array.isArray(plan.objetivos)?plan.objetivos.map(o=>o.meta||o).join('\n'):plan.objetivos);
+    f('d4-canais', Array.isArray(plan.canais)?plan.canais.join(', '):plan.canais);
+    f('d4-pilares', Array.isArray(plan.pilares)?plan.pilares.join(', '):plan.pilares);
+    f('d4-frequencia', plan.frequencia);
+    f('d4-metricas', Array.isArray(plan.metricas)?plan.metricas.join(', '):plan.metricas);
+    if(plan.cronograma) _renderCronograma4(plan.cronograma);
+    toast('Plano gerado! Revise e salve.');
+  }catch(e){toast('Erro ao gerar plano de marketing.',true);}
+  finally{document.getElementById('diag4-mkt-loading').style.display='none';}
+}
+
+function _renderCronograma4(cron){
+  const el = document.getElementById('diag4-cronograma');
+  if(!el||!Array.isArray(cron)||!cron.length){if(el)el.style.display='none';return;}
+  el.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;">Cronograma 90 dias</div>`+
+    cron.map(m=>`<div class="diag4-cronograma-item">
+      <div style="font-size:12px;font-weight:700;">${escHtml(m.periodo||'')}</div>
+      <div style="font-size:12px;color:var(--text-2);margin:2px 0;">${escHtml(m.foco||'')}</div>
+      ${Array.isArray(m.entregas)?'<ul style="font-size:11px;color:var(--text-3);padding-left:16px;margin:4px 0;">'+m.entregas.map(e=>`<li>${escHtml(e)}</li>`).join('')+'</ul>':''}
+    </div>`).join('');
+  el.style.display='block';
+}
+
+async function diag4SaveStep3(){
+  const data = {
+    objetivos: document.getElementById('d4-objetivos').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    canais: document.getElementById('d4-canais').value.split(',').map(s=>s.trim()).filter(Boolean),
+    pilares: document.getElementById('d4-pilares').value.split(',').map(s=>s.trim()).filter(Boolean),
+    frequencia: document.getElementById('d4-frequencia').value.trim(),
+    metricas: document.getElementById('d4-metricas').value.split(',').map(s=>s.trim()).filter(Boolean),
+    cronograma: window._diag4Plan?.cronograma || [],
+  };
+  if(!data.objetivos.length){toast('Preencha pelo menos 1 meta.',true);return;}
+  try{
+    await api('/api/diag/steps/marketing','PUT',data);
+    diag4Steps.marketing = data;
+    toast('Plano de marketing salvo!');
+    diag4Render();
+    updateHomeMetrics();
+  }catch(e){toast('Erro ao salvar.',true);}
+}
+
+// ── DIAGNOSTIC (legacy 35-question flow — kept for data compat) ───
 const QUESTIONS = {
   a1:{stage:"perfil",text:"Como você se sente mais energizada no trabalho?",options:[
     {val:"executar",label:"Executando projetos de clientes"},{val:"ensinar",label:"Ensinando e mentorando"},
@@ -1550,12 +1895,15 @@ function renderPaths(paths){
 
 // ── HOME ─────────────────────────────────────────────────────────
 async function updateHomeMetrics(){
-  const answered = Object.keys(diagAnswers).length;
-  const diagPct = Math.round(answered/TOTAL_Q*100);
+  // Diagnóstico — usar progresso das 3 etapas (Fase 4)
+  const s1done = !!(diag4Steps.persona?.publico);
+  const s2done = !!(diag4Steps.positioning?.proposta);
+  const s3done = !!(diag4Steps.marketing?.objetivos?.length);
+  const diagPct = s3done ? 100 : s2done ? 66 : s1done ? 33 : 0;
 
   // KPI — Diagnóstico
   const kpiDiag = document.getElementById('kpi-diag');
-  if(kpiDiag) kpiDiag.textContent = diagPct;
+  if(kpiDiag) kpiDiag.textContent = diagPct + '%';
 
   // KPI — Projetos ativos
   const active = allProjects.filter(p=>p.status==='em_andamento');
@@ -2789,27 +3137,14 @@ async function init(){
   await checkStatus();
   setInterval(checkStatus, 30000);
 
-  // Load diagnostic
+  // Load new 3-step diagnostic (Fase 4)
+  await loadDiag4().catch(()=>{});
+
+  // Load legacy diagnostic answers (for career scoring)
   try{
     const data=await api('/api/diagnostic');
     diagAnswers=data.answers||{};
   }catch(e){}
-
-  // Determine current diagnostic position
-  if(Object.keys(diagAnswers).length>=Object.keys(QUESTIONS).length){
-    document.getElementById('diag-ui').style.display='none';
-    document.getElementById('diag-complete').style.display='block';
-  } else {
-    // Find first unanswered question
-    let q='a1';
-    while(q && diagAnswers[q]){
-      diagHistory.push(q);
-      q=resolveNext(q);
-    }
-    diagCurrentQ=q||'a1';
-    if(!q){ document.getElementById('diag-ui').style.display='none'; document.getElementById('diag-complete').style.display='block'; }
-    else renderDiagQuestion();
-  }
 
   // Load profile greeting
   try{

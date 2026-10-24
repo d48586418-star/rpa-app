@@ -1416,13 +1416,39 @@ def build_ai_context(c) -> str:
         for (fact,) in memory:
             parts.append(f"- {fact}")
 
-    # Diagnostic answers
+    # Diagnostic answers (old adaptive flow)
     diag = c.execute("SELECT question_id, label FROM diagnostic").fetchall()
     if diag:
         parts.append("\nRESPOSTAS DO DIAGNÓSTICO:")
         for qid, label in diag:
             if label:
                 parts.append(f"- {qid}: {label}")
+
+    # New 3-step diagnostic (Fase 4)
+    try:
+        steps_rows = c.execute("SELECT step, data FROM diag_steps").fetchall()
+        for row in steps_rows:
+            step_data = json.loads(row[0 if hasattr(row, '__getitem__') else 'data'] if False else row["data"] or "{}")
+            step_name = row["step"]
+            if step_data:
+                if step_name == "persona":
+                    parts.append("\nPERSONA (diagnóstico etapa 1):")
+                    if step_data.get("publico"): parts.append(f"- Público ideal: {step_data['publico'][:150]}")
+                    if step_data.get("dores"): parts.append(f"- Dores: {step_data['dores'][:150]}")
+                    if step_data.get("persona_escolhida"):
+                        pc = step_data["persona_escolhida"]
+                        parts.append(f"- Persona escolhida: {pc.get('nome','')} — {pc.get('descricao','')[:120]}")
+                elif step_name == "positioning":
+                    parts.append("\nPOSICIONAMENTO (diagnóstico etapa 2):")
+                    if step_data.get("proposta"): parts.append(f"- Proposta de valor: {step_data['proposta'][:150]}")
+                    if step_data.get("frase_posicionamento"): parts.append(f"- Frase: {step_data['frase_posicionamento'][:120]}")
+                    if step_data.get("tom_voz"): parts.append(f"- Tom de voz: {step_data['tom_voz'][:100]}")
+                elif step_name == "marketing":
+                    parts.append("\nPLANO DE MARKETING (diagnóstico etapa 3):")
+                    if step_data.get("canais"): parts.append(f"- Canais: {', '.join(step_data['canais'])}")
+                    if step_data.get("frequencia"): parts.append(f"- Frequência: {step_data['frequencia']}")
+    except Exception:
+        pass
 
     # Projects
     projects = c.execute("SELECT data FROM projects ORDER BY created_at DESC LIMIT 10").fetchall()
@@ -2075,6 +2101,157 @@ async def upload_profile_photo(file: UploadFile = File(...)):
             (json.dumps(pdata),)
         )
     return {"ok": True, "url": url}
+
+
+# ── FASE 4 — DIAGNÓSTICO EM ETAPAS ───────────────────────────────
+@app.get("/api/diag/steps")
+async def get_diag_steps():
+    with db() as c:
+        rows = c.execute("SELECT step, data FROM diag_steps").fetchall()
+    return {r["step"]: json.loads(r["data"] or "{}") for r in rows}
+
+
+@app.put("/api/diag/steps/{step}")
+async def put_diag_step(step: str, request: Request):
+    if step not in ("persona", "positioning", "marketing"):
+        raise HTTPException(400, "Etapa inválida")
+    payload = await request.json()
+    with db() as c:
+        c.execute(
+            "INSERT INTO diag_steps (step, data, updated_at) VALUES (?,?,CURRENT_TIMESTAMP) "
+            "ON CONFLICT(step) DO UPDATE SET data=excluded.data, updated_at=CURRENT_TIMESTAMP",
+            (step, json.dumps(payload))
+        )
+    return {"ok": True}
+
+
+@app.post("/api/ai/diag-personas")
+async def ai_diag_personas(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    answers = body.get("answers", {})
+    with db() as c:
+        ctx = build_ai_context(c)
+    instrucao = f"""{ctx}
+
+RESPOSTAS DA ETAPA 1 (Persona):
+{json.dumps(answers, ensure_ascii=False, indent=2)}
+
+Com base no perfil acima e nas respostas da utilizadora, proponha 2 ou 3 personas de cliente ideal (ICP).
+
+Devolva APENAS um JSON array:
+[
+  {{
+    "id": "persona_1",
+    "nome": "Nome da persona",
+    "cargo": "Cargo/função",
+    "descricao": "Quem é esta persona em 2-3 frases",
+    "dores": ["dor 1", "dor 2"],
+    "objetivos": ["objetivo 1", "objetivo 2"],
+    "onde_encontrar": "Onde esta persona está",
+    "match": "por que esta persona combina com o perfil"
+  }}
+]
+Sem texto antes ou depois do JSON."""
+    try:
+        import re as _re
+        text = await call_gemini(instrucao, "Você é especialista em marketing estratégico para profissionais criativos.")
+        m = _re.search(r'\[[\s\S]*\]', text)
+        personas = json.loads(m.group() if m else text)
+        return {"ok": True, "personas": personas}
+    except Exception as e:
+        log.error("ai_diag_personas: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar personas. Tente de novo."})
+
+
+@app.post("/api/ai/diag-positioning")
+async def ai_diag_positioning(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    persona = body.get("persona", {})
+    with db() as c:
+        ctx = build_ai_context(c)
+        steps_row = c.execute("SELECT data FROM diag_steps WHERE step='persona'").fetchone()
+    step1 = json.loads(steps_row["data"] if steps_row else "{}")
+    instrucao = f"""{ctx}
+
+PERSONA ESCOLHIDA:
+{json.dumps(persona, ensure_ascii=False, indent=2)}
+
+DADOS DA ETAPA 1:
+{json.dumps(step1, ensure_ascii=False, indent=2)}
+
+Gere o posicionamento estratégico para esta profissional.
+
+Devolva APENAS um JSON:
+{{
+  "proposta_valor": "Frase de proposta de valor (1-2 frases)",
+  "diferenciais": ["diferencial 1", "diferencial 2", "diferencial 3"],
+  "tom_voz": "Tom de voz em 1-2 frases",
+  "frase_posicionamento": "Quem você é, para quem e qual resultado",
+  "concorrentes": ["referência 1", "referência 2"]
+}}
+Sem texto antes ou depois do JSON."""
+    try:
+        import re as _re
+        text = await call_gemini(instrucao, "Você é especialista em posicionamento de marca para profissionais criativos.")
+        m = _re.search(r'\{[\s\S]*\}', text)
+        positioning = json.loads(m.group() if m else text)
+        return {"ok": True, "positioning": positioning}
+    except Exception as e:
+        log.error("ai_diag_positioning: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar posicionamento. Tente de novo."})
+
+
+@app.post("/api/ai/diag-marketing")
+async def ai_diag_marketing(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    with db() as c:
+        ctx = build_ai_context(c)
+        s1 = c.execute("SELECT data FROM diag_steps WHERE step='persona'").fetchone()
+        s2 = c.execute("SELECT data FROM diag_steps WHERE step='positioning'").fetchone()
+    step1 = json.loads(s1["data"] if s1 else "{}")
+    step2 = json.loads(s2["data"] if s2 else "{}")
+    instrucao = f"""{ctx}
+
+PERSONA (Etapa 1):
+{json.dumps(step1, ensure_ascii=False, indent=2)}
+
+POSICIONAMENTO (Etapa 2):
+{json.dumps(step2, ensure_ascii=False, indent=2)}
+
+Gere um plano de marketing completo e accionável.
+
+Devolva APENAS um JSON:
+{{
+  "objetivos": [
+    {{"meta": "Meta 1 mensurável", "prazo": "30 dias", "indicador": "KPI"}},
+    {{"meta": "Meta 2 mensurável", "prazo": "60 dias", "indicador": "KPI"}},
+    {{"meta": "Meta 3 mensurável", "prazo": "90 dias", "indicador": "KPI"}}
+  ],
+  "canais": ["canal 1", "canal 2", "canal 3"],
+  "pilares": ["pilar 1", "pilar 2", "pilar 3"],
+  "frequencia": "Frequência de publicação",
+  "cronograma": [
+    {{"periodo": "Mês 1 (dias 1-30)", "foco": "Ação principal", "entregas": ["entrega 1", "entrega 2"]}},
+    {{"periodo": "Mês 2 (dias 31-60)", "foco": "Ação principal", "entregas": ["entrega 1", "entrega 2"]}},
+    {{"periodo": "Mês 3 (dias 61-90)", "foco": "Ação principal", "entregas": ["entrega 1", "entrega 2"]}}
+  ],
+  "metricas": ["métrica 1", "métrica 2", "métrica 3"]
+}}
+Sem texto antes ou depois do JSON."""
+    try:
+        import re as _re
+        text = await call_gemini(instrucao, "Você é especialista em marketing estratégico para profissionais criativos do audiovisual.")
+        m = _re.search(r'\{[\s\S]*\}', text)
+        plan = json.loads(m.group() if m else text)
+        return {"ok": True, "plan": plan}
+    except Exception as e:
+        log.error("ai_diag_marketing: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar plano de marketing. Tente de novo."})
 
 
 # ── STATUS ────────────────────────────────────────────────────────

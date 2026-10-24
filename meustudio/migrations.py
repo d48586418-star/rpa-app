@@ -236,11 +236,23 @@ def migration_004(conn: sqlite3.Connection) -> None:
     """)
 
 
+def migration_005(conn: sqlite3.Connection) -> None:
+    """Fase 4 — Diagnóstico em 3 etapas (persona, posicionamento, marketing)."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS diag_steps (
+            step       TEXT PRIMARY KEY,
+            data       TEXT NOT NULL DEFAULT '{}',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_001,
     migration_002,
     migration_003,
     migration_004,
+    migration_005,
 ]
 
 
