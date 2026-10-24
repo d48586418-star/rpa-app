@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-import json, time, os, logging, sqlite3
+import json, time, os, logging, sqlite3, asyncio
 from pathlib import Path
 from contextlib import contextmanager
 import feedparser, requests
@@ -49,6 +49,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 DB_PATH = Path("studio.db")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_FALLBACK_MODELS = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+GEMINI_RETRY_ERRORS = {429, 500, 503, 504}
 
 # ── DATABASE ───────────────────────────────────────────────────────
 def init_db():
@@ -1415,6 +1417,33 @@ Contexto actual dos dados de Débora:
 {context}"""
 
 
+async def call_gemini(contents, system_instruction: str) -> str:
+    client = genai_client.Client()
+    models_to_try = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
+    last_err = None
+    for model in models_to_try:
+        for attempt in range(2):
+            try:
+                response = await client.aio.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=genai_types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        max_output_tokens=4096,
+                    )
+                )
+                return response.text
+            except Exception as e:
+                last_err = e
+                code = getattr(e, "status_code", None) or getattr(e, "code", None)
+                if code in GEMINI_RETRY_ERRORS and attempt == 0:
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+                break
+    log.error(f"Gemini falhou em todos os modelos: {last_err}")
+    raise last_err
+
+
 @app.post("/api/ai/chat")
 async def ai_chat(request: Request):
     if not HAS_GEMINI:
@@ -1434,30 +1463,20 @@ async def ai_chat(request: Request):
         ).fetchall()
         history = list(reversed(history))
 
-        # Save user message
-        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
-                  (session_id, "user", message))
+    contents = []
+    for role, content in history:
+        contents.append(genai_types.Content(role=role, parts=[genai_types.Part(text=content)]))
+    contents.append(genai_types.Content(role='user', parts=[genai_types.Part(text=message)]))
 
     try:
-        client = genai_client.Client()
-        contents = []
-        for role, content in history:
-            contents.append(genai_types.Content(role=role, parts=[genai_types.Part(text=content)]))
-        contents.append(genai_types.Content(role='user', parts=[genai_types.Part(text=message)]))
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                system_instruction=GEMINI_SYSTEM.format(context=context),
-                max_output_tokens=1024,
-            )
-        )
-        reply = response.text
+        reply = await call_gemini(contents, GEMINI_SYSTEM.format(context=context))
     except Exception as e:
         log.error(f"Gemini error: {e}")
         raise HTTPException(status_code=502, detail=f"Erro na IA: {str(e)}")
 
     with db() as c:
+        c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
+                  (session_id, "user", message))
         c.execute("INSERT INTO ai_conversations (session_id, role, content) VALUES (?,?,?)",
                   (session_id, "model", reply))
 
