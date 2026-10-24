@@ -880,40 +880,68 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
   <!-- ═══ FINANCEIRO ════════════════════════════════════════════ -->
   <section id="s-financeiro" class="section">
     <h1 class="page-title">Financeiro</h1>
-    <p class="page-sub">Cenários de receita e projeção de 12 meses.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-      <div>
-        <div class="section-label">Parâmetros</div>
-        <div class="card">
-          <div class="field"><label>Preço por projeto (R$)</label>
-            <input type="number" id="fin-price" value="0" oninput="updateFinSlider('price')">
-            <input type="range" id="fin-price-r" min="100" max="20000" value="0" oninput="updateFinInput('price')">
+    <p class="page-sub">Resumo do mês e projeção de cenários.</p>
+    <!-- Mês + KPIs -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <label style="font-size:13px;color:var(--text-2);">Mês:</label>
+      <input type="month" id="fin-month" onchange="loadFinanceiro()" style="width:auto;padding:6px 10px;">
+    </div>
+    <div id="fin-kpis" class="card-grid" style="margin-bottom:16px;"></div>
+    <!-- Leitura da IA -->
+    <div style="margin-bottom:20px;">
+      <button class="btn btn-ghost btn-sm" id="btn-leitura-ia" onclick="gerarLeituraFinanceira()">✨ Leitura da IA</button>
+      <div id="fin-leitura-ia" class="card" style="display:none;margin-top:10px;font-size:13px;line-height:1.6;color:var(--text);"></div>
+    </div>
+    <!-- Cenários (collapsible) -->
+    <details>
+      <summary class="section-label" style="cursor:pointer;user-select:none;margin-bottom:0;">Cenários Projetados</summary>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div>
+          <div class="section-label">Parâmetros</div>
+          <div class="card">
+            <div class="field"><label>Preço por projeto (R$)</label><input type="number" id="fin-price" value="0"></div>
+            <div class="field"><label>Horas por projeto</label><input type="number" id="fin-hpp" value="10"></div>
+            <div class="field"><label>Horas disponíveis/mês</label><input type="number" id="fin-hpm" value="80"></div>
+            <div class="field"><label>Taxa de conversão (%)</label><input type="number" id="fin-conv" value="10"></div>
+            <div class="field"><label>Custos fixos/mês (R$)</label><input type="number" id="fin-fixed" value="0"></div>
+            <div class="field"><label>Renda atual/mês (R$)</label><input type="number" id="fin-current" value="0"></div>
+            <div class="field"><label>Meta de renda/mês (R$)</label><input type="number" id="fin-goal" value="6000"></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="calcFinance()">Calcular Cenários</button>
           </div>
-          <div class="field"><label>Horas por projeto</label>
-            <input type="number" id="fin-hpp" value="10" oninput="updateFinSlider('hpp')">
-            <input type="range" id="fin-hpp-r" min="1" max="200" value="10" oninput="updateFinInput('hpp')">
-          </div>
-          <div class="field"><label>Horas disponíveis/mês</label>
-            <input type="number" id="fin-hpm" value="80" oninput="updateFinSlider('hpm')">
-            <input type="range" id="fin-hpm-r" min="10" max="200" value="80" oninput="updateFinInput('hpm')">
-          </div>
-          <div class="field"><label>Taxa de conversão (%)</label>
-            <input type="number" id="fin-conv" value="10" oninput="updateFinSlider('conv')">
-            <input type="range" id="fin-conv-r" min="1" max="50" value="10" oninput="updateFinInput('conv')">
-          </div>
-          <div class="field"><label>Custos fixos/mês (R$)</label><input type="number" id="fin-fixed" value="0"></div>
-          <div class="field"><label>Renda atual/mês (R$)</label><input type="number" id="fin-current" value="0"></div>
-          <div class="field"><label>Meta de renda/mês (R$)</label><input type="number" id="fin-goal" value="6000"></div>
-          <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="calcFinance()">Calcular Cenários</button>
+        </div>
+        <div>
+          <div class="section-label">Cenários</div>
+          <div id="fin-scenarios" style="color:var(--text-2);font-size:13px;">Preencha os parâmetros e calcule.</div>
+          <div class="section-label" style="margin-top:20px;">Projeção 12 meses</div>
+          <canvas id="fin-chart" style="max-height:200px;"></canvas>
         </div>
       </div>
-      <div>
-        <div class="section-label">Cenários</div>
-        <div id="fin-scenarios" style="color:var(--text-2);font-size:13px;">Preencha os parâmetros e calcule.</div>
-        <div class="section-label" style="margin-top:20px;">Projeção 12 meses</div>
-        <canvas id="fin-chart" style="max-height:200px;"></canvas>
+    </details>
+    <!-- Lançamentos (collapsible) -->
+    <details style="margin-top:16px;">
+      <summary class="section-label" style="cursor:pointer;user-select:none;margin-bottom:0;">Lançamentos do mês</summary>
+      <div style="margin-top:12px;">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('fin-entry-form').style.display='block'">+ Lançamento</button>
+        </div>
+        <div id="fin-entry-form" class="card" style="display:none;margin-bottom:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label>Tipo</label>
+              <select id="fe-type"><option value="receita">Receita</option><option value="despesa">Despesa</option></select>
+            </div>
+            <div class="field"><label>Valor (R$)</label><input type="number" id="fe-amount" step="0.01"></div>
+            <div class="field"><label>Descrição *</label><input type="text" id="fe-desc"></div>
+            <div class="field"><label>Data</label><input type="date" id="fe-date"></div>
+            <div class="field"><label>Categoria</label><input type="text" id="fe-cat" placeholder="ex: projeto, curso"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="saveFinEntry()">Salvar</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('fin-entry-form').style.display='none'">Cancelar</button>
+          </div>
+        </div>
+        <div id="fin-entries-list"></div>
       </div>
-    </div>
+    </details>
   </section>
 
   <!-- ═══ IDENTIDADE ════════════════════════════════════════════ -->
@@ -1153,7 +1181,7 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         <div class="field"><label>Nível atual (1–5)</label><input type="number" id="learn-cur" min="1" max="5" value="1"></div>
         <div class="field"><label>Nível meta (1–5)</label><input type="number" id="learn-tgt" min="1" max="5" value="3"></div>
         <div class="field"><label>Status</label>
-          <select id="learn-status"><option value="ativa">Ativa</option><option value="concluida">Concluída</option><option value="pausada">Pausada</option></select>
+          <select id="learn-status"><option value="quero_fazer">Quero fazer</option><option value="fazendo">Fazendo</option><option value="concluido">Concluído</option></select>
         </div>
       </div>
       <div class="field"><label>Recursos (cursos, livros, links)</label><textarea id="learn-resources" rows="2" placeholder="Um recurso por linha"></textarea></div>
@@ -1173,7 +1201,7 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     <p class="page-sub">Captura rápida de insights, observações e perguntas.</p>
     <div class="card" style="margin-bottom:16px;">
       <div style="display:flex;gap:8px;align-items:flex-start;">
-        <textarea id="idea-input" rows="2" placeholder="Anote uma ideia…" style="flex:1;" onkeydown="if(event.key==='Enter'&&event.ctrlKey)saveIdeia()"></textarea>
+        <textarea id="idea-input" rows="2" placeholder="Anote uma ideia… (Ctrl+Enter para salvar)" style="flex:1;" onkeydown="if(event.key==='Enter'&&event.ctrlKey)saveIdeia()"></textarea>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <select id="idea-type" style="width:130px;padding:7px 8px;">
             <option value="ideia">Ideia</option>
@@ -1181,9 +1209,14 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
             <option value="pergunta">Pergunta</option>
             <option value="referencia">Referência</option>
           </select>
+          <input type="text" id="idea-tags" placeholder="Tags (vírgula)" style="width:130px;padding:7px 8px;font-size:12px;">
           <button class="btn btn-primary btn-sm" onclick="saveIdeia()">Salvar</button>
         </div>
       </div>
+    </div>
+    <!-- Busca + filtros -->
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
+      <input type="text" id="ideias-search" placeholder="Buscar…" style="flex:1;min-width:140px;padding:7px 10px;font-size:13px;" oninput="searchIdeias()">
     </div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
       <button class="btn btn-ghost btn-sm" onclick="filterIdeias('')" id="if-all" style="font-weight:600;">Todas</button>
@@ -1200,21 +1233,37 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     <h1 class="page-title">Relatórios e Progresso</h1>
     <p class="page-sub">Visão consolidada do seu histórico e evolução.</p>
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('rel','projetos',this)">Projetos</div>
+      <div class="tab active" onclick="switchTab('rel','ia',this);loadRelatorioIA()">Relatório IA</div>
+      <div class="tab" onclick="switchTab('rel','projetos',this)">Projetos</div>
       <div class="tab" onclick="switchTab('rel','financeiro',this)">Financeiro</div>
       <div class="tab" onclick="switchTab('rel','oportunidades',this)">Oportunidades</div>
       <div class="tab" onclick="switchTab('rel','resultados',this)">Resultados</div>
     </div>
-    <div id="rel-projetos" class="tab-panel active">
+    <div id="rel-tab-ia" class="tab-panel active">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="month" id="rel-period" style="width:auto;padding:6px 10px;">
+        <button class="btn btn-primary btn-sm" id="btn-gerar-relatorio" onclick="gerarRelatorioIA()">✨ Gerar Relatório</button>
+        <button class="btn btn-ghost btn-sm" id="btn-exportar-relatorio" onclick="exportarRelatorio()" style="display:none;">⬇ Exportar .md</button>
+      </div>
+      <div id="rel-ia-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> A gerar relatório…</div>
+      <div id="rel-ia-content" class="card" style="display:none;">
+        <div id="rel-ia-text" style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);"></div>
+      </div>
+      <div id="rel-ia-saved" style="margin-top:16px;">
+        <div class="section-label">Relatórios Anteriores</div>
+        <div id="rel-ia-history"></div>
+      </div>
+    </div>
+    <div id="rel-tab-projetos" class="tab-panel">
       <div id="rel-proj-list"></div>
     </div>
-    <div id="rel-financeiro" class="tab-panel">
+    <div id="rel-tab-financeiro" class="tab-panel">
       <div id="rel-fin-summary"></div>
     </div>
-    <div id="rel-oportunidades" class="tab-panel">
+    <div id="rel-tab-oportunidades" class="tab-panel">
       <div id="rel-opp-list"></div>
     </div>
-    <div id="rel-resultados" class="tab-panel">
+    <div id="rel-tab-resultados" class="tab-panel">
       <div id="rel-res-list"></div>
     </div>
   </section>
@@ -1344,6 +1393,7 @@ function nav(el, targetId){
   const fcBtn = document.getElementById('float-chat-btn');
   if (fcBtn) fcBtn.style.display = id === 's-assistente' ? 'none' : 'flex';
   if(id==='s-estrategia'){ runCareerAnalysis(); loadEstrategiaV2(); }
+  if(id==='s-financeiro') loadFinanceiro();
   if(id==='s-calendario') renderCalendar();
   if(id==='s-identidade') loadIdentidade();
   if(id==='s-pesquisa') loadTrends();
@@ -1353,7 +1403,7 @@ function nav(el, targetId){
   if(id==='s-oportunidades') loadOportunidades();
   if(id==='s-aprendizado') loadLearning();
   if(id==='s-ideias') loadIdeias();
-  if(id==='s-relatorios') loadRelatorios();
+  if(id==='s-relatorios'){ loadRelatorioIA(); loadRelatorios(); }
   if(id==='s-assistente'){ loadConversations(); loadAiActions(); }
   if(id==='s-perfil') loadProfileForm();
 }
@@ -2456,13 +2506,19 @@ function renderFinScenarios(data){
   const el=document.getElementById('fin-scenarios');
   const sc=data;
   const fmt=v=>`R$ ${(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}`;
+  const legend={
+    conservative:'Pessimista: poucos projetos fechados, menor conversão.',
+    base:'Realista: conversão normal, ritmo sustentável.',
+    optimistic:'Otimista: alta conversão, meses cheios de projetos.'
+  };
   el.innerHTML=['conservative','base','optimistic'].map(k=>{
-    const s=sc[k];const label={conservative:'Conservador',base:'Base',optimistic:'Otimista'}[k];
+    const s=sc[k];const label={conservative:'Pessimista',base:'Realista',optimistic:'Otimista'}[k];
     return`<div class="card" style="margin-bottom:8px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <span style="font-size:13px;font-weight:600;">${label}</span>
         <span style="font-size:16px;font-weight:600;color:var(--accent);">${fmt(s.revenue)}/mês</span>
       </div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;font-style:italic;">${legend[k]}</div>
       <div style="font-size:12px;color:var(--text-2);">${s.projects} projetos · ${s.goal_percent}% da meta · Líquido ${fmt(s.net_revenue)}</div>
       <div class="progress" style="margin-top:8px;"><div class="progress-fill" style="width:${Math.min(100,s.goal_percent)}%"></div></div>
     </div>`;
@@ -2498,6 +2554,87 @@ async function loadFinances(){
       document.getElementById('fin-goal').value=data.income_goal||6000;
     }
   }catch(e){}
+}
+
+async function loadFinanceiro(){
+  // Init month
+  const inp=document.getElementById('fin-month');
+  if(inp&&!inp.value){ const n=new Date(); inp.value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
+  const month=inp?inp.value:'';
+  const el=document.getElementById('fin-kpis');
+  if(!el) return;
+  try{
+    const summary=await api('/api/finances/summary'+(month?`?month=${month}`:''));
+    const finData=await api('/api/finances');
+    const receita=summary.receita||0;
+    const despesa=summary.despesa||0;
+    const saldo=receita-despesa;
+    const meta=finData.income_goal||0;
+    const pct=meta?Math.min(100,Math.round(receita/meta*100)):0;
+    el.innerHTML=`
+      <div class="metric-card"><div class="metric-val accent">R$ ${receita.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Receita do mês</div></div>
+      <div class="metric-card"><div class="metric-val" style="color:var(--red);">R$ ${despesa.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Despesas</div></div>
+      <div class="metric-card"><div class="metric-val" style="color:${saldo>=0?'var(--green)':'var(--red)'};">R$ ${saldo.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Saldo</div></div>
+      <div class="metric-card"><div class="metric-val">${pct}%</div><div class="metric-label">Meta (R$ ${meta.toLocaleString('pt-BR',{minimumFractionDigits:0})})</div><div class="progress" style="margin-top:6px;"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
+    // Load entries
+    await loadFinEntries(month);
+  }catch(e){}
+}
+async function loadFinEntries(month){
+  const el=document.getElementById('fin-entries-list');
+  if(!el) return;
+  try{
+    const entries=await api('/api/finances/entries'+(month?`?month=${month}`:''));
+    if(!entries.length){ el.innerHTML='<div style="font-size:13px;color:var(--text-2);">Nenhum lançamento neste mês.</div>'; return; }
+    const fmt=v=>`R$ ${(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+    const typeBadge={receita:'badge-green',despesa:'badge-gray'};
+    el.innerHTML=entries.map(e=>`<div class="card" style="padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;">${escHtml(e.description)}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtDate(e.date)} ${e.category?'· '+escHtml(e.category):''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <span class="badge ${typeBadge[e.type]||'badge-gray'}">${e.type}</span>
+        <span style="font-weight:600;font-size:13px;">${fmt(e.amount)}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteFinEntry(${e.id})">×</button>
+      </div>
+    </div>`).join('');
+  }catch(e){}
+}
+async function saveFinEntry(){
+  const desc=document.getElementById('fe-desc').value.trim();
+  if(!desc){ toast('Descrição obrigatória.', true); return; }
+  const body={
+    type:document.getElementById('fe-type').value,
+    amount:parseFloat(document.getElementById('fe-amount').value)||0,
+    description:desc,
+    date:document.getElementById('fe-date').value||new Date().toISOString().slice(0,10),
+    category:document.getElementById('fe-cat').value,
+  };
+  try{
+    await api('/api/finances/entries','POST',body);
+    document.getElementById('fin-entry-form').style.display='none';
+    ['fe-desc','fe-amount','fe-cat'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const month=document.getElementById('fin-month')?.value||'';
+    await loadFinanceiro();
+    toast('Lançamento guardado!');
+  }catch(e){ toast('Erro ao guardar.', true); }
+}
+async function deleteFinEntry(id){
+  if(!confirm('Remover lançamento?')) return;
+  try{ await api('/api/finances/entries/'+id,'DELETE'); await loadFinanceiro(); }catch(e){}
+}
+async function gerarLeituraFinanceira(){
+  const btn=document.getElementById('btn-leitura-ia');
+  const el=document.getElementById('fin-leitura-ia');
+  const month=document.getElementById('fin-month')?.value||'';
+  btn.disabled=true; btn.textContent='⏳ A analisar…';
+  try{
+    const data=await api('/api/ai/leitura-financeira','POST',{month});
+    el.textContent=data.text;
+    el.style.display='block';
+  }catch(e){ toast('Erro ao gerar leitura.', true); }
+  finally{ btn.disabled=false; btn.textContent='✨ Leitura da IA'; }
 }
 
 // ── IDENTIDADE ───────────────────────────────────────────────────
@@ -2800,7 +2937,8 @@ async function loadLearning(){
   try{
     const data=await api('/api/learning');
     const el=document.getElementById('learning-list');
-    const statusBadge={ativa:'badge-green',concluida:'badge-gray',pausada:'badge-amber'};
+    const statusBadge={quero_fazer:'badge-amber',fazendo:'badge-green',concluido:'badge-gray',ativa:'badge-green',concluida:'badge-gray',pausada:'badge-amber'};
+  const statusLabel={quero_fazer:'Quero fazer',fazendo:'Fazendo',concluido:'Concluído',ativa:'Ativa',concluida:'Concluída',pausada:'Pausada'};
     el.innerHTML=data.length?data.map(g=>`<div class="card" style="margin-bottom:8px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
         <div style="flex:1;min-width:0;">
@@ -2812,14 +2950,14 @@ async function loadLearning(){
             </div>
           </div>
           ${g.notes?`<div style="font-size:12px;color:var(--text-2);margin-top:6px;">${escHtml(g.notes)}</div>`:''}
-          <div style="margin-top:6px;"><span class="badge ${statusBadge[g.status]||'badge-gray'}">${g.status}</span></div>
+          <div style="margin-top:6px;"><span class="badge ${statusBadge[g.status]||'badge-gray'}">${statusLabel[g.status]||g.status}</span></div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;">
           <button class="btn btn-ghost btn-sm" onclick="editLearning('${g.id}')">Editar</button>
           <button class="btn btn-danger btn-sm" onclick="deleteLearning('${g.id}')">×</button>
         </div>
       </div>
-    </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum objetivo de aprendizado registado.</div>';
+    </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Ainda não há objetivos de aprendizado. Clique em \'+ Novo Objetivo\'.</div>';
   }catch(e){}
 }
 async function saveLearning(){
@@ -2864,34 +3002,63 @@ function filterIdeias(type){
   ['all','ideia','observacao','pergunta','referencia'].forEach(t=>{ const el=document.getElementById('if-'+t); if(el){ el.style.fontWeight=(t===type||(!type&&t==='all'))?'700':'400'; }});
   renderIdeias();
 }
+let ideiasSearch='';
+function searchIdeias(){
+  ideiasSearch=document.getElementById('ideias-search').value.trim().toLowerCase();
+  renderIdeias();
+}
 function renderIdeias(){
-  const data=ideiasFilter?ideiasAll.filter(x=>x.type===ideiasFilter):ideiasAll;
+  let data=ideiasFilter?ideiasAll.filter(x=>x.type===ideiasFilter):ideiasAll;
+  if(ideiasSearch) data=data.filter(x=>x.content.toLowerCase().includes(ideiasSearch)||(x.tags||'').toLowerCase().includes(ideiasSearch));
   const el=document.getElementById('ideias-list');
   const typeBadge={ideia:'badge-amber',observacao:'badge-gray',pergunta:'badge-green',referencia:'badge-gray'};
-  el.innerHTML=data.length?data.map(i=>`<div class="card" style="margin-bottom:8px;padding:12px;display:flex;justify-content:space-between;gap:8px;">
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:13px;">${escHtml(i.content)}</div>
-      <div style="margin-top:6px;display:flex;gap:6px;">
-        <span class="badge ${typeBadge[i.type]||'badge-gray'}">${i.type}</span>
-        <span style="font-size:11px;color:var(--text-3);">${fmtDate(i.created_at?.slice(0,10)||'')}</span>
+  el.innerHTML=data.length?data.map(i=>{
+    let tags=[];try{tags=JSON.parse(i.tags||'[]');}catch(e){}
+    const tagsHtml=tags.length?tags.map(t=>`<span class="badge badge-gray" style="font-size:10px;">${escHtml(t)}</span>`).join(''):'';
+    return`<div class="card" style="margin-bottom:8px;padding:12px;">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;">${escHtml(i.content)}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <span class="badge ${typeBadge[i.type]||'badge-gray'}">${i.type}</span>
+          ${tagsHtml}
+          <span style="font-size:11px;color:var(--text-3);">${fmtDate(i.created_at?.slice(0,10)||'')}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
+        <button class="btn btn-ghost btn-sm" onclick="resumirIdeia('${i.id}')">✨ Resumir</button>
+        <button class="btn btn-ghost btn-sm" onclick="ideiaToProject('${i.id}')">→ Proj</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteIdeia('${i.id}')">×</button>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
-      <button class="btn btn-ghost btn-sm" onclick="ideiaToProject('${i.id}')">→ Proj</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteIdeia('${i.id}')">×</button>
-    </div>
-  </div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhuma ideia registada ainda. Ctrl+Enter para salvar.</div>';
+    <div id="ideia-resumo-${i.id}" style="display:none;margin-top:8px;font-size:12px;color:var(--text-2);font-style:italic;padding:8px;background:var(--surface-2);border-radius:var(--radius-sm);"></div>
+  </div>`;
+  }).join(''):'<div style="font-size:13px;color:var(--text-2);">Ainda não há notas. Escreva algo acima e salve.</div>';
 }
 async function saveIdeia(){
   const content=document.getElementById('idea-input').value.trim(); if(!content) return;
   const type=document.getElementById('idea-type').value;
+  const tagsRaw=document.getElementById('idea-tags')?.value||'';
+  const tags=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
   try{
-    await api('/api/ideas','POST',{content,type});
+    await api('/api/ideas','POST',{content,type,tags});
     document.getElementById('idea-input').value='';
+    if(document.getElementById('idea-tags')) document.getElementById('idea-tags').value='';
     loadIdeias();
   }catch(e){}
 }
 async function deleteIdeia(id){ if(!confirm('Remover ideia?')) return; try{ await api('/api/ideas/'+id,'DELETE'); loadIdeias(); }catch(e){} }
+async function resumirIdeia(id){
+  const idea=ideiasAll.find(x=>x.id===id); if(!idea) return;
+  const el=document.getElementById('ideia-resumo-'+id);
+  if(!el) return;
+  if(el.style.display!=='none'&&el.textContent){ el.style.display='none'; return; }
+  el.textContent='⏳ A resumir…'; el.style.display='block';
+  try{
+    const data=await api('/api/ai/resumir-ideia','POST',{content:idea.content});
+    el.textContent=data.resumo||'Sem resultado.';
+  }catch(e){el.textContent='Erro ao resumir.';setTimeout(()=>el.style.display='none',2000);}
+}
 async function ideiaToProject(id){
   const idea=ideiasAll.find(x=>x.id===id); if(!idea) return;
   if(!confirm('Converter esta ideia em projeto?')) return;
@@ -2907,7 +3074,6 @@ async function loadRelatorios(){
   try{
     const projs=await api('/api/projects');
     const el=document.getElementById('rel-proj-list');
-    const statusBadge={ativo:'badge-green',concluido:'badge-gray',pausado:'badge-amber',rascunho:'badge-gray'};
     const byStatus={};
     projs.forEach(praw=>{const p=typeof praw==='string'?JSON.parse(praw):praw;const s=p.status||'rascunho';(byStatus[s]=byStatus[s]||[]).push(p);});
     el.innerHTML=Object.entries(byStatus).map(([s,ps])=>`<div style="margin-bottom:20px;"><div class="section-label">${s.toUpperCase()} (${ps.length})</div>${ps.map(p=>`<div class="card" style="padding:12px;margin-bottom:6px;"><div style="font-size:13px;font-weight:600;">${escHtml(p.name||'')}</div><div style="font-size:12px;color:var(--text-2);">${escHtml(p.description?.slice(0,100)||'')}</div></div>`).join('')}</div>`).join('')||'<div style="font-size:13px;color:var(--text-2);">Nenhum projeto.</div>';
@@ -2918,11 +3084,10 @@ async function loadRelatorios(){
     const el=document.getElementById('rel-fin-summary');
     const receita=summary.receita||0;
     const despesa=summary.despesa||0;
-    const investimento=summary.investimento||0;
     el.innerHTML=`<div class="card-grid">
       <div class="metric-card"><div class="metric-val accent">R$ ${receita.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Total Receitas</div></div>
       <div class="metric-card"><div class="metric-val" style="color:var(--red);">R$ ${despesa.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Total Despesas</div></div>
-      <div class="metric-card"><div class="metric-val">R$ ${(receita-despesa-investimento).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Saldo Líquido</div></div>
+      <div class="metric-card"><div class="metric-val">R$ ${(receita-despesa).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="metric-label">Saldo Líquido</div></div>
     </div>`;
   }catch(e){}
   // Oportunidades
@@ -2940,6 +3105,57 @@ async function loadRelatorios(){
     const el=document.getElementById('rel-res-list');
     el.innerHTML=results.length?results.map(r=>`<div class="card" style="padding:12px;margin-bottom:6px;"><div style="font-size:13px;">${escHtml(r.description)}</div><div style="font-size:11px;color:var(--text-3);margin-top:4px;">${fmtDate(r.date)} · ${r.category}</div></div>`).join(''):'<div style="font-size:13px;color:var(--text-2);">Nenhum resultado.</div>';
   }catch(e){}
+}
+async function loadRelatorioIA(){
+  // Initialize month selector
+  const inp=document.getElementById('rel-period');
+  if(inp&&!inp.value){ const n=new Date(); inp.value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
+  // Load history
+  try{
+    const list=await api('/api/reports');
+    const el=document.getElementById('rel-ia-history');
+    if(!list.length){ el.innerHTML='<div style="font-size:13px;color:var(--text-2);">Ainda não há relatórios gerados.</div>'; return; }
+    el.innerHTML=list.map(r=>`<div class="card" style="padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="loadRelatorioContent('${r.period}')">
+      <span style="font-size:13px;font-weight:500;">${r.period}</span>
+      <span style="font-size:11px;color:var(--text-3);">${fmtDate(r.created_at?.slice(0,10)||'')}</span>
+    </div>`).join('');
+  }catch(e){}
+}
+async function loadRelatorioContent(period){
+  document.getElementById('rel-period').value=period;
+  try{
+    const data=await api('/api/reports/'+period);
+    document.getElementById('rel-ia-text').textContent=data.content;
+    document.getElementById('rel-ia-content').style.display='block';
+    document.getElementById('btn-exportar-relatorio').style.display='inline-flex';
+  }catch(e){ toast('Erro ao carregar relatório.', true); }
+}
+async function gerarRelatorioIA(){
+  const period=document.getElementById('rel-period').value;
+  if(!period){ toast('Selecione um mês.', true); return; }
+  const btn=document.getElementById('btn-gerar-relatorio');
+  const loading=document.getElementById('rel-ia-loading');
+  btn.disabled=true; btn.textContent='⏳ A gerar…';
+  loading.style.display='block';
+  document.getElementById('rel-ia-content').style.display='none';
+  try{
+    const data=await api('/api/ai/relatorio-mensal','POST',{period,force:true});
+    document.getElementById('rel-ia-text').textContent=data.content;
+    document.getElementById('rel-ia-content').style.display='block';
+    document.getElementById('btn-exportar-relatorio').style.display='inline-flex';
+    await loadRelatorioIA();
+    toast('Relatório gerado e guardado!');
+  }catch(e){ toast('Erro ao gerar relatório.', true); }
+  finally{ btn.disabled=false; btn.textContent='✨ Gerar Relatório'; loading.style.display='none'; }
+}
+function exportarRelatorio(){
+  const content=document.getElementById('rel-ia-text').textContent;
+  const period=document.getElementById('rel-period').value||'relatorio';
+  const blob=new Blob([content],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`relatorio-${period}.md`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ── CONFIGURAÇÕES ────────────────────────────────────────────────

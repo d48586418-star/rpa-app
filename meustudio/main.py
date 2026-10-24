@@ -917,9 +917,18 @@ async def financial_summary(month: str = ""):
 
 # ── IDEAS ────────────────────────────────────────────────────────
 @app.get("/api/ideas")
-async def get_ideas():
+async def get_ideas(q: str = "", type: str = ""):
     with db() as c:
-        rows = c.execute("SELECT * FROM ideas ORDER BY created_at DESC").fetchall()
+        query = "SELECT * FROM ideas WHERE 1=1"
+        params: list = []
+        if q:
+            query += " AND (content LIKE ? OR tags LIKE ?)"
+            params += [f"%{q}%", f"%{q}%"]
+        if type:
+            query += " AND type=?"
+            params.append(type)
+        query += " ORDER BY created_at DESC"
+        rows = c.execute(query, params).fetchall()
         return [dict(r) for r in rows]
 
 @app.post("/api/ideas")
@@ -2484,6 +2493,162 @@ Sem texto antes ou depois do JSON."""
     except Exception as e:
         log.error("ai_diag_marketing: %s", e)
         raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar plano de marketing. Tente de novo."})
+
+
+# ── FASE 7: LEITURA FINANCEIRA, RESUMIR IDEIA, RELATÓRIOS ────────
+
+@app.post("/api/ai/leitura-financeira")
+async def ai_leitura_financeira(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    month = body.get("month", "")
+    with db() as c:
+        ctx = build_ai_context(c)
+        q = "SELECT type, SUM(amount) as total FROM financial_entries"
+        params: list = []
+        if month:
+            q += " WHERE date LIKE ?"
+            params.append(f"{month}%")
+        q += " GROUP BY type"
+        rows = c.execute(q, params).fetchall()
+        summary = {r["type"]: r["total"] for r in rows}
+        fin_row = c.execute("SELECT data FROM financial_data WHERE id=1").fetchone()
+        fin_params = json.loads(fin_row["data"] if fin_row else "{}")
+    receita = summary.get("receita", 0) or 0
+    despesa = summary.get("despesa", 0) or 0
+    saldo = receita - despesa
+    meta = fin_params.get("income_goal", 0) or 0
+    instrucao = f"""{ctx}
+
+DADOS FINANCEIROS DO MÊS ({month or 'geral'}):
+- Receita: R$ {receita:.2f}
+- Despesas: R$ {despesa:.2f}
+- Saldo líquido: R$ {saldo:.2f}
+- Meta mensal: R$ {meta:.2f}
+- Progresso da meta: {round(receita/meta*100) if meta else 0}%
+
+Faça uma leitura breve (3-5 frases) dos números acima para {ctx.split('NOME:')[1].split('\\n')[0].strip() if 'NOME:' in ctx else 'a profissional'}.
+Seja directa, concreta e construtiva. Mencione o que está bem e o que pode melhorar.
+Devolva apenas o texto, sem JSON, sem bullet points, em português do Brasil."""
+    try:
+        text = await call_gemini(instrucao, "Você é consultora financeira especializada em profissionais criativos.")
+        return {"ok": True, "text": text.strip()}
+    except Exception as e:
+        log.error("ai_leitura_financeira: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar leitura. Tente de novo."})
+
+
+@app.post("/api/ai/resumir-ideia")
+async def ai_resumir_ideia(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    content = body.get("content", "")
+    if not content.strip():
+        raise HTTPException(400, detail={"ok": False, "code": "EMPTY", "message": "Conteúdo vazio."})
+    instrucao = f"""Resuma esta ideia em 1-2 frases claras e accionáveis, preservando a essência:
+
+"{content}"
+
+Devolva apenas o resumo, em português do Brasil."""
+    try:
+        text = await call_gemini(instrucao, "Você é especialista em síntese criativa.")
+        return {"ok": True, "resumo": text.strip()}
+    except Exception as e:
+        log.error("ai_resumir_ideia: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao resumir. Tente de novo."})
+
+
+@app.get("/api/reports")
+async def get_reports():
+    with db() as c:
+        rows = c.execute("SELECT id, period, created_at FROM monthly_reports ORDER BY period DESC").fetchall()
+    return [dict(r) for r in rows]
+
+
+@app.get("/api/reports/{period}")
+async def get_report(period: str):
+    with db() as c:
+        row = c.execute("SELECT * FROM monthly_reports WHERE period=?", (period,)).fetchone()
+    if not row:
+        raise HTTPException(404, detail={"ok": False, "code": "NOT_FOUND", "message": "Relatório não encontrado."})
+    return dict(row)
+
+
+@app.post("/api/ai/relatorio-mensal")
+async def ai_relatorio_mensal(request: Request):
+    if not HAS_GEMINI:
+        raise HTTPException(503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    body = await request.json()
+    period = body.get("period", "")
+    force = body.get("force", False)
+    if not period:
+        from datetime import date
+        period = date.today().strftime("%Y-%m")
+    if not force:
+        with db() as c:
+            cached = c.execute("SELECT content FROM monthly_reports WHERE period=?", (period,)).fetchone()
+        if cached:
+            return {"ok": True, "period": period, "content": cached["content"], "cached": True}
+    with db() as c:
+        ctx = build_ai_context(c)
+        projs = [dict(r) for r in c.execute("SELECT * FROM projects ORDER BY updated_at DESC LIMIT 10").fetchall()]
+        fin_q = "SELECT type, SUM(amount) as total FROM financial_entries WHERE date LIKE ? GROUP BY type"
+        fin_rows = c.execute(fin_q, (f"{period}%",)).fetchall()
+        fin = {r["type"]: r["total"] for r in fin_rows}
+        opps = [dict(r) for r in c.execute("SELECT title, status, deadline FROM opportunities ORDER BY created_at DESC LIMIT 10").fetchall()]
+        results = [dict(r) for r in c.execute("SELECT description, category, date FROM results_log ORDER BY date DESC LIMIT 5").fetchall()]
+        learning = [dict(r) for r in c.execute("SELECT competency, status FROM learning_goals ORDER BY updated_at DESC LIMIT 5").fetchall()]
+        est_row = c.execute("SELECT data FROM estrategia_data WHERE id=1").fetchone()
+        estrategia = json.loads(est_row["data"] if est_row else "{}")
+    receita = fin.get("receita", 0) or 0
+    despesa = fin.get("despesa", 0) or 0
+    instrucao = f"""{ctx}
+
+PERÍODO: {period}
+
+PROJETOS ACTIVOS:
+{json.dumps([{'nome': p.get('name',''), 'status': p.get('status','')} for p in projs[:5]], ensure_ascii=False)}
+
+FINANCEIRO DO MÊS:
+- Receita: R$ {receita:.2f}
+- Despesas: R$ {despesa:.2f}
+- Saldo: R$ {receita-despesa:.2f}
+
+OPORTUNIDADES:
+{json.dumps([{'titulo': o['title'], 'status': o['status']} for o in opps[:5]], ensure_ascii=False)}
+
+CONQUISTAS/RESULTADOS:
+{json.dumps([r['description'] for r in results], ensure_ascii=False)}
+
+APRENDIZADO EM ANDAMENTO:
+{json.dumps([l['competency'] for l in learning if l['status'] in ('ativa','fazendo')], ensure_ascii=False)}
+
+VISÃO ESTRATÉGICA:
+{estrategia.get('visao', 'Não definida')}
+
+Gere um relatório mensal completo em formato Markdown, com as secções:
+## Resumo do Mês
+## Projetos
+## Financeiro
+## Oportunidades
+## Aprendizado
+## Próximos Passos (3-5 acções concretas)
+
+Seja concreta, pessoal e motivadora. Escreva em português do Brasil."""
+    try:
+        content = await call_gemini(instrucao, "Você é consultora estratégica para profissionais criativos do audiovisual.")
+        with db() as c:
+            c.execute(
+                "INSERT INTO monthly_reports (period, content) VALUES (?,?) "
+                "ON CONFLICT(period) DO UPDATE SET content=excluded.content, created_at=CURRENT_TIMESTAMP",
+                (period, content)
+            )
+        return {"ok": True, "period": period, "content": content, "cached": False}
+    except Exception as e:
+        log.error("ai_relatorio_mensal: %s", e)
+        raise HTTPException(500, detail={"ok": False, "code": "AI_ERROR", "message": "Erro ao gerar relatório. Tente de novo."})
 
 
 # ── STATUS ────────────────────────────────────────────────────────

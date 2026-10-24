@@ -259,6 +259,19 @@ def migration_006(conn: sqlite3.Connection) -> None:
     conn.execute("INSERT OR IGNORE INTO estrategia_data (id, data) VALUES (1, '{}')")
 
 
+def migration_007(conn: sqlite3.Connection) -> None:
+    """Fase 7 — Relatórios mensais gerados pela IA."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS monthly_reports (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            period     TEXT NOT NULL,
+            content    TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(period)
+        )
+    """)
+
+
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_001,
     migration_002,
@@ -266,6 +279,7 @@ _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_004,
     migration_005,
     migration_006,
+    migration_007,
 ]
 
 
