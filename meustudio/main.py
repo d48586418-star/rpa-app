@@ -1419,9 +1419,6 @@ Contexto actual dos dados de Débora:
 async def ai_chat(request: Request):
     if not HAS_GEMINI:
         raise HTTPException(status_code=503, detail="google-generativeai não instalado")
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=503, detail="GEMINI_API_KEY não configurada")
 
     body = await request.json()
     message = body.get("message", "").strip()
@@ -1442,7 +1439,7 @@ async def ai_chat(request: Request):
                   (session_id, "user", message))
 
     try:
-        client = genai_client.Client(api_key=api_key)
+        client = genai_client.Client()
         contents = []
         for role, content in history:
             contents.append(genai_types.Content(role=role, parts=[genai_types.Part(text=content)]))
