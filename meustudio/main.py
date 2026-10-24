@@ -1575,6 +1575,87 @@ async def delete_ai_conversation(session_id: str):
     return {"ok": True}
 
 
+# ── FASE 2 — SUGESTÕES DA PÁGINA INICIAL ─────────────────────────
+_HOME_SUGGESTIONS_TTL_HOURS = 24
+
+
+@app.get("/api/ai/home-suggestions")
+async def get_home_suggestions():
+    """Devolve sugestões cacheadas (24h). Se expiradas, retorna lista vazia."""
+    today = __import__("datetime").date.today().isoformat()
+    with db() as c:
+        row = c.execute(
+            """SELECT resposta, created_at FROM ai_cache
+               WHERE modulo='home_suggestions' AND hash_ctx=?
+               ORDER BY id DESC LIMIT 1""",
+            (today,)
+        ).fetchone()
+    if row:
+        import datetime as _dt
+        created = _dt.datetime.fromisoformat(str(row["created_at"]))
+        age_h = (_dt.datetime.utcnow() - created).total_seconds() / 3600
+        if age_h < _HOME_SUGGESTIONS_TTL_HOURS:
+            try:
+                return {"ok": True, "suggestions": json.loads(row["resposta"]), "cached": True}
+            except Exception:
+                pass
+    return {"ok": True, "suggestions": [], "cached": False}
+
+
+@app.post("/api/ai/home-suggestions")
+async def generate_home_suggestions():
+    """Gera (ou regera) até 5 sugestões de próximas acções via IA e guarda em cache."""
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+
+    today = __import__("datetime").date.today().isoformat()
+    with db() as c:
+        used_today = c.execute(
+            "SELECT COUNT(*) FROM ai_conversations WHERE role='model' AND date(created_at)=?",
+            (today,)
+        ).fetchone()[0]
+    if used_today >= AI_DAILY_BUDGET:
+        raise HTTPException(status_code=429, detail={"ok": False, "code": "AI_BUDGET_EXCEEDED", "message": f"Limite diário de {AI_DAILY_BUDGET} respostas atingido."})
+
+    with db() as c:
+        ctx = build_ai_context(c)
+
+    instrucao = f"""Com base nos dados actuais de Débora Augusta abaixo, gera exactamente 5 sugestões concretas e accionáveis do que ela deve fazer a seguir na sua carreira (projectos, prazos, oportunidades, aprendizado). Cada sugestão deve ser curta (máx. 15 palavras). Devolve APENAS um array JSON de strings, sem texto extra.
+
+Exemplo de resposta: ["Enviar proposta para cliente X até sexta", "Concluir edição do projecto Y"]
+
+Dados actuais:
+{ctx}"""
+
+    try:
+        from google.genai import types as _gt
+        contents = [_gt.Content(role="user", parts=[_gt.Part(text=instrucao)])]
+        reply = await call_gemini(contents, "Você é a assistente estratégica de Débora Augusta. Responda sempre em português brasileiro.")
+    except Exception as e:
+        log.error("Gemini home-suggestions error: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+
+    # Parse — find JSON array in response
+    import re as _re
+    match = _re.search(r'\[.*?\]', reply, _re.DOTALL)
+    if match:
+        try:
+            suggestions = json.loads(match.group())
+            suggestions = [str(s) for s in suggestions[:5]]
+        except Exception:
+            suggestions = [s.strip("- ").strip() for s in reply.split("\n") if s.strip()][:5]
+    else:
+        suggestions = [s.strip("- ").strip() for s in reply.split("\n") if s.strip()][:5]
+
+    with db() as c:
+        c.execute(
+            "INSERT OR REPLACE INTO ai_cache (modulo, hash_ctx, resposta, modelo) VALUES (?,?,?,?)",
+            ("home_suggestions", today, json.dumps(suggestions), GEMINI_MODEL)
+        )
+
+    return {"ok": True, "suggestions": suggestions, "cached": False}
+
+
 # ── FASE 1 — CONVERSAS NOMEADAS ───────────────────────────────────
 @app.get("/api/conversations")
 async def list_conversations():
