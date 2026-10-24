@@ -51,6 +51,9 @@ DB_PATH = Path("studio.db")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
 GEMINI_RETRY_ERRORS = {429, 500, 503, 504}
+AI_DAILY_BUDGET = int(os.environ.get("AI_DAILY_BUDGET", "15"))
+HOST = os.environ.get("HOST", "127.0.0.1")
+PORT = int(os.environ.get("PORT", "8000"))
 
 # ── DATABASE ───────────────────────────────────────────────────────
 def init_db():
@@ -220,6 +223,9 @@ init_db()
 def db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("PRAGMA busy_timeout=5000")
     try:
         yield conn
         conn.commit()
@@ -1418,7 +1424,7 @@ Contexto actual dos dados de Débora:
 
 
 async def call_gemini(contents, system_instruction: str) -> str:
-    client = genai_client.Client()
+    client = genai_client.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
     models_to_try = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
     last_err = None
     for model in models_to_try:
@@ -1454,6 +1460,15 @@ async def ai_chat(request: Request):
     session_id = body.get("session_id", "default")
     if not message:
         raise HTTPException(status_code=400, detail="Mensagem vazia")
+
+    today = __import__("datetime").date.today().isoformat()
+    with db() as c:
+        used_today = c.execute(
+            "SELECT COUNT(*) FROM ai_conversations WHERE role='model' AND date(created_at)=?",
+            (today,)
+        ).fetchone()[0]
+    if used_today >= AI_DAILY_BUDGET:
+        raise HTTPException(status_code=429, detail=f"Limite diário de {AI_DAILY_BUDGET} respostas atingido.")
 
     with db() as c:
         context = build_ai_context(c)
@@ -1518,5 +1533,5 @@ app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    print("\n🎬 Meu Studio v3 em http://localhost:8000\n")
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    print(f"\n Meu Studio v4 em http://{HOST}:{PORT}\n")
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)

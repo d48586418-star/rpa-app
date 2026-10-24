@@ -1117,9 +1117,13 @@ const QUESTIONS = {
   idioma_conteudo:{stage:"exposicao",text:"Em que idioma você prefere criar conteúdo?",options:[
     {val:"portugues",label:"Português — foco no mercado brasileiro"},{val:"ingles",label:"Inglês — mercado internacional"},
     {val:"ambos",label:"Ambos"},{val:"outro",label:"Outro idioma"}
-  ],next:"maior_conquista"},
+  ],next:"tipos_projetos"},
 
   // Módulo Histórico
+  tipos_projetos:{stage:"historico",text:"Que tipos de projetos você já concluiu?",options:[
+    {val:"documentario",label:"Documentários e filmes"},{val:"publicidade",label:"Publicidade e vídeos corporativos"},
+    {val:"redes_sociais",label:"Conteúdo para redes sociais"},{val:"multiplos",label:"Vários tipos"}
+  ],next:"maior_conquista"},
   maior_conquista:{stage:"historico",text:"Qual foi sua maior conquista profissional recente?",options:[
     {val:"cliente_grande",label:"Conquistei um cliente grande ou de prestígio"},{val:"projeto_autoral",label:"Lancei um projeto autoral"},
     {val:"renda_record",label:"Bati minha maior renda mensal"},{val:"habilidade",label:"Dominei uma nova habilidade"}
@@ -1127,6 +1131,11 @@ const QUESTIONS = {
   maior_dificuldade:{stage:"historico",text:"Qual dificuldade você enfrenta com mais frequência?",options:[
     {val:"precificacao",label:"Dificuldade em precificar e negociar"},{val:"captacao",label:"Captação de novos clientes"},
     {val:"entrega",label:"Gestão de prazos e entrega"},{val:"constancia",label:"Manter constância e motivação"}
+  ],next:"orcamento_6m"},
+
+  orcamento_6m:{stage:"historico",text:"Quanto você quer ganhar por mês em 6 meses?",options:[
+    {val:"ate_3k",label:"Até R$ 3.000"},{val:"3k_6k",label:"R$ 3.000–6.000"},
+    {val:"6k_12k",label:"R$ 6.000–12.000"},{val:"mais_12k",label:"Mais de R$ 12.000"}
   ],next:"equipamentos"},
 
   // Módulo Restrições
@@ -1250,6 +1259,19 @@ function scorePathsClient(answers){
     if(answers.equipamentos==='nao'&&id==='freelancer_internacional'){score-=10;gaps.push('Equipamento adequado necessário');}
     // Idioma de conteúdo
     if(id==='freelancer_internacional'&&answers.idioma_conteudo==='ingles'){score+=10;reasons.push('Orientação internacional alinhada');}
+    // Tipos de projetos
+    if(answers.tipos_projetos==='documentario'){
+      if(id==='empreendedor_audiovisual'){score+=10;reasons.push('Experiência em projetos de fôlego');}
+    } else if(answers.tipos_projetos==='redes_sociais'){
+      if(id==='editora_conteudo_digital'){score+=12;reasons.push('Experiência em conteúdo para redes sociais');}
+      if(id==='criador_conteudo'){score+=8;reasons.push('Familiar com dinâmicas de conteúdo digital');}
+    }
+    // Meta de renda em 6 meses
+    if(answers.orcamento_6m==='mais_12k'||answers.orcamento_6m==='6k_12k'){
+      if(['empreendedor_audiovisual','freelancer_internacional'].includes(id)){score+=8;reasons.push('Meta de renda alinhada com potencial do modelo');}
+    } else if(answers.orcamento_6m==='ate_3k'){
+      if(['editora_conteudo_digital','freelancer_premium'].includes(id)){score+=5;reasons.push('Caminho rápido para meta inicial');}
+    }
     return{id,...path,score:Math.max(0,Math.min(100,score)),reasons:reasons.slice(0,3),gaps:gaps.slice(0,3),recommended:false};
   }).sort((a,b)=>b.score-a.score).map((p,i)=>({...p,recommended:i===0}));
 }
