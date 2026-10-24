@@ -48,6 +48,7 @@ app = FastAPI(title="Meu Studio API v3")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 DB_PATH = Path("studio.db")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 # ── DATABASE ───────────────────────────────────────────────────────
 def init_db():
@@ -1447,7 +1448,7 @@ async def ai_chat(request: Request):
             contents.append(genai_types.Content(role=role, parts=[genai_types.Part(text=content)]))
         contents.append(genai_types.Content(role='user', parts=[genai_types.Part(text=message)]))
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model=GEMINI_MODEL,
             contents=contents,
             config=genai_types.GenerateContentConfig(
                 system_instruction=GEMINI_SYSTEM.format(context=context),
