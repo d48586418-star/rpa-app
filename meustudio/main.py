@@ -1477,7 +1477,7 @@ Contexto actual dos dados de Débora:
 
 
 # B3 — call_gemini movido para ai.py; importar aqui para compatibilidade
-from ai import call_gemini
+from ai import call_gemini, call_gemini_tools
 
 
 @app.post("/api/ai/chat")
@@ -1524,10 +1524,21 @@ async def ai_chat(request: Request):
     contents.append(genai_types.Content(role='user', parts=[genai_types.Part(text=message)]))
 
     try:
-        reply = await call_gemini(contents, GEMINI_SYSTEM.format(context=context))
+        result = await call_gemini_tools(contents, GEMINI_SYSTEM.format(context=context), _build_ai_tools())
     except Exception as e:
-        log.error(f"Gemini error: {e}")
+        log.error("Gemini error: %s", e)
         raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+
+    # Function call — propor ao utilizador, não executar nem persistir
+    if result.get("type") == "function_call":
+        return {
+            "type": "function_call",
+            "tool": result["name"],
+            "args": result["args"],
+            "conversation_id": conversation_id,
+        }
+
+    reply = result["text"]
 
     with db() as c:
         c.execute(
@@ -1572,6 +1583,283 @@ async def get_ai_conversation(session_id: str):
 async def delete_ai_conversation(session_id: str):
     with db() as c:
         c.execute("DELETE FROM ai_conversations WHERE session_id=?", (session_id,))
+    return {"ok": True}
+
+
+# ── FASE 3 — NÚCLEO DE IA ─────────────────────────────────────────
+
+def _build_ai_tools():
+    """Devolve a lista fechada de ferramentas para o assistente (AFC desactivado)."""
+    if not HAS_GEMINI:
+        return []
+    from google.genai import types as _gt
+    return [
+        _gt.Tool(function_declarations=[
+            _gt.FunctionDeclaration(
+                name="criar_evento",
+                description="Cria um evento no calendário de Débora",
+                parameters=_gt.Schema(
+                    type=_gt.Type.OBJECT,
+                    properties={
+                        "title": _gt.Schema(type=_gt.Type.STRING, description="Título do evento"),
+                        "date":  _gt.Schema(type=_gt.Type.STRING, description="Data YYYY-MM-DD"),
+                        "notes": _gt.Schema(type=_gt.Type.STRING, description="Notas opcionais"),
+                    },
+                    required=["title", "date"],
+                ),
+            ),
+            _gt.FunctionDeclaration(
+                name="criar_tarefa",
+                description="Cria uma tarefa/item de checklist para Débora",
+                parameters=_gt.Schema(
+                    type=_gt.Type.OBJECT,
+                    properties={
+                        "question": _gt.Schema(type=_gt.Type.STRING, description="Descrição da tarefa"),
+                        "period":   _gt.Schema(type=_gt.Type.STRING, description="Período ou prazo"),
+                    },
+                    required=["question"],
+                ),
+            ),
+            _gt.FunctionDeclaration(
+                name="adicionar_nota",
+                description="Adiciona uma nota ou ideia",
+                parameters=_gt.Schema(
+                    type=_gt.Type.OBJECT,
+                    properties={
+                        "content": _gt.Schema(type=_gt.Type.STRING, description="Conteúdo da nota"),
+                        "type":    _gt.Schema(type=_gt.Type.STRING, description="ideia | observacao | pergunta | referencia"),
+                    },
+                    required=["content"],
+                ),
+            ),
+            _gt.FunctionDeclaration(
+                name="adicionar_oportunidade",
+                description="Adiciona uma oportunidade de carreira",
+                parameters=_gt.Schema(
+                    type=_gt.Type.OBJECT,
+                    properties={
+                        "title":    _gt.Schema(type=_gt.Type.STRING, description="Título"),
+                        "category": _gt.Schema(type=_gt.Type.STRING, description="emprego | edital | bolsa | cliente | residencia | curso"),
+                        "deadline": _gt.Schema(type=_gt.Type.STRING, description="Prazo YYYY-MM-DD"),
+                        "url":      _gt.Schema(type=_gt.Type.STRING, description="URL"),
+                        "notes":    _gt.Schema(type=_gt.Type.STRING, description="Notas"),
+                    },
+                    required=["title"],
+                ),
+            ),
+            _gt.FunctionDeclaration(
+                name="atualizar_status_projeto",
+                description="Actualiza o status de um projecto existente",
+                parameters=_gt.Schema(
+                    type=_gt.Type.OBJECT,
+                    properties={
+                        "project_name": _gt.Schema(type=_gt.Type.STRING, description="Nome do projecto (parcial)"),
+                        "status":       _gt.Schema(type=_gt.Type.STRING, description="planejando | em_andamento | pausado | concluido"),
+                    },
+                    required=["project_name", "status"],
+                ),
+            ),
+        ])
+    ]
+
+
+async def ai_generate(modulo: str, instrucao: str) -> str:
+    """Função central: monta contexto, chama Gemini, devolve texto."""
+    with db() as c:
+        ctx = build_ai_context(c)
+    prompt = f"{instrucao}\n\nContexto de Débora Augusta:\n{ctx}"
+    contents = [genai_types.Content(role="user", parts=[genai_types.Part(text=prompt)])]
+    system = "Você é a assistente estratégica de Débora Augusta. Responda sempre em português brasileiro. Seja directa, prática e específica para o contexto dela."
+    return await call_gemini(contents, system)
+
+
+# ── GET /api/ai/<modulo> — cache ───────────────────────────────────
+
+def _get_ai_cache(modulo: str) -> dict | None:
+    with db() as c:
+        row = c.execute(
+            "SELECT resposta FROM ai_cache WHERE modulo=? AND hash_ctx='latest' ORDER BY id DESC LIMIT 1",
+            (modulo,)
+        ).fetchone()
+    return {"resposta": row["resposta"]} if row else None
+
+
+def _set_ai_cache(modulo: str, resposta: str) -> None:
+    with db() as c:
+        c.execute(
+            "INSERT OR REPLACE INTO ai_cache (modulo, hash_ctx, resposta, modelo) VALUES (?,?,?,?)",
+            (modulo, "latest", resposta, GEMINI_MODEL)
+        )
+
+
+@app.get("/api/ai/estrategia")
+async def get_ai_estrategia():
+    cached = _get_ai_cache("estrategia")
+    if cached:
+        return {"ok": True, "text": cached["resposta"], "cached": True}
+    return {"ok": True, "text": None, "cached": False}
+
+
+@app.post("/api/ai/estrategia")
+async def generate_ai_estrategia():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        "Gera uma análise estratégica de carreira para Débora Augusta em 4 parágrafos numerados:\n"
+        "1. Resumo do momento actual com base nos dados reais.\n"
+        "2. Principais oportunidades identificadas.\n"
+        "3. Riscos e desafios a considerar.\n"
+        "4. Próximos 3 passos concretos e accionáveis.\n"
+        "Usa os dados reais dela — projetos, diagnóstico, finanças — e sê específica."
+    )
+    try:
+        text = await ai_generate("estrategia", instrucao)
+    except Exception as e:
+        log.error("ai_generate estrategia: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    _set_ai_cache("estrategia", text)
+    return {"ok": True, "text": text, "cached": False}
+
+
+@app.get("/api/ai/conteudo")
+async def get_ai_conteudo():
+    cached = _get_ai_cache("conteudo")
+    if cached:
+        try:
+            return {"ok": True, "data": json.loads(cached["resposta"]), "cached": True}
+        except Exception:
+            pass
+    return {"ok": True, "data": None, "cached": False}
+
+
+@app.post("/api/ai/conteudo")
+async def generate_ai_conteudo():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        'Com base no perfil de Débora, cria uma estratégia de conteúdo. '
+        'Responde APENAS com JSON válido, sem texto extra:\n'
+        '{"bio":"proposta de valor em 2 frases","tom_voz":"3-4 adjectivos","temas":"5-6 temas separados por vírgula","formatos":"3-4 formatos separados por vírgula"}'
+    )
+    try:
+        raw = await ai_generate("conteudo", instrucao)
+    except Exception as e:
+        log.error("ai_generate conteudo: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    import re as _re
+    m = _re.search(r'\{.*\}', raw, _re.DOTALL)
+    if m:
+        try:
+            data = json.loads(m.group())
+            _set_ai_cache("conteudo", json.dumps(data))
+            return {"ok": True, "data": data, "cached": False}
+        except Exception:
+            pass
+    _set_ai_cache("conteudo", raw)
+    return {"ok": True, "data": {"bio": raw}, "cached": False}
+
+
+@app.get("/api/ai/aprendizado")
+async def get_ai_aprendizado():
+    cached = _get_ai_cache("aprendizado")
+    if cached:
+        try:
+            return {"ok": True, "suggestions": json.loads(cached["resposta"]), "cached": True}
+        except Exception:
+            pass
+    return {"ok": True, "suggestions": None, "cached": False}
+
+
+@app.post("/api/ai/aprendizado")
+async def generate_ai_aprendizado():
+    if not HAS_GEMINI:
+        raise HTTPException(status_code=503, detail={"ok": False, "code": "AI_NOT_INSTALLED", "message": "google-genai não instalado"})
+    instrucao = (
+        "Com base no perfil e projectos de Débora, sugere 5 competências a desenvolver. "
+        "Responde APENAS com um array JSON válido, sem texto extra:\n"
+        '[{"competency":"...","current_level":1,"target_level":3,"notes":"por quê esta competência é importante agora"}]'
+    )
+    try:
+        raw = await ai_generate("aprendizado", instrucao)
+    except Exception as e:
+        log.error("ai_generate aprendizado: %s", e)
+        raise HTTPException(status_code=502, detail={"ok": False, "code": "AI_OVERLOADED", "message": "A IA está sobrecarregada, tente de novo em alguns segundos"})
+    import re as _re
+    m = _re.search(r'\[.*\]', raw, _re.DOTALL)
+    if m:
+        try:
+            suggestions = json.loads(m.group())
+            _set_ai_cache("aprendizado", json.dumps(suggestions))
+            return {"ok": True, "suggestions": suggestions, "cached": False}
+        except Exception:
+            pass
+    _set_ai_cache("aprendizado", raw)
+    return {"ok": True, "suggestions": [], "cached": False}
+
+
+@app.get("/api/ai/actions")
+async def list_ai_actions():
+    with db() as c:
+        rows = c.execute(
+            "SELECT id, tool, args_json, status, created_at FROM ai_actions ORDER BY id DESC LIMIT 50"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+@app.post("/api/ai/actions/execute")
+async def execute_ai_action(request: Request):
+    body = await request.json()
+    tool = body.get("tool", "")
+    args = body.get("args", {})
+
+    if tool == "criar_evento":
+        with db() as c:
+            c.execute(
+                "INSERT INTO events (title, date, type, notes) VALUES (?,?,?,?)",
+                (args.get("title",""), args.get("date",""), "ia", args.get("notes",""))
+            )
+    elif tool == "criar_tarefa":
+        with db() as c:
+            c.execute(
+                "INSERT INTO checklist_items (question, period) VALUES (?,?)",
+                (args.get("question",""), args.get("period",""))
+            )
+    elif tool == "adicionar_nota":
+        with db() as c:
+            c.execute(
+                "INSERT INTO ideas (id, content, type) VALUES (?,?,?)",
+                (str(uuid.uuid4()), args.get("content",""), args.get("type","ideia"))
+            )
+    elif tool == "adicionar_oportunidade":
+        with db() as c:
+            c.execute(
+                "INSERT INTO opportunities (id, title, category, deadline, url, notes) VALUES (?,?,?,?,?,?)",
+                (str(uuid.uuid4()), args.get("title",""), args.get("category",""),
+                 args.get("deadline",""), args.get("url",""), args.get("notes",""))
+            )
+    elif tool == "atualizar_status_projeto":
+        target = (args.get("project_name") or "").lower()
+        new_status = args.get("status","")
+        with db() as c:
+            rows = c.execute("SELECT id, data FROM projects").fetchall()
+            for row in rows:
+                p = json.loads(row["data"] or "{}")
+                if target in (p.get("name","") or "").lower():
+                    p["status"] = new_status
+                    c.execute(
+                        "UPDATE projects SET data=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+                        (json.dumps(p), row["id"])
+                    )
+                    break
+    else:
+        raise HTTPException(status_code=400, detail={"ok": False, "code": "UNKNOWN_TOOL", "message": f"Ferramenta desconhecida: {tool}"})
+
+    with db() as c:
+        c.execute(
+            "INSERT INTO ai_actions (tool, args_json, status) VALUES (?,?,?)",
+            (tool, json.dumps(args), "executada")
+        )
+
     return {"ok": True}
 
 

@@ -223,10 +223,24 @@ def migration_003(conn: sqlite3.Connection) -> None:
         )
 
 
+def migration_004(conn: sqlite3.Connection) -> None:
+    """Fase 3 — Histórico de acções da IA (function calling)."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS ai_actions (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            tool       TEXT NOT NULL,
+            args_json  TEXT NOT NULL,
+            status     TEXT NOT NULL DEFAULT 'executada',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+
 _MIGRATIONS: list[Callable[[sqlite3.Connection], None]] = [
     migration_001,
     migration_002,
     migration_003,
+    migration_004,
 ]
 
 

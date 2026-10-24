@@ -179,6 +179,29 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 .chat-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap;}
 .chat-msg-user .chat-bubble{background:var(--accent);color:#111111;border-bottom-right-radius:4px;}
 .chat-msg-ai .chat-bubble{background:var(--surface-2);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--sep);}
+
+/* FLOATING CHAT */
+#float-chat-btn{position:fixed;bottom:28px;right:28px;z-index:200;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#111;border:none;cursor:pointer;font-size:22px;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+#float-chat-btn:hover{transform:scale(1.1);}
+#float-chat-panel{position:fixed;bottom:0;right:0;z-index:199;width:380px;max-width:100vw;height:520px;max-height:90vh;background:var(--surface);border:1px solid var(--sep);border-bottom:none;border-right:none;border-radius:14px 0 0 0;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+#float-chat-panel.open{transform:translateY(0);}
+#float-chat-panel .fc-header{padding:12px 16px;border-bottom:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;}
+#float-chat-panel .fc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+#float-chat-panel .fc-input-row{padding:10px 12px;border-top:1px solid var(--sep);display:flex;gap:8px;}
+#float-chat-panel .fc-input-row input{flex:1;padding:7px 10px;border:1px solid var(--sep);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;}
+
+/* FUNCTION CALL CARD */
+#fc-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;}
+#fc-overlay.open{display:flex;}
+#fc-card{background:var(--surface);border-radius:var(--radius-md);padding:24px;max-width:420px;width:92%;box-shadow:var(--shadow-lg);}
+#fc-card h4{font-size:14px;font-weight:700;margin:0 0 8px;}
+#fc-card .fc-desc{font-size:13px;color:var(--text-2);margin-bottom:16px;line-height:1.5;}
+#fc-card .fc-args-list{background:var(--surface-2);border-radius:var(--radius-sm);padding:12px;margin-bottom:18px;font-size:12px;font-family:monospace;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+#fc-card .fc-btns{display:flex;gap:8px;}
+
+/* AI ACTIONS HISTORY */
+.ai-action-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sep);font-size:12px;}
+.ai-action-pill{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534;}
 </style>
 
 <!-- SIDEBAR -->
@@ -493,8 +516,10 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 
   <!-- ═══ ESTRATÉGIA ═════════════════════════════════════════════ -->
   <section id="s-estrategia" class="section">
-    <h1 class="page-title">Estratégia de Carreira</h1>
-    <p class="page-sub">Caminhos recomendados com base no seu perfil.</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+      <div><h1 class="page-title">Estratégia de Carreira</h1><p class="page-sub">Caminhos recomendados com base no seu perfil.</p></div>
+      <button class="btn btn-primary btn-sm" id="btn-gerar-estrategia" onclick="generateEstrategia()">✨ Gerar análise com IA</button>
+    </div>
     <div id="estrategia-cta" class="card" style="display:none;">
       <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Complete o diagnóstico para ver seus caminhos de carreira.</p>
       <button class="btn btn-primary btn-sm" onclick="nav(null,'s-perfil')">Iniciar Diagnóstico →</button>
@@ -502,7 +527,15 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     <div id="estrategia-loading" style="display:none;padding:20px 0;"><span class="spinner"></span> Analisando perfil…</div>
     <div id="estrategia-paths"></div>
     <div style="margin-top:16px;display:flex;gap:8px;">
-      <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()">↻ Recalcular</button>
+      <button class="btn btn-ghost btn-sm" onclick="runCareerAnalysis()">↻ Recalcular caminhos</button>
+    </div>
+    <!-- Análise IA -->
+    <div id="estrategia-ai-card" class="card" style="margin-top:20px;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:13px;font-weight:600;">Análise da IA</span>
+        <button class="btn btn-ghost btn-sm" onclick="generateEstrategia(true)" style="font-size:11px;">↻ Regenerar</button>
+      </div>
+      <div id="estrategia-ai-text" style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;"></div>
     </div>
   </section>
 
@@ -551,6 +584,14 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
       </div>
     </div>
     <div id="chat-conv-title" style="font-size:12px;color:var(--text-3);margin-top:4px;text-align:right;"></div>
+    <!-- Histórico de acções IA -->
+    <div style="margin-top:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="section-label" style="margin:0;">Acções executadas pela IA</div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAiActions()" style="font-size:11px;">↻</button>
+      </div>
+      <div id="ai-actions-list" style="font-size:12px;color:var(--text-3);">A carregar…</div>
+    </div>
   </section>
 
   <!-- ═══ PESQUISA ═══════════════════════════════════════════════ -->
@@ -818,7 +859,10 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
     </div>
     <div id="conteudo-estrategia" class="tab-panel active">
       <div class="card">
-        <div class="section-label">Posicionamento Editorial</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="section-label" style="margin:0;">Posicionamento Editorial</div>
+          <button class="btn btn-primary btn-sm" id="btn-gerar-conteudo" onclick="generateConteudo()">✨ Preencher com IA</button>
+        </div>
         <div class="field"><label>Bio / Proposta de Valor</label><textarea id="ct-bio" rows="3" placeholder="Quem você é e o que entrega…"></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="field"><label>Tom de voz</label><input type="text" id="ct-tom" placeholder="ex: direto, técnico, empático"></div>
@@ -826,8 +870,10 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
         </div>
         <div class="field"><label>Temas principais (separados por vírgula)</label><input type="text" id="ct-temas" placeholder="ex: DaVinci Resolve, edição de vídeo, freelance"></div>
         <div class="field"><label>Formatos preferidos</label><input type="text" id="ct-formatos" placeholder="ex: tutoriais, vlogs, shorts"></div>
-        <button class="btn btn-primary" onclick="saveConteudo()">Salvar Estratégia</button>
-        <span id="ct-saved" style="display:none;font-size:12px;color:var(--green);margin-left:10px;">✓ Salvo</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-primary" onclick="saveConteudo()">Salvar Estratégia</button>
+          <span id="ct-saved" style="display:none;font-size:12px;color:var(--green);">✓ Salvo</span>
+        </div>
       </div>
     </div>
     <div id="conteudo-youtube" class="tab-panel">
@@ -894,10 +940,17 @@ hr.divider{border:none;border-top:1px solid var(--sep);margin:24px 0;}
 
   <!-- ═══ APRENDIZADO ══════════════════════════════════════════════ -->
   <section id="s-aprendizado" class="section">
-    <h1 class="page-title">Aprendizado</h1>
-    <p class="page-sub">Objetivos de desenvolvimento de competências.</p>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-      <button class="btn btn-primary" onclick="document.getElementById('learn-form').style.display='block'">+ Novo Objetivo</button>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+      <div><h1 class="page-title">Aprendizado</h1><p class="page-sub">Objetivos de desenvolvimento de competências.</p></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px;">
+      <button class="btn btn-primary btn-sm" id="btn-gerar-aprendizado" onclick="generateAprendizado()">✨ Sugerir com IA</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('learn-form').style.display='block'">+ Novo Objetivo</button>
+    </div>
+    <!-- Sugestões IA -->
+    <div id="aprendizado-ai-suggestions" style="display:none;margin-bottom:20px;" class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Sugestões da IA <span style="font-size:11px;color:var(--text-3);font-weight:400;">(clique para adicionar)</span></div>
+      <div id="aprendizado-suggestions-list" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     <div id="learn-form" class="card" style="display:none;margin-bottom:16px;">
       <input type="hidden" id="learn-edit-id">
@@ -1059,6 +1112,7 @@ let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 let allEvents = [];
 let allProjects = [];
+let currentSection = 's-home';
 
 // ── API helpers ──────────────────────────────────────────────────
 function cfgHeaders(){
@@ -1086,23 +1140,27 @@ function ls(k,v){
 // ── Navigation ───────────────────────────────────────────────────
 function nav(el, targetId){
   const id = targetId || el.dataset.target;
+  currentSection = id;
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.target===id));
   document.getElementById('topbar-title').textContent = SECTION_TITLES[id]||id;
   closeSidebar();
-  if(id==='s-estrategia') runCareerAnalysis();
+  // Hide/show floating chat button
+  const fcBtn = document.getElementById('float-chat-btn');
+  if (fcBtn) fcBtn.style.display = id === 's-assistente' ? 'none' : 'flex';
+  if(id==='s-estrategia'){ runCareerAnalysis(); generateEstrategia(); }
   if(id==='s-calendario') renderCalendar();
   if(id==='s-identidade') loadIdentidade();
   if(id==='s-pesquisa') loadTrends();
   if(id==='s-revisoes'){ loadDecisions(); loadResults(); }
   if(id==='s-config') loadConnectorStatus();
-  if(id==='s-conteudo') loadConteudo();
+  if(id==='s-conteudo'){ loadConteudo(); generateConteudo(); }
   if(id==='s-oportunidades') loadOportunidades();
-  if(id==='s-aprendizado') loadLearning();
+  if(id==='s-aprendizado'){ loadLearning(); generateAprendizado(); }
   if(id==='s-ideias') loadIdeias();
   if(id==='s-relatorios') loadRelatorios();
-  if(id==='s-assistente') loadConversations();
+  if(id==='s-assistente'){ loadConversations(); loadAiActions(); }
   if(id==='s-perfil') loadProfileForm();
 }
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); }
@@ -2507,6 +2565,8 @@ function appendChatMsg(role, content){
 
 // ── CONVERSAS ─────────────────────────────────────────────────────
 let currentConvId = null;
+// alias used by floating chat
+Object.defineProperty(window,'currentConversationId',{get:()=>currentConvId,set:v=>{currentConvId=v;}});
 
 async function loadConversations(){
   const list = document.getElementById('conv-list');
@@ -2599,7 +2659,12 @@ async function sendChatMessage(){
   document.getElementById('chat-loading').style.display='block';
   try{
     const data=await api('/api/ai/chat',{method:'POST',body:JSON.stringify({message,conversation_id:currentConvId})});
-    appendChatMsg('model',data.reply);
+    if(data.type==='function_call'){
+      showFunctionCallCard(data.tool, data.args);
+      appendChatMsg('model','A IA quer executar uma acção. Confirma no cartão abaixo.');
+    } else {
+      appendChatMsg('model',data.reply);
+    }
     if(data.conversation_id && data.conversation_id!==currentConvId){
       currentConvId=data.conversation_id;
     }
@@ -2761,4 +2826,306 @@ async function init(){
 }
 
 init();
+
+// ── FASE 3 — FLOATING CHAT ────────────────────────────────────────
+
+let floatChatOpen = false;
+
+function toggleFloatChat() {
+  floatChatOpen = !floatChatOpen;
+  document.getElementById('float-chat-panel').classList.toggle('open', floatChatOpen);
+}
+
+function closeFloatChat() {
+  floatChatOpen = false;
+  document.getElementById('float-chat-panel').classList.remove('open');
+}
+
+async function submitFloatChat() {
+  const inp = document.getElementById('float-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const msgs = document.getElementById('float-msgs');
+
+  // Append user bubble
+  const ubub = document.createElement('div');
+  ubub.className = 'chat-msg chat-msg-user';
+  ubub.innerHTML = `<div class="chat-bubble">${msg.replace(/</g,'&lt;')}</div>`;
+  msgs.appendChild(ubub);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Thinking indicator
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-msg chat-msg-ai';
+  thinking.innerHTML = '<div class="chat-bubble" style="color:var(--text-3);">A pensar…</div>';
+  msgs.appendChild(thinking);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const data = await api('/api/ai/chat', 'POST', {
+      message: msg,
+      conversation_id: currentConversationId,
+      context_tab: currentSection,
+    });
+    thinking.remove();
+
+    if (data.type === 'function_call') {
+      showFunctionCallCard(data.tool, data.args);
+      const notif = document.createElement('div');
+      notif.className = 'chat-msg chat-msg-ai';
+      notif.innerHTML = '<div class="chat-bubble">A IA quer executar uma acção. Vê o cartão de confirmação.</div>';
+      msgs.appendChild(notif);
+    } else {
+      const abub = document.createElement('div');
+      abub.className = 'chat-msg chat-msg-ai';
+      abub.innerHTML = `<div class="chat-bubble">${(data.reply||'').replace(/</g,'&lt;')}</div>`;
+      msgs.appendChild(abub);
+      if (data.conversation_id) currentConversationId = data.conversation_id;
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch (e) {
+    thinking.remove();
+    const err = document.createElement('div');
+    err.className = 'chat-msg chat-msg-ai';
+    err.innerHTML = '<div class="chat-bubble" style="color:var(--red);">Erro ao contactar a IA. Tenta de novo.</div>';
+    msgs.appendChild(err);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+// ── FASE 3 — FUNCTION CALLING ────────────────────────────────────
+
+let pendingFunctionCall = null;
+
+const TOOL_LABELS = {
+  criar_evento: 'Criar evento no calendário',
+  criar_tarefa: 'Criar tarefa',
+  adicionar_nota: 'Adicionar nota/ideia',
+  adicionar_oportunidade: 'Adicionar oportunidade',
+  atualizar_status_projeto: 'Actualizar status de projecto',
+};
+
+function showFunctionCallCard(tool, args) {
+  pendingFunctionCall = { tool, args };
+  document.getElementById('fc-tool-label').textContent = TOOL_LABELS[tool] || tool;
+  const argLines = Object.entries(args).map(([k,v]) => `${k}: ${v}`).join('\n');
+  document.getElementById('fc-args-display').textContent = argLines || '(sem parâmetros)';
+  document.getElementById('fc-overlay').classList.add('open');
+}
+
+async function confirmFunctionCall() {
+  if (!pendingFunctionCall) return;
+  document.getElementById('fc-overlay').classList.remove('open');
+  try {
+    await api('/api/ai/actions/execute', 'POST', pendingFunctionCall);
+    toast('Acção executada com sucesso!');
+    pendingFunctionCall = null;
+    // Refresh relevant data
+    await Promise.all([loadProjects(), loadEvents(), loadOportunidades()]);
+    loadAiActions();
+  } catch (e) {
+    toast('Erro ao executar a acção.', true);
+  }
+}
+
+function cancelFunctionCall() {
+  pendingFunctionCall = null;
+  document.getElementById('fc-overlay').classList.remove('open');
+}
+
+function toast(msg, err=false) {
+  let el = document.getElementById('toast-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast-msg';
+    el.style.cssText = 'position:fixed;bottom:90px;right:28px;z-index:400;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.15);transition:opacity .3s;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.background = err ? '#FEE2E2' : '#DCFCE7';
+  el.style.color = err ? '#991B1B' : '#166534';
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 2800);
+}
+
+// ── FASE 3 — GERAR COM IA (por aba) ──────────────────────────────
+
+async function generateEstrategia(force=false) {
+  const card = document.getElementById('estrategia-ai-card');
+  const textEl = document.getElementById('estrategia-ai-text');
+  const btn = document.getElementById('btn-gerar-estrategia');
+
+  if (!force && textEl.textContent.trim()) {
+    if (!confirm('Já existe uma análise. Regenerar?')) return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ A gerar…';
+
+  try {
+    // First try cache if not forced
+    if (!force) {
+      const cached = await api('/api/ai/estrategia');
+      if (cached.text) {
+        textEl.textContent = cached.text;
+        card.style.display = 'block';
+        return;
+      }
+    }
+    const data = await api('/api/ai/estrategia', 'POST');
+    textEl.textContent = data.text || '';
+    card.style.display = data.text ? 'block' : 'none';
+  } catch(e) {
+    toast('Erro ao gerar análise.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Gerar análise com IA';
+  }
+}
+
+async function generateConteudo(force=false) {
+  const bio = document.getElementById('ct-bio');
+  const btn = document.getElementById('btn-gerar-conteudo');
+
+  if (!force && bio.value.trim()) {
+    if (!confirm('Já existem dados. A IA vai sobrescrever os campos. Continuar?')) return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ A gerar…';
+
+  try {
+    if (!force) {
+      const cached = await api('/api/ai/conteudo');
+      if (cached.data) { _fillConteudo(cached.data); return; }
+    }
+    const data = await api('/api/ai/conteudo', 'POST');
+    if (data.data) _fillConteudo(data.data);
+  } catch(e) {
+    toast('Erro ao gerar estratégia de conteúdo.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Preencher com IA';
+  }
+}
+
+function _fillConteudo(d) {
+  if (d.bio)      document.getElementById('ct-bio').value = d.bio;
+  if (d.tom_voz)  document.getElementById('ct-tom').value = d.tom_voz;
+  if (d.temas)    document.getElementById('ct-temas').value = d.temas;
+  if (d.formatos) document.getElementById('ct-formatos').value = d.formatos;
+  toast('Campos preenchidos! Edite e guarde.');
+}
+
+async function generateAprendizado(force=false) {
+  const btn = document.getElementById('btn-gerar-aprendizado');
+  const listEl = document.getElementById('aprendizado-suggestions-list');
+  const card = document.getElementById('aprendizado-ai-suggestions');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ A gerar…';
+
+  try {
+    if (!force) {
+      const cached = await api('/api/ai/aprendizado');
+      if (cached.suggestions && cached.suggestions.length) {
+        _renderAprendizadoSuggestions(cached.suggestions);
+        return;
+      }
+    }
+    const data = await api('/api/ai/aprendizado', 'POST');
+    _renderAprendizadoSuggestions(data.suggestions || []);
+  } catch(e) {
+    toast('Erro ao gerar sugestões.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Sugerir com IA';
+  }
+}
+
+function _renderAprendizadoSuggestions(suggestions) {
+  const listEl = document.getElementById('aprendizado-suggestions-list');
+  const card = document.getElementById('aprendizado-ai-suggestions');
+  if (!suggestions.length) { card.style.display = 'none'; return; }
+
+  listEl.innerHTML = '';
+  suggestions.forEach(s => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:8px;background:var(--surface-2);border-radius:var(--radius-sm);';
+    const name = s.competency || s;
+    const note = typeof s === 'object' ? (s.notes || '') : '';
+    row.innerHTML = `<div style="flex:1;"><div style="font-size:13px;font-weight:500;">${name}</div>${note?`<div style="font-size:11px;color:var(--text-3);margin-top:2px;">${note}</div>`:''}</div>
+      <button class="btn btn-primary btn-sm" style="white-space:nowrap;font-size:11px;" onclick='_addSuggestedLearning(${JSON.stringify(s)})'>+ Adicionar</button>`;
+    listEl.appendChild(row);
+  });
+  card.style.display = 'block';
+}
+
+async function _addSuggestedLearning(s) {
+  const comp = typeof s === 'string' ? s : (s.competency || s);
+  try {
+    await api('/api/learning', 'POST', {
+      competency: comp,
+      current_level: s.current_level || 1,
+      target_level: s.target_level || 3,
+      notes: s.notes || '',
+    });
+    toast('Objetivo adicionado!');
+    loadLearning();
+  } catch(e) {
+    toast('Erro ao adicionar.', true);
+  }
+}
+
+// ── FASE 3 — HISTÓRICO DE ACÇÕES ─────────────────────────────────
+
+async function loadAiActions() {
+  const el = document.getElementById('ai-actions-list');
+  if (!el) return;
+  try {
+    const rows = await api('/api/ai/actions');
+    if (!rows.length) { el.innerHTML = '<span style="color:var(--text-3);">Nenhuma acção executada ainda.</span>'; return; }
+    el.innerHTML = rows.map(r => {
+      const args = (() => { try { return Object.entries(JSON.parse(r.args_json)).map(([k,v])=>`${k}: ${v}`).join(' · '); } catch { return r.args_json; } })();
+      return `<div class="ai-action-row"><span class="ai-action-pill">✓</span><div style="flex:1;"><span style="font-weight:500;">${TOOL_LABELS[r.tool]||r.tool}</span><span style="color:var(--text-3);margin-left:8px;">${args}</span></div><span style="color:var(--text-3);white-space:nowrap;">${r.created_at?.slice(0,16)||''}</span></div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<span style="color:var(--text-3);">Erro ao carregar.</span>';
+  }
+}
+
+
 </script>
+
+<!-- FLOATING CHAT BUTTON + PANEL -->
+<button id="float-chat-btn" onclick="toggleFloatChat()" title="Abrir assistente" aria-label="Assistente IA">💬</button>
+
+<div id="float-chat-panel">
+  <div class="fc-header">
+    <span>Assistente IA</span>
+    <button onclick="closeFloatChat()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-2);padding:0 4px;">×</button>
+  </div>
+  <div class="fc-msgs" id="float-msgs">
+    <div class="chat-msg chat-msg-ai"><div class="chat-bubble">Olá! Como posso ajudar?</div></div>
+  </div>
+  <div class="fc-input-row">
+    <input type="text" id="float-input" placeholder="Mensagem…" onkeydown="if(event.key==='Enter')submitFloatChat()">
+    <button class="btn btn-primary btn-sm" onclick="submitFloatChat()">Enviar</button>
+  </div>
+</div>
+
+<!-- FUNCTION CALL CONFIRMATION MODAL -->
+<div id="fc-overlay" onclick="if(event.target===this)cancelFunctionCall()">
+  <div id="fc-card">
+    <h4>🤖 A IA quer executar uma acção</h4>
+    <div class="fc-desc"><strong id="fc-tool-label"></strong></div>
+    <div class="fc-args-list" id="fc-args-display"></div>
+    <div class="fc-btns">
+      <button class="btn btn-primary" onclick="confirmFunctionCall()">✓ Confirmar</button>
+      <button class="btn btn-ghost" onclick="cancelFunctionCall()">✕ Cancelar</button>
+    </div>
+  </div>
+</div>
